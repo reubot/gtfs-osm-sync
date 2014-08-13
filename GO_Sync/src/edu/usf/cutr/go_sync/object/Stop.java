@@ -27,7 +27,7 @@ import edu.usf.cutr.go_sync.tag_defs;
  * @author Khoa Tran
  */
 
-public class Stop extends OsmPrimitive implements Comparable{
+public class Stop extends OsmPrimitive implements Comparable<Stop>{
 	private final double ERROR_TO_ZERO = 0.5;	
 	private final String GTFS_STOP_ID_KEY	= tag_defs.GTFS_STOP_ID_KEY;
     private final String GTFS_OPERATOR_KEY	= tag_defs.GTFS_OPERATOR_KEY;
@@ -35,7 +35,7 @@ public class Stop extends OsmPrimitive implements Comparable{
     private String lat, lon;
     private HashSet<Route> routes;
     public Stop(String stopID, String operatorName, String stopName, String lat, String lon) {
-        osmTags = new Hashtable();
+        osmTags = new Hashtable<String,String>();
         if (operatorName == null || operatorName.equals("")) operatorName="none";
         if (stopID == null || stopID.equals("")) stopID="none";
         if (stopName == null || stopName.equals("")) stopName="none";
@@ -59,7 +59,7 @@ public class Stop extends OsmPrimitive implements Comparable{
     }
 
     public Stop(Stop s) {
-        this.osmTags = new Hashtable();
+        this.osmTags = new Hashtable<String,String>();
         this.osmTags.putAll(s.osmTags);
 //        this.osmTags.put("highway", "bus_stop");
 
@@ -136,8 +136,8 @@ public class Stop extends OsmPrimitive implements Comparable{
         return false;
     }
 
-    public int compareTo(Object o){
-        Stop s = (Stop) o;
+    public int compareTo(Stop s){
+//        Stop s = (Stop) o;
         double distance = OsmDistance.distVincenty(this.getLat(), this.getLon(),
                             s.getLat(), s.getLon());
         if (!(this.getStopID().equals("none")) && !(this.getStopID().equals("missing"))
@@ -184,7 +184,7 @@ public class Stop extends OsmPrimitive implements Comparable{
                     st.getLat()+";lon:"+st.getLon();
         }
         HashSet<String> keys = st.keySet();
-        Iterator it = keys.iterator();
+        Iterator<String> it = keys.iterator();
         while (it.hasNext()){
             String k = (String)it.next();
             temp = temp+";"+k+":"+st.getTag(k);
