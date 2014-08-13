@@ -26,10 +26,10 @@ import java.util.Hashtable;
  * @author Khoa Tran
  */
 public class OsmPrimitive {
-    Hashtable osmTags;
+    Hashtable<String,String> osmTags;
     private String status, osmVersion, osmid, reportCategory, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
     public OsmPrimitive(){
-        osmTags = new Hashtable();
+        osmTags = new Hashtable<String,String>();
     }
 
     public void addTag(String k, String v){
@@ -47,7 +47,7 @@ public class OsmPrimitive {
      * Cannot use osmTags.putAll(h)
      * since we don't want the new data overwrite the old one. Use addAndOverwriteTags instead
      * */
-    public void addTags(Hashtable h){
+    public void addTags(Hashtable<String,String> h){
         ArrayList<String> keys = new ArrayList<String>();
         keys.addAll(h.keySet());
         for (int i=0; i<keys.size(); i++){
@@ -67,7 +67,7 @@ public class OsmPrimitive {
         }
     }
 
-    public void addAndOverwriteTags(Hashtable h){
+    public void addAndOverwriteTags(Hashtable<String,String> h){
         osmTags.putAll(h);
     }
 
@@ -77,7 +77,7 @@ public class OsmPrimitive {
         return null;
     }
 
-    public Hashtable getTags(){
+    public Hashtable<String,String> getTags(){
         return osmTags;
     }
 
