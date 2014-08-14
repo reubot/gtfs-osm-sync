@@ -40,7 +40,7 @@ public class GTFSReadIn {
 
     public List<Stop> readBusStop(String fName, String agencyName, String routes_fName, String trips_fName, String stop_times_fName){
         Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>();
-        Hashtable id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
+        Hashtable<String, HashSet<Route>> id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
         stopIDs.putAll(id);
         
         String thisLine;
@@ -49,7 +49,7 @@ public class GTFSReadIn {
         try {
             BufferedReader br = new BufferedReader(new FileReader(fName));
             boolean isFirstLine = true;
-            Hashtable keysIndex = new Hashtable();
+            Hashtable<String, Integer> keysIndex = new Hashtable<String, Integer>();
             while ((thisLine = br.readLine()) != null) 
             { 
                 if (isFirstLine) {
@@ -100,14 +100,14 @@ public class GTFSReadIn {
                     Stop s = new Stop(tempStopId, agencyName, elements[stopNameKey],elements[stopLatKey],elements[stopLonKey]);
                     HashSet<String> keys = new HashSet<String>();
                     keys.addAll(keysIndex.keySet());
-                    Iterator it = keys.iterator();
+                    Iterator<String> it = keys.iterator();
                     try {
                         while(it.hasNext()){
-                        	String k = (String)it.next();
+                        	String k = it.next();
                         	
                             String v = null;
                             //if(!lastIndexEmpty) v = elements[(Integer)keysIndex.get(k)];
-                            if((Integer)keysIndex.get(k)< elements.length) v = elements[(Integer)keysIndex.get(k)];
+                            if(keysIndex.get(k)< elements.length) v = elements[keysIndex.get(k)];
                             if ((v!=null) && (!v.equals(""))) s.addTag(k, v);
                             
                             //System.out.print(k+":" + v +" ");
@@ -136,12 +136,12 @@ public class GTFSReadIn {
                         System.exit(0);
                     }
                    // System.err.println(s.getTags());
-                    String r = getRoutesInTextByBusStop((HashSet<Route>)stopIDs.get(tempStopId));
+                    String r = getRoutesInTextByBusStop(stopIDs.get(tempStopId));
                     
 //             disable route tagging for now      
                     if (!r.isEmpty()) s.addTag(ROUTE_KEY, r);
-                    HashSet<Route> asdf = (HashSet<Route>)stopIDs.get(tempStopId);
-                    if(asdf!=null)s.addRoutes((HashSet<Route>)stopIDs.get(tempStopId));
+                    HashSet<Route> asdf = stopIDs.get(tempStopId);
+                    if(asdf!=null)s.addRoutes(stopIDs.get(tempStopId));
                     
                     stops.add(s);
                     
@@ -149,6 +149,7 @@ public class GTFSReadIn {
 //                    System.out.println(thisLine);
                 }
             } 
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
@@ -164,7 +165,7 @@ public class GTFSReadIn {
         try {
             BufferedReader br = new BufferedReader(new FileReader(routes_fName));
             boolean isFirstLine = true;
-            Hashtable keysIndex = new Hashtable();
+            Hashtable<String, Integer> keysIndex = new Hashtable<String, Integer>();
             while ((thisLine = br.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
@@ -201,12 +202,12 @@ public class GTFSReadIn {
                     Route r = new Route(elements[routeIdKey], routeName, OperatorInfo.getFullName());
                     HashSet<String> keys = new HashSet<String>();
                     keys.addAll(keysIndex.keySet());
-                    Iterator it = keys.iterator();
+                    Iterator<String> it = keys.iterator();
                     try {
                         while(it.hasNext()){
-                            String k = (String)it.next();
+                            String k = it.next();
                             String v = null;
-                            if(!lastIndexEmpty) v = elements[(Integer)keysIndex.get(k)];
+                            if(!lastIndexEmpty) v = elements[keysIndex.get(k)];
                             if ((v!=null) && (!v.equals(""))) r.addTag(k, v);
                         }
                     } catch(Exception e){
@@ -217,6 +218,7 @@ public class GTFSReadIn {
                     routes.put(elements[routeIdKey], r);
                 }
             }
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
@@ -229,7 +231,7 @@ public class GTFSReadIn {
         String thisLine;
         String [] elements;
         // hashtable String vs. String
-        Hashtable tripIDs = new Hashtable();
+        Hashtable<String, String> tripIDs = new Hashtable<String, String>();
 
         // trips.txt read-in
         try {
@@ -265,13 +267,14 @@ public class GTFSReadIn {
                     tripIDs.put(elements[tripIdKey], elements[routeIdKey]);
                 }
             }
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
         }
 
         // hashtable String(stop_id) vs. HashSet(routes)
-        Hashtable stopIDs = new Hashtable();
+        Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>();
         // stop_times.txt read-in
         int stopIdKey=-1, tripIdKey = -1;
         try {
@@ -302,16 +305,17 @@ public class GTFSReadIn {
                     String trip = elements[tripIdKey];
                     HashSet<Route> routes = new HashSet<Route>();
                     Route tr = null;
-                    if((String)tripIDs.get(trip)!=null) tr = (Route)allRoutes.get((String)tripIDs.get(trip));
+                    if(tripIDs.get(trip)!=null) tr = allRoutes.get(tripIDs.get(trip));
                     if(tr!=null) routes.add(tr);
                     String sid = OsmFormatter.getValidBusStopId(elements[stopIdKey]);
                     if (stopIDs.containsKey(sid)) {
-                        routes.addAll((HashSet<Route>)stopIDs.get(sid));
+                        routes.addAll(stopIDs.get(sid));
                         stopIDs.remove(sid);
                     }
                     stopIDs.put(sid, routes);
                 }
             }
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
