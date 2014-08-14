@@ -35,7 +35,7 @@ public class DefaultOperatorReader {
                     
                     if(thisLine.contains("\"")) {
                          String[] temp = thisLine.split("\"");
-                         ArrayList l = new ArrayList();
+                         ArrayList<String> l = new ArrayList<String>();
                          l.add(temp[1].toString());
                          int commas = temp[1].replaceAll("[^,]", "").length();
                          
@@ -88,6 +88,7 @@ public class DefaultOperatorReader {
                     ops.add(op);
                 }
             } 
+            br.close();
             return ops;
         }
         catch (IOException e) {

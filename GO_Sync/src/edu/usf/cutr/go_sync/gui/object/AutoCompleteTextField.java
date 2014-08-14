@@ -34,7 +34,7 @@ import javax.swing.text.PlainDocument;
  */
 public class AutoCompleteTextField extends JTextField {
 
-    public List list;
+    public List<String> list;
     public boolean isCaseSensitive;
     public boolean isStrict;
     private ArrayList<String> matches;
@@ -107,7 +107,7 @@ public class AutoCompleteTextField extends JTextField {
         }
     }
     
-    public AutoCompleteTextField(List _list) {
+    public AutoCompleteTextField(List<String> _list) {
         isCaseSensitive = false;
         isStrict = false;
         if (_list == null) {
