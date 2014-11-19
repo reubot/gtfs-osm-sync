@@ -393,7 +393,7 @@ public class CompareData extends OsmTask{
                 existingRoutes.put(routeId, er);
             }
         }
-        System.out.println("There are "+routeKeys.size()+" in total!");
+        System.out.println("There are "+routeKeys.size()+" routeKeys in total!");
     }
 
     public void compareBusStopData() throws InterruptedException {
@@ -734,6 +734,10 @@ public class CompareData extends OsmTask{
                     OSMRelations.addAll(tempOSMRelations);
                     OSMRelationTags.addAll(osmRequest.getExistingBusRelationTags());
                     OSMRelationMembers.addAll(osmRequest.getExistingBusRelationMembers());
+                    System.out.println("Existing Routes = "+OSMRelations.size());
+                    System.out.println("Existing Route Tags = "+OSMRelationTags.size());
+                    System.out.println("Existing Route Members = "+OSMRelationMembers.size());
+   //                 System.out.println("New Nodes = "+GTFSRelations.size());
                 }
                 compareRouteData();
                 if(this.flagIsDone) return;

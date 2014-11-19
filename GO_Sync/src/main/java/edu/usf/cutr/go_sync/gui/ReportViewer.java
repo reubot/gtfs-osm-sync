@@ -193,6 +193,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         existingRoutes = new Hashtable();
         existingRoutes.putAll(eRoutes);
+        System.out.println("existingRoutes " + existingRoutes.size() + " eRoutes " + eRoutes.size());
 
 //System.out.println(r.size() + "\t" + u.size() + "\t" + m.size() + "\t" + d.size() + "\t");
         ArrayList<Stop> reportKeys = new ArrayList<Stop>();
