@@ -1,0 +1,3 @@
+qconnect-Whitsunday Transit,qconnect,,http://translink.com.au/sites/default/files/assets/resources/about-translink/reporting-and-publications/open-data/gtfs/airlie.zip,
+qconnect-Bowen Transit,qconnect,,http://translink.com.au/sites/default/files/assets/resources/about-translink/reporting-and-publications/open-data/gtfs/bowen.zip,
+qconnect-Bundaberg,qconnect,,http://translink.com.au/sites/default/files/assets/resources/about-translink/reporting-and-publications/open-data/gtfs/bundaberg.zip,
