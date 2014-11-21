@@ -240,11 +240,11 @@ public class GTFSReadIn {
         Hashtable<String, Route> routes = new Hashtable<String, Route>();
         String thisLine;
         String [] elements;
-        int routeIdKey=-1, routeShortNameKey=-1;
+        int routeIdKey=-1, routeShortNameKey=-1,routeLongNameKey=-1;;
         try {
             BufferedReader br = new BufferedReader(new FileReader(routes_fName));
             boolean isFirstLine = true;
-            Hashtable keysIndex = new Hashtable();
+            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer> ();
             while ((thisLine = br.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
@@ -254,6 +254,7 @@ public class GTFSReadIn {
                         if(keys[i].equals("route_id")) routeIdKey = i;
                         else {
                             if(keys[i].equals("route_short_name")) routeShortNameKey = i;
+                            if(keys[i].equals("route_long_name")) routeLongNameKey = i;
                             String t = "gtfs_"+keys[i];
                             keysIndex.put(t, i);
                         }
@@ -276,6 +277,7 @@ public class GTFSReadIn {
                     elements = thisLine.split(",");
                     if(thisLine.charAt(thisLine.length()-1)==',') lastIndexEmpty=true;
                     String routeName;
+                    
                     if(elements[routeShortNameKey]==null || elements[routeShortNameKey].equals("")) routeName = elements[routeIdKey];
                     else routeName = elements[routeShortNameKey];
                     Route r = new Route(elements[routeIdKey], routeName, OperatorInfo.getFullName());
