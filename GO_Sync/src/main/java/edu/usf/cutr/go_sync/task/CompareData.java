@@ -451,7 +451,8 @@ public class CompareData extends OsmTask{
                 routes.remove((String)r.getRouteId());
                 routes.put(r.getRouteId(), r);
 
-                existingRoutes.put(  , er);
+                existingRoutes.put(routeId, er);
+                
             }
         }
         System.out.println("There are "+routeKeys.size()+" routeKeys in total!");
