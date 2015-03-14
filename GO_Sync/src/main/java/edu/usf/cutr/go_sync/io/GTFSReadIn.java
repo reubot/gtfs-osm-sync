@@ -120,7 +120,7 @@ public class GTFSReadIn {
     
     public List<Stop> readBusStop(String fName, String agencyName, String routes_fName, String trips_fName, String stop_times_fName){
         Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>();
-        Hashtable id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
+        Hashtable<String, HashSet<Route>> id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
         stopIDs.putAll(id);
         
         String thisLine;
@@ -129,7 +129,7 @@ public class GTFSReadIn {
         try {
             BufferedReader br = new BufferedReader(new FileReader(fName));
             boolean isFirstLine = true;
-            Hashtable keysIndex = new Hashtable();
+            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer>();
             while ((thisLine = br.readLine()) != null) 
             { 
                 if (isFirstLine) {
@@ -180,7 +180,7 @@ public class GTFSReadIn {
                     Stop s = new Stop(tempStopId, agencyName, elements[stopNameKey],elements[stopLatKey],elements[stopLonKey]);
                     HashSet<String> keys = new HashSet<String>();
                     keys.addAll(keysIndex.keySet());
-                    Iterator it = keys.iterator();
+                    Iterator<String> it = keys.iterator();
                     try {
                         while(it.hasNext()){
                         	String k = (String)it.next();
@@ -229,6 +229,7 @@ public class GTFSReadIn {
 //                    System.out.println(thisLine);
                 }
             } 
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
@@ -244,7 +245,7 @@ public class GTFSReadIn {
         try {
             BufferedReader br = new BufferedReader(new FileReader(routes_fName));
             boolean isFirstLine = true;
-            Hashtable keysIndex = new Hashtable();
+            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer>();
             while ((thisLine = br.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
@@ -281,7 +282,7 @@ public class GTFSReadIn {
                     Route r = new Route(elements[routeIdKey], routeName, OperatorInfo.getFullName());
                     HashSet<String> keys = new HashSet<String>();
                     keys.addAll(keysIndex.keySet());
-                    Iterator it = keys.iterator();
+                    Iterator<String> it = keys.iterator();
                     try {
                         while(it.hasNext()){
                             String k = (String)it.next();
@@ -297,6 +298,7 @@ public class GTFSReadIn {
                     routes.put(elements[routeIdKey], r);
                 }
             }
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
@@ -309,7 +311,7 @@ public class GTFSReadIn {
         String thisLine;
         String [] elements;
         // hashtable String vs. String
-        Hashtable tripIDs = new Hashtable();
+        Hashtable<String,String> tripIDs = new Hashtable<String,String>();
 
         // trips.txt read-in
         try {
@@ -345,13 +347,14 @@ public class GTFSReadIn {
                     tripIDs.put(elements[tripIdKey], elements[routeIdKey]);
                 }
             }
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
         }
 
         // hashtable String(stop_id) vs. HashSet(routes)
-        Hashtable stopIDs = new Hashtable();
+        Hashtable<String,HashSet<Route>> stopIDs = new Hashtable<String,HashSet<Route>>();
         // stop_times.txt read-in
         int stopIdKey=-1, tripIdKey = -1;
         try {
@@ -392,6 +395,7 @@ public class GTFSReadIn {
                     stopIDs.put(sid, routes);
                 }
             }
+            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
