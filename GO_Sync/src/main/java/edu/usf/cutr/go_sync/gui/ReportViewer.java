@@ -21,9 +21,12 @@ import edu.usf.cutr.go_sync.object.Stop;
 import edu.usf.cutr.go_sync.osm.HttpRequest;
 import edu.usf.cutr.go_sync.task.UploadData;
 import edu.usf.cutr.go_sync.tools.OsmDistance;
+
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -42,6 +45,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -53,6 +57,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -65,11 +70,15 @@ import org.jdesktop.swingx.mapviewer.WaypointRenderer;
 import org.jdesktop.swingx.mapviewer.DefaultWaypointRenderer;
 import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.Painter;
+
 import edu.usf.cutr.go_sync.tag_defs;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.Icon;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
@@ -82,7 +91,37 @@ import javax.swing.JCheckBox;
  */
 public class ReportViewer extends javax.swing.JFrame implements TableModelListener, PropertyChangeListener {
 
-    
+    private class GuiIcon  implements Icon{
+
+        private int width = 20;
+        private int height = 20;
+
+
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Graphics2D g2d = (Graphics2D) g.create();
+
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(x +1 ,y + 1,width -2 ,height -2);
+
+            g2d.setColor(Color.BLACK);
+            g2d.drawRect(x +1 ,y + 1,width -2 ,height -2);
+
+            g2d.setColor(Color.RED);
+
+            g2d.drawLine(x +10, y + 10, x + width -10, y + height -10);
+            g2d.drawLine(x +10, y + height -10, x + width -10, y + 10);
+
+            g2d.dispose();
+        }
+
+        public int getIconWidth() {
+            return width;
+        }
+
+        public int getIconHeight() {
+            return height;
+        }
+    }
 
     private JCheckBox routesCheckbox, stopsCheckbox;
     private HttpRequest osmRequest;
@@ -1369,7 +1408,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                                                 gbc_gtfsStopsComboBox.gridy = 1;
                                                 busStopPanel.add(gtfsStopsComboBox, gbc_gtfsStopsComboBox);
                                         
-                                        nextButton = new JButton("→");
+                                        nextButton = new JButton("���");
                                         nextButton.addActionListener(new java.awt.event.ActionListener() {
                                             public void actionPerformed(java.awt.event.ActionEvent evt) {
                                         
@@ -1607,7 +1646,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 gbc_tableStopButton.gridy = 5;
                 busStopPanel.add(tableStopButton, gbc_tableStopButton);
                 jLabel15 = new javax.swing.JLabel();
-                
+
+//TODO remove pngs                jLabel15.setIcon(new GuiIcon()); // NOI18N
                         jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/usf/cutr/go_sync/gui/yellow.png"))); // NOI18N
                         jLabel15.setText("Potential Match Stops");
                         jLabel15.setName("jLabel15"); // NOI18N
