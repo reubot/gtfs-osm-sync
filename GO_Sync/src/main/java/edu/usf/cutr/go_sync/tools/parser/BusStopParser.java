@@ -29,20 +29,20 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author Khoa Tran
  */
 public class BusStopParser extends DefaultHandler{
-    private Hashtable tempTag;
+    private Hashtable<String,String> tempTag;
     private AttributesImpl attImplNode;
     private ArrayList<AttributesImpl> xmlNodes;
-    private ArrayList<Hashtable> xmlTags;
+    private ArrayList<Hashtable<String,String> > xmlTags;
     public BusStopParser(){
         xmlNodes = new ArrayList<AttributesImpl>();
-        xmlTags = new ArrayList<Hashtable>();
+        xmlTags = new ArrayList<Hashtable<String,String> >();
     }
     
     @Override public void startElement(String namespaceURI, String localName, String qname, Attributes attributes) throws SAXException {
         if (qname.equals("node") || qname.equals("changeset")) {
             attImplNode = new AttributesImpl(attributes);
             xmlNodes.add(attImplNode);
-            tempTag = new Hashtable();      // start to collect tags of that node
+            tempTag = new Hashtable<String,String> ();      // start to collect tags of that node
         }
         if (qname.equals("tag")) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
@@ -61,7 +61,7 @@ public class BusStopParser extends DefaultHandler{
         return attImplNode;
     }
 
-    public Hashtable getTagsOneNode(){
+    public Hashtable<String,String>  getTagsOneNode(){
         return tempTag;
     }
 
@@ -69,7 +69,7 @@ public class BusStopParser extends DefaultHandler{
         return xmlNodes;
     }
 
-    public ArrayList<Hashtable> getTags(){
+    public ArrayList<Hashtable<String,String> > getTags(){
         return xmlTags;
     }
 }
