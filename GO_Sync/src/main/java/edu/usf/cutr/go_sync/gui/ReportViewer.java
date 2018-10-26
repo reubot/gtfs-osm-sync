@@ -533,7 +533,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         Stop agencyStop = agencyStops.get(selectedNewStop.toString());
         addSelectedStopsOverlay(selectedNewStop, selectedOsmStop);
         // get all the possible tag names from gtfs data and osm data
-        HashSet<String> tagKeys = new HashSet<String>();
+        Set<String> tagKeys = new TreeSet<String>();
         Hashtable aTags = null;
         if(selectedNewStop!=null) {
             tagKeys.addAll(selectedNewStop.keySet());
@@ -950,7 +950,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     private void updateRouteTable(Route selectedNewRoute){
 
         // get all the possible tag names from gtfs data and osm data
-        HashSet<String> tagKeys = new HashSet<String>();
+        Set<String> tagKeys = new TreeSet<String>();
         Hashtable<String, String> aTags = new Hashtable<String, String>();
         Hashtable<String, String> eTags= new Hashtable<String, String>();
         Route aRoute = null, eRoute=null;
