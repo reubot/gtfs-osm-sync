@@ -1049,7 +1049,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
 
     public void generateReport(){
 
-    	System.out.println("GTFSstops "+ GTFSstops.size() + " report" + report.size() + "upload" + upload.size() + "modify" + modify.size() + "delete" + delete.size()  );
+        System.out.println("GTFSstops "+ GTFSstops.size() + " report:" + report.size() + " upload:" + upload.size() + " modify:" + modify.size() + " delete:" + delete.size()  );
 
         // copy report, where values are TreeSets,
         // to reportArrays, where values are ArrayLists
