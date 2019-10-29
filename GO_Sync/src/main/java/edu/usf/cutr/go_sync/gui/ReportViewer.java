@@ -18,6 +18,7 @@ import edu.usf.cutr.go_sync.io.WriteFile;
 import edu.usf.cutr.go_sync.object.RelationMember;
 import edu.usf.cutr.go_sync.object.Route;
 import edu.usf.cutr.go_sync.object.Stop;
+import edu.usf.cutr.go_sync.object.ReportCategory;
 import edu.usf.cutr.go_sync.osm.HttpRequest;
 import edu.usf.cutr.go_sync.task.UploadData;
 import edu.usf.cutr.go_sync.tools.OsmDistance;
@@ -312,13 +313,13 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         for (int i=0; i<reportKeys.size(); i++) {
             gtfsAll[i] = reportKeys.get(i);
             String category = gtfsAll[i].getReportCategory();
-            if (category.equals("UPLOAD_CONFLICT")) {
+            if (category.equals(ReportCategory.UPLOAD_CONFLICT)) {
                 uci++;
-            } else if (category.equals("UPLOAD_NO_CONFLICT")) {
+            } else if (category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
                 unci++;
-            } else if (category.equals("MODIFY")) {
+            } else if (category.equals(ReportCategory.MODIFY)) {
                 mi++;
-            } else if (category.equals("NOTHING_NEW")) {
+            } else if (category.equals(ReportCategory.NOTHING_NEW)) {
                 nui++;
             }
         }
@@ -330,18 +331,18 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         uci=0; unci=0; mi=0; nui=0;
         for (int i=0; i<reportKeys.size(); i++) {
             String category = reportKeys.get(i).getReportCategory();
-            if (category.equals("UPLOAD_CONFLICT")) {
+            if (category.equals(ReportCategory.UPLOAD_CONFLICT)) {
                 gtfsUploadConflict[uci] = reportKeys.get(i);
                 uci++;
                 stopsToFinish.add(reportKeys.get(i).toString());
-            } else if (category.equals("UPLOAD_NO_CONFLICT")) {
+            } else if (category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
                 gtfsUploadNoConflict[unci] = reportKeys.get(i);
                 unci++;
-            } else if (category.equals("MODIFY")) {
+            } else if (category.equals(ReportCategory.MODIFY)) {
                 gtfsModify[mi] = reportKeys.get(i);
                 mi++;
                 stopsToFinish.add(reportKeys.get(i).toString());
-            } else if (category.equals("NOTHING_NEW")) {
+            } else if (category.equals(ReportCategory.NOTHING_NEW)) {
                 gtfsNoUpload[nui] = reportKeys.get(i);
                 nui++;
             }
@@ -368,7 +369,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             ArrayList<Boolean> arr = new ArrayList<Boolean>(numberOfBool);
             // FIXME: very difficult to read, and does not handle gtfs nulls
             for(int j=0; j<numberOfBool; j++){
-                if(category.equals("UPLOAD_CONFLICT") || category.equals("UPLOAD_NO_CONFLICT")) {
+                if(category.equals(ReportCategory.UPLOAD_CONFLICT) || category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
                     if(j%2==0) arr.add(true);
                     else arr.add(false);
                 }
@@ -401,13 +402,13 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             osmDefaultFinalStops.put(osmStop.getStopID(), osmStop);
 
             String category = newStop.getReportCategory();
-/*            if (category.equals("UPLOAD_CONFLICT")) {
+/*            if (category.equals(ReportCategory.UPLOAD_CONFLICT)) {
                 gtfsUploadConflict[uci] = reportKeys.get(i);
                 uci++;
-            } else if (category.equals("UPLOAD_NO_CONFLICT")) {
+            } else if (category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
                 gtfsUploadNoConflict[unci] = reportKeys.get(i);
                 unci++;*/
-            if ((category.equals("MODIFY") || category.equals("NOTHING_NEW")) && numEquiv==1) {
+            if ((category.equals(ReportCategory.MODIFY) || category.equals(ReportCategory.NOTHING_NEW)) && numEquiv==1) {
                 //String stopID, String operatorName, String stopName, String lat, String lon
                 Stop stopWithSelectedTags = new Stop(newStop.getStopID(), newStop.getOperatorName(), osmStop.getStopName(), osmStop.getLat(), osmStop.getLon());
                 Stop agencyStop = agencyStops.get(newStop.getStopID());
@@ -428,7 +429,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                         isDiff = true;
                     }
                 }
-                if(category.equals("MODIFY") || isDiff)
+                if(category.equals(ReportCategory.MODIFY) || isDiff)
                     osmDefaultOnlyChangedFinalStops.put(stopWithSelectedTags.getStopID(), stopWithSelectedTags);
             }
         }
@@ -563,7 +564,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //            aTags = (Hashtable)agencyTable.get(selectedNewStop);
             aTags = (agencyStops.get(selectedNewStop.toString())).getTags();
             // treat stops in upload_conflict differently from others
-            if(selectedNewStop.getReportCategory().equals("UPLOAD_CONFLICT")) {
+            if(selectedNewStop.getReportCategory().equals(ReportCategory.UPLOAD_CONFLICT)) {
                 tagKeys.addAll(aTags.keySet());
             }
         }
@@ -634,14 +635,14 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //                osmCheckValue = true;
 //            }
 //            //add tag to table, index+2 because of lat and lon
-//            if(selectedNewStop.getReportCategory().equals("UPLOAD_CONFLICT")) {
+//            if(selectedNewStop.getReportCategory().equals(ReportCategory.UPLOAD_CONFLICT)) {
 //                stopTableModel.setRowValueAt(new Object[] {k, gtfsValue, gtfsCheckValue, osmValue, osmCheckValue, newValue}, i+2);
 //>>>>>>> 1a58b026a52d1271696dac9c53450d65f773cf06
             } else {
                 stopTableModel.setRowValueAt(new Object[]{k, gtfsValue, gtfsCB, osmValue, osmCB, newValue}, i + 2);
             }
             /*
-            if(selectedNewStop.getReportCategory().equals("UPLOAD_CONFLICT")) {
+            if(selectedNewStop.getReportCategory().equals(ReportCategory.UPLOAD_CONFLICT)) {
                   stopTableModel.setRowValueAt(new Object[] {k, gtfsValue, true, osmValue, false, newValue}, i+2);
             } else {
                 stopTableModel.setRowValueAt(new Object[] {k, gtfsValue, finalCB.get((i+2)*2), osmValue, finalCB.get((i+2)*2+1), finalSt.getTag(k)}, i+2);
@@ -669,7 +670,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // Must be placed after all data has been inserted inside the table. Otherwise, saveChangeButton is enabled
         dataTable.getModel().addTableModelListener(this);
 
-        if(selectedNewStop.getReportCategory().equals("UPLOAD_NO_CONFLICT") && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
+        if(selectedNewStop.getReportCategory().equals(ReportCategory.UPLOAD_NO_CONFLICT) && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
             updateButtonTableStop("Accept", true, "Add", true);
         else
             updateButtonTableStop("Accept", true, "Save Change", false);
@@ -1172,7 +1173,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         Stop selectedGtfsStop = (Stop)gtfsStopsComboBox.getSelectedItem();
 
         String category = selectedGtfsStop.getReportCategory();
-        if((category.equals("UPLOAD_CONFLICT") || category.equals("MODIFY")) && (stopsToFinish.contains(selectedGtfsStop.toString()))) {
+        if((category.equals(ReportCategory.UPLOAD_CONFLICT) || category.equals(ReportCategory.MODIFY)) && (stopsToFinish.contains(selectedGtfsStop.toString()))) {
             tableStopButton.setText(uploadConflictCategoryText);
             tableStopButton.setEnabled(uploadConflictStatus);
         } else {
@@ -1217,16 +1218,16 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
     public void updateDataWhenStopSelected(Stop selected){
         String category = selected.getReportCategory();
-        if (category.equals("UPLOAD_CONFLICT")) {
+        if (category.equals(ReportCategory.UPLOAD_CONFLICT)) {
             newWithMatchStopsRadioButton.setSelected(true);
             updateStopCategory(gtfsUploadConflict, 0);
-        } else if (category.equals("UPLOAD_NO_CONFLICT")) {
+        } else if (category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
             newNoMatchStopsRadioButton.setSelected(true);
             updateStopCategory(gtfsUploadNoConflict, 0);
-        } else if (category.equals("MODIFY")) {
+        } else if (category.equals(ReportCategory.MODIFY)) {
             updateStopsRadioButton.setSelected(true);
             updateStopCategory(gtfsModify, 0);
-        } else if (category.equals("NOTHING_NEW")) {
+        } else if (category.equals(ReportCategory.NOTHING_NEW)) {
             existingStopRadioButton.setSelected(true);
             updateStopCategory(gtfsNoUpload, 0);
         }
@@ -1268,14 +1269,14 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         for(int i=0; i<stopIds.size(); i++){
             Stop s = stops.get(stopIds.get(i));
             String category = s.getReportCategory();
-            if(category.equals("UPLOAD_NO_CONFLICT")){
+            if(category.equals(ReportCategory.UPLOAD_NO_CONFLICT)){
                 upload.add(s);
             }
-            else if(category.equals("UPLOAD_CONFLICT") && acceptedOnlyCheckbox.isSelected()){
+            else if(category.equals(ReportCategory.UPLOAD_CONFLICT) && acceptedOnlyCheckbox.isSelected()){
                 modify.add(s);
 
             }
-            else if(category.equals("UPLOAD_CONFLICT")){
+            else if(category.equals(ReportCategory.UPLOAD_CONFLICT)){
                 // upload the new stop
                 upload.add(s);
                 // add FIXME to its potential matches
@@ -1284,7 +1285,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     HashSet<Stop> equiv = new HashSet<Stop>((ArrayList<Stop>)o);
                     modify.addAll(equiv);
                 }
-            } else if(category.equals("MODIFY")){
+            } else if(category.equals(ReportCategory.MODIFY)){
                 // if s is already in modify set, meaning GO-Sync added FIXME tag for the UPLOAD_CONFLICT category
                 // then, remove the stop and add FIXME tag to the current s
                 if(modify.contains(s)) {
@@ -2546,7 +2547,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         Stop[] gtfsarraynew;
         List<Stop> gtfsListnew;
-        if(category.equals("UPLOAD_CONFLICT")){
+        if(category.equals(ReportCategory.UPLOAD_CONFLICT)){
    //         gtfsUploadConflict = removeOneStopFromArray(gtfsUploadConflict, s);
         	List <Stop> gtfsUploadConflictList = Arrays.asList(gtfsUploadConflict);
             GtfsAllLinkedList.removeAll(gtfsUploadConflictList);
@@ -2570,7 +2571,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //          finalCheckboxes.remove(sid);
           gtfsUploadConflict = new Stop[0];
           updateStopCategory(gtfsUploadConflict, 0);
-        } else if(category.equals("UPLOAD_NO_CONFLICT")) {
+        } else if(category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
         	List <Stop> gtfsUploadNoConflictList = Arrays.asList(gtfsUploadNoConflict);
             GtfsAllLinkedList.removeAll(gtfsUploadNoConflictList);
 
@@ -2590,7 +2591,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             gtfsUploadNoConflict = new Stop[0];
             //Arrays.fill(gtfsUploadNoConflict, null);
             updateStopCategory(gtfsUploadNoConflict, 0);
-        } else if(category.equals("MODIFY")){
+        } else if(category.equals(ReportCategory.MODIFY)){
         	List <Stop> gtfsModifyConflictList = Arrays.asList(gtfsModify);
             GtfsAllLinkedList.removeAll(gtfsModifyConflictList);
 
@@ -2630,11 +2631,11 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         String category = s.getReportCategory();
         Stop[] stoplist;
 
-		if(category.equals("UPLOAD_CONFLICT"))
+		if(category.equals(ReportCategory.UPLOAD_CONFLICT))
 			stoplist = gtfsUploadConflict;
-		else if(category.equals("UPLOAD_NO_CONFLICT"))
+		else if(category.equals(ReportCategory.UPLOAD_NO_CONFLICT))
 			stoplist = gtfsUploadNoConflict;
-		else if(category.equals("MODIFY"))
+		else if(category.equals(ReportCategory.MODIFY))
 	         stoplist = gtfsModify;
 		else
 			 stoplist = gtfsModify;*/
@@ -2683,21 +2684,21 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
  //       System.err.print(category);
 //        System.err.println(index + "\t" + gtfsStopsComboBox.getItemCount() + "b");
         gtfsAll = removeOneStopFromArray(gtfsAll, s);
-        if(category.equals("UPLOAD_CONFLICT")){
+        if(category.equals(ReportCategory.UPLOAD_CONFLICT)){
             gtfsUploadConflict = removeOneStopFromArray(gtfsUploadConflict, s);
 //            if index > gtfsUploadConflict.length //FIXME case where index > array after removal
             if (allStopsRadioButton.isSelected())
             	updateStopCategory(gtfsAll, index);
             else
             updateStopCategory(gtfsUploadConflict, index);
-        } else if(category.equals("UPLOAD_NO_CONFLICT")) {
+        } else if(category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
 
             gtfsUploadNoConflict = removeOneStopFromArray(gtfsUploadNoConflict, s);
         	if (allStopsRadioButton.isSelected())
             	updateStopCategory(gtfsAll, 0);
             else
             updateStopCategory(gtfsUploadNoConflict, index);
-        } else if(category.equals("MODIFY")){
+        } else if(category.equals(ReportCategory.MODIFY)){
             gtfsModify = removeOneStopFromArray(gtfsModify, s);
         	if (allStopsRadioButton.isSelected())
             	updateStopCategory(gtfsAll, 0);
@@ -2874,8 +2875,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         }
         if(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Add"))
         {
-            if (       !selectedGtfsStop.getReportCategory().equals("MODIFY")
-                    && !selectedGtfsStop.getReportCategory().equals("UPLOAD_NO_CONFLICT") )
+            if (       !selectedGtfsStop.getReportCategory().equals(ReportCategory.MODIFY)
+                    && !selectedGtfsStop.getReportCategory().equals(ReportCategory.UPLOAD_NO_CONFLICT) )
             {
 
                 selectedGtfsStop.setOsmId(selectedOSMStop.getOsmId());
@@ -2917,7 +2918,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //                    int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
                         st.setOsmVersion(selectedOsmStop.getOsmVersion());
                     }
-                    st.setReportCategory("MODIFY");
+                    st.setReportCategory(ReportCategory.MODIFY);
                 }
                 finalStopsAccepted.put(selectedGtfs,st);
                 usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
@@ -2951,9 +2952,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //            System.out.println("test");
 //            JOptionPane.showMessageDialog(this,"Stop is accepted and changes have been made!");
             updateButtonTableStop("Save Change", false, "Save Change", false);
-            if(selectedNewStop.getReportCategory().equals("UPLOAD_NO_CONFLICT") && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
+            if(selectedNewStop.getReportCategory().equals(ReportCategory.UPLOAD_NO_CONFLICT) && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
                 updateButtonTableStop("Accept", true, "Add", true);
-        } else */if(selectedNewStop.getReportCategory().equals("UPLOAD_NO_CONFLICT") && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
+        } else */if(selectedNewStop.getReportCategory().equals(ReportCategory.UPLOAD_NO_CONFLICT) && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
             updateButtonTableStop("Accept", true, "Add", true);
         else
         {

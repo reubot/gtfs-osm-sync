@@ -18,6 +18,7 @@ Copyright 2010 University of South Florida
 package edu.usf.cutr.go_sync.task;
 
 import edu.usf.cutr.go_sync.gui.ReportViewer;
+import edu.usf.cutr.go_sync.object.*;
 import edu.usf.cutr.go_sync.osm.*;
 import edu.usf.cutr.go_sync.io.GTFSReadIn;
 
@@ -34,12 +35,6 @@ import java.util.Map;
 
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
-
-import edu.usf.cutr.go_sync.object.OperatorInfo;
-import edu.usf.cutr.go_sync.object.OsmPrimitive;
-import edu.usf.cutr.go_sync.object.RelationMember;
-import edu.usf.cutr.go_sync.object.Route;
-import edu.usf.cutr.go_sync.object.Stop;
 
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -242,7 +237,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             tree.add(osmStop);
 
             // set stop value to osm value as default (only affect modify category)
-            if(gtfsStop.getReportCategory().equals("MODIFY")){
+            if(gtfsStop.getReportCategory().equals(ReportCategory.MODIFY)){
                 gtfsStop.setLat(osmStop.getLat());
                 gtfsStop.setLon(osmStop.getLon());
                 gtfsStop.addAndOverwriteTags(osmStop.getTags());
@@ -348,7 +343,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             if(this.flagIsDone) return;
             Stop st = reportKeys.get(i);
             String category = st.getReportCategory();
-            if (category.equals("MODIFY") || category.equals("NOTHING_NEW")) {
+            if (category.equals(ReportCategory.MODIFY) || category.equals(ReportCategory.NOTHING_NEW)) {
                 ArrayList<Route> routeInOneStop = new ArrayList<Route>();
                 if(st.getRoutes()!=null) {
                     routeInOneStop.addAll(st.getRoutes());
@@ -463,7 +458,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             if(this.flagIsDone) return;
             Stop st = reportKeys.get(i);
             String category = st.getReportCategory();
-            if (category.equals("MODIFY") || category.equals("NOTHING_NEW")) {
+            if (category.equals(ReportCategory.MODIFY) || category.equals(ReportCategory.NOTHING_NEW)) {
                 ArrayList<Route> routeInOneStop = new ArrayList<Route>();
                 if(st.getRoutes()!=null) {
                     routeInOneStop.addAll(st.getRoutes());
@@ -717,7 +712,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                                     modify.remove(ns);
                                 }
                                 modify.add(ns);
-                                ns.setReportCategory("MODIFY");
+                                ns.setReportCategory(ReportCategory.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -741,7 +736,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                                     es.setReportText("Stop already exists in OSM. Nothing new from last upload.\n" +
                                             "\t   " + es.printOSMStop() +
                                             "\n ACTION: No upload!");
-                                    ns.setReportCategory("NOTHING_NEW");
+                                    ns.setReportCategory(ReportCategory.NOTHING_NEW);
                                     addToReport(ns, es, true);
                                     noUpload.add(ns);
                                     osmIdToGtfsId.put(node.getValue("id"), gtfsStop.getStopID());
@@ -755,7 +750,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                                     }
                                     modify.add(ns);
                                     osmActiveUsers.add(node.getValue("user"));
-                                    ns.setReportCategory("MODIFY");
+                                    ns.setReportCategory(ReportCategory.MODIFY);
                                     addToReport(ns, es, true);
                                 }
                                 break;
@@ -823,7 +818,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                                 }
                                 // check for osm id in gtfs db here,  if not in gtfs stops, add as potential match TODO bounding boxes still show up
                                 if (!GTFSstopsIDs.contains(osmStopID)) {
-                                    ns.setReportCategory("UPLOAD_CONFLICT");
+                                    ns.setReportCategory(ReportCategory.UPLOAD_CONFLICT);
                                     addToReport(ns, es, false);
                                 }
                             }
@@ -849,7 +844,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                                 es.setLastEditedOsmUser(node.getValue("user"));
                                 es.setLastEditedOsmDate(node.getValue("timestamp"));
 
-                                ns.setReportCategory("MODIFY");
+                                ns.setReportCategory(ReportCategory.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -885,7 +880,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportIDs.contains(GTFSstops.get(i).getStopID())) ) {
                 Stop n = new Stop(GTFSstops.get(i));
                 n.setReportText("New upload with no conflicts");
-                n.setReportCategory("UPLOAD_NO_CONFLICT");
+                n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
                 upload.add(n);
 
                 addToReport(n, null, false);
@@ -901,7 +896,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             if(this.flagIsDone) return;
             Stop s = new Stop(reportKeys.get(i));
             String category = s.getReportCategory();
-            if(category.equals("MODIFY")){
+            if(category.equals(ReportCategory.MODIFY)){
                 TreeSet<Stop> arr = report.get(s);
                 if(arr.size()==1) {
                     String tempStopId=null;
@@ -977,7 +972,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                     if(this.flagIsDone) return;
                     Stop n = new Stop(GTFSstops.get(i));
                     n.setReportText("New upload with no conflicts");
-                    n.setReportCategory("UPLOAD_NO_CONFLICT");
+                    n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
                     upload.add(n);
                     addToReport(n, null, false);
                 }
