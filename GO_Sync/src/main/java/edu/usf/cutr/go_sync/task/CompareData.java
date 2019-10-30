@@ -450,10 +450,8 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
         System.out.println("Reading GTFS routes from modify and noupload sets...");
 
         // get all the routes and its associated bus stops
-        ArrayList<Stop> reportKeys = new ArrayList<Stop>();
-        reportKeys.addAll(report.keySet());
-        HashSet<String> gtfsRoutes = new HashSet<String>();
-        gtfsRoutes.addAll(GTFSReadIn.getAllRoutesID());
+        ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
+        HashSet<String> gtfsRoutes = new HashSet<String>(GTFSReadIn.getAllRoutesID());
         for (int i=0; i<reportKeys.size(); i++) {
             if(this.flagIsDone) return;
             Stop st = reportKeys.get(i);
@@ -505,8 +503,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
         System.out.println("Comparing GTFS routes with OSM routes...");
 
         //compare with existing OSM relation
-        ArrayList<String> routeKeys = new ArrayList<String>();
-        routeKeys.addAll(routes.keySet());
+        ArrayList<String> routeKeys = new ArrayList<String>(routes.keySet());
         System.out.println ("routeKeys " + routeKeys.size()  +" OSMRelations " + OSMRelations.size());
 
         Hashtable<String, Route> routesByShortName = new Hashtable<String, Route>();
@@ -537,14 +534,12 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
         System.out.println ("routes " + routes.size()  + "routesByShortName" + routesByShortName.size());
 
         //TODO parralise in Java 8
-        ArrayList<String> routeNameKeys = new ArrayList<String>();
-        routeNameKeys.addAll(routesByShortName.keySet());
+        ArrayList<String> routeNameKeys = new ArrayList<String>(routesByShortName.keySet());
 
         for(int osm=0; osm<OSMRelations.size(); osm++){
             if(this.flagIsDone) return;
             AttributesImpl osmRelation = OSMRelations.get(osm);
-            Hashtable osmtag = new Hashtable();
-            osmtag.putAll(OSMRelationTags.get(osm));
+            Hashtable osmtag = new Hashtable(OSMRelationTags.get(osm));
             String routeLongName = (String)osmtag.get("name");
             String routeId = (String)osmtag.get("gtfs_route_id");
             String routeShortName = (String)osmtag.get("ref");
@@ -574,8 +569,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                     routeId = r.getRouteId();
                 }
                 Route er = new Route(routeId, routeShortName, ostring);
-                ArrayList<RelationMember> tempem = new ArrayList<RelationMember>();
-                tempem.addAll(em);
+                ArrayList<RelationMember> tempem = new ArrayList<RelationMember>(em);
                 for(int i=0; i<em.size(); i++) {
                     if(this.flagIsDone) return;
                     RelationMember m = tempem.get(i);
@@ -639,8 +633,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                 updateProgress(progressToUpdate);
                 this.setMessage("Comparing "+osmindex+"/"+totalOsmNode+" ...");
             }
-            Hashtable<String,String> osmtag = new Hashtable<String,String>();
-            osmtag.putAll(OSMTags.get(osmindex));
+            Hashtable<String, String> osmtag = new Hashtable<String, String>(OSMTags.get(osmindex));
             String osmOperator = (String)osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
             String osmStopID = (String)osmtag.get("gtfs_id");
             //add leading 0's
@@ -1058,8 +1051,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
 
         for (Map.Entry<Stop, TreeSet<Stop>> entry : report.entrySet()) {
             Stop key = entry.getKey();
-            ArrayList<Stop> arr = new ArrayList<Stop>();
-            arr.addAll(entry.getValue());
+            ArrayList<Stop> arr = new ArrayList<Stop>(entry.getValue());
             reportArrays.put(key, arr);
         }
     	ReportViewer rv = new ReportViewer(GTFSstops, reportArrays, upload, modify, delete, routes, agencyRoutes, existingRoutes, taskOutput);
