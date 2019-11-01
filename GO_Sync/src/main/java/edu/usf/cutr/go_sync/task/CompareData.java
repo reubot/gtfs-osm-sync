@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
 
+import org.w3c.tidy.Report;
 import org.xml.sax.helpers.AttributesImpl;
 
 import edu.usf.cutr.go_sync.tools.OsmDistance;
@@ -152,8 +153,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
 
     public List<Stop> convertToStopObject(List<AttributesImpl> eNodes, String agencyName){
         List<Stop> stops = new ArrayList<Stop>(eNodes.size());
-        for (int i=0; i<eNodes.size(); i++){
-            AttributesImpl s = eNodes.get(i);
+        for (AttributesImpl s : eNodes) {
             stops.add(new Stop(s.getValue("id"), agencyName, s.getValue("user"), s.getValue("lat"), s.getValue("lon")));
         }
         return stops;
@@ -452,9 +452,9 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
         // get all the routes and its associated bus stops
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
         HashSet<String> gtfsRoutes = new HashSet<String>(GTFSReadIn.getAllRoutesID());
-        for (int i=0; i<reportKeys.size(); i++) {
+        for (Stop st : reportKeys) {
             if(this.flagIsDone) return;
-            Stop st = reportKeys.get(i);
+//            Stop st = reportKeys.get(i);
             String category = st.getReportCategory();
             if (category.equals(ReportCategory.MODIFY) || category.equals(ReportCategory.NOTHING_NEW)) {
                 ArrayList<Route> routeInOneStop = new ArrayList<Route>();
@@ -665,9 +665,9 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             AttributesImpl node = OSMNodes.get(osmindex);
             String version = Integer.toString(Integer.parseInt(node.getValue("version")));
             if (isOp) {
-                for (int gtfsindex=0; gtfsindex<GTFSstops.size(); gtfsindex++){
+                for (Stop gtfsStop : GTFSstops){
                     if(this.flagIsDone) return;
-                    Stop gtfsStop = GTFSstops.get(gtfsindex);
+//                    Stop gtfsStop = GTFSstops.get(gtfsindex);
                     double distance = OsmDistance.distVincenty(node.getValue("lat"), node.getValue("lon"),
                             gtfsStop.getLat(), gtfsStop.getLon());
                     if ((distance<RANGE) && !(noUpload.contains(gtfsStop)) ){//&& (!matched.contains(gtfsStop))){
@@ -897,10 +897,10 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                     // empty all the value of the tags
                     Hashtable<String, String> newTags = s.getTags();
                     ArrayList<String> newTagKeys = new ArrayList<String>(newTags.keySet());
-                    for(int j=0; j<newTagKeys.size(); j++){
-                        if(newTagKeys.get(j).equals("gtfs_id")) tempStopId=newTags.get("gtfs_id");
+                    for (String newTagKey : newTagKeys) {
+                        if (newTagKey.equals("gtfs_id")) tempStopId = newTags.get("gtfs_id");
 
-                        newTags.put(newTagKeys.get(j), "");
+                        newTags.put(newTagKey, "");
                     }
                     s.addAndOverwriteTags(newTags);
                     // add Osm tags, the rest remains empty
