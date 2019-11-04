@@ -55,7 +55,7 @@
        </archive>
          </configuration>
      </plugin>
-<!--      
+<!--
 	TODO - This fails on Travis CI, so its commented out for now (see https://github.com/CUTR-at-USF/gtfs-osm-sync/pull/15#issuecomment-61645728)
 	  <plugin>
        <groupId>org.codehaus.mojo</groupId>
@@ -72,7 +72,7 @@
          </configuration>
         </execution>
        </executions>
-      </plugin>	    
+      </plugin>
 -->
 
 <plugin>
@@ -104,8 +104,14 @@
       <source>1.7</source>
       <target>1.7</target>
     </configuration>
+  </plugin><plugin><groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <configuration>
+          <source>8</source>
+          <target>8</target>
+      </configuration>
   </plugin>
-</plugins>
+  </plugins>
 </build>
 </project>
 

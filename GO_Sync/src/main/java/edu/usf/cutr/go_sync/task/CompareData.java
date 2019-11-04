@@ -625,15 +625,16 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             progressToUpdate = 50/totalOsmNode;
         }
         int currentTotalProgress=0;
-        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
+//        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
+        OSMTags.parallelStream().forEach(osmtag -> {
             if(this.flagIsDone)
                 return;
-            if((osmindex%timeToUpdate)==0) {
-                currentTotalProgress += progressToUpdate;
-                updateProgress(progressToUpdate);
-                this.setMessage("Comparing "+osmindex+"/"+totalOsmNode+" ...");
-            }
-            Hashtable<String, String> osmtag = new Hashtable<String, String>(OSMTags.get(osmindex));
+//            if((osmindex%timeToUpdate)==0) {
+//                currentTotalProgress += progressToUpdate;
+//                updateProgress(progressToUpdate);
+//                this.setMessage("Comparing "+osmindex+"/"+totalOsmNode+" ...");
+//            }
+//            Hashtable<String, String> osmtag = new Hashtable<String, String>(OSMTags.get(osmindex));
             String osmOperator = (String)osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
             String osmStopID = (String)osmtag.get("gtfs_id");
             //add leading 0's
@@ -662,7 +663,8 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                 osmOperator = "missing";
             }
             String osmStopName = (String)osmtag.get("name");
-            AttributesImpl node = OSMNodes.get(osmindex);
+//            AttributesImpl node = OSMNodes.get(osmindex);
+            AttributesImpl node = OSMNodes.get(OSMTags.indexOf(osmtag));
             String version = Integer.toString(Integer.parseInt(node.getValue("version")));
             if (isOp) {
                 for (Stop gtfsStop : GTFSstops){
@@ -845,7 +847,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                     }
                 }
             }
-        }
+        });
         // set OSM value to all stops in modify category
         setStopWithOsmDataDefault();
         //make sure is 50% overall
