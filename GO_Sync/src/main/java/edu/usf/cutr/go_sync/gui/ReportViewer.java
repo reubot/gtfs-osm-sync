@@ -246,6 +246,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, HashSet<Stop>u, HashSet<Stop>m, HashSet<Stop>d, Hashtable routes, Hashtable nRoutes, Hashtable eRoutes, JTextArea to) {
         super("GO-Sync: Report");
         super.setResizable(true); //false);
+        long tStart = System.currentTimeMillis();
 
         try {
         	busIcon = new javax.swing.ImageIcon(this.getClass().getClassLoader().getResource("bus_icon.png"));
@@ -289,7 +290,6 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         finalCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
         finalRouteCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
 
-
 //System.out.println(r.size() + "\t" + u.size() + "\t" + m.size() + "\t" + d.size() + "\t");
         ArrayList<Stop> reportKeys = new ArrayList<Stop>();
         //convert to arrayList for ordering
@@ -325,6 +325,10 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         }
 
         System.out.println("Categories " + " UPLOAD_CONFLICT:" + uci + " UPLOAD_NO_CONFLICT:" + unci + " MODIFY:" + mi + " NOTHING_NEW:" + nui);
+        long tDelta = System.currentTimeMillis() - tStart;
+//        this.setMessage("Completed in "+ tDelta /1000.0 + "seconds");
+        System.out.println("ReportViewer lists generated in "+ tDelta /1000.0 + "seconds");
+
 
         // add data to correct list (categorizing)
         gtfsUploadConflict = new Stop[uci];
