@@ -36,7 +36,7 @@ public class GTFSReadIn {
     private final String NTD_ID_KEY = "ntd_id";
     private static final String UTF8_BOM = "\uFEFF";
 //TODO read agency.txt
-    
+
 
     private List<Stop> stops;
 
@@ -383,7 +383,8 @@ public class GTFSReadIn {
                         while(it.hasNext()){
                             String k = it.next();
                             String v = null;
-                            if(!lastIndexEmpty) v = elements[keysIndex.get(k)];
+                            int ki = keysIndex.get(k);
+                            if(/*!(lastIndexEmpty && */ki <elements.length) v = elements[ki];
                             if ((v!=null) && (!v.equals("")))
                             {
                                 if (k.equals(tag_defs.OSM_ROUTE_TYPE_KEY))
