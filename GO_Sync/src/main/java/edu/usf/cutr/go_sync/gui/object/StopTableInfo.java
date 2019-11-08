@@ -28,9 +28,10 @@ package edu.usf.cutr.go_sync.gui.object;
   */
 
 public abstract class StopTableInfo {
-    static final int GTFS_DATA_COL = 1;
-    static final int GTFS_CHECK_COL = 2;
-    static final int OSM_DATA_COL = 3;
-    static final int OSM_CHECK_COL = 4;
-    static final int NEW_VALUE_DATA_COL = 5;
+    public static final int KEY = 0;
+    public static final int GTFS_DATA_COL = 1;
+    public static final int GTFS_CHECK_COL = 2;
+    public static final int OSM_DATA_COL = 3;
+    public static final int OSM_CHECK_COL = 4;
+    public static final int NEW_VALUE_DATA_COL = 5;
 };

@@ -13,6 +13,7 @@ package edu.usf.cutr.go_sync.gui;
 
 import edu.usf.cutr.go_sync.gui.object.BooleanMouseListener;
 import edu.usf.cutr.go_sync.gui.object.RouteMemberTableModel;
+import edu.usf.cutr.go_sync.gui.object.StopTableInfo;
 import edu.usf.cutr.go_sync.gui.object.TagReportTableModel;
 import edu.usf.cutr.go_sync.io.WriteFile;
 import edu.usf.cutr.go_sync.object.RelationMember;
@@ -2837,8 +2838,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // Save to final Stops
         Stop st = finalStops.get(selectedGtfs);     //not creating new object
         for(int i=0; i<stopTableModel.getRowCount(); i++){
-            String tagName = (String)stopTableModel.getValueAt(i, 0);
-            String tagValue = (String)stopTableModel.getValueAt(i, 5);
+            String tagName = (String)stopTableModel.getValueAt(i, StopTableInfo.KEY);
+            String tagValue = (String)stopTableModel.getValueAt(i, StopTableInfo.NEW_VALUE_DATA_COL);
             if(tagName.equals("lat")) st.setLat(tagValue);
             else if(tagName.equals("lon")) st.setLon(tagValue);
             else {
@@ -2861,8 +2862,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             // no need to add 2 since lat and lon are already there (counted)
             ArrayList<Boolean> saveValues = new ArrayList<Boolean>(stopTableModel.getRowCount()*2);
             for(int i=0; i<stopTableModel.getRowCount(); i++){
-                saveValues.add((Boolean)stopTableModel.getValueAt(i, 2)); //gtfs
-                saveValues.add((Boolean)stopTableModel.getValueAt(i, 4)); //osm
+                saveValues.add((Boolean)stopTableModel.getValueAt(i, StopTableInfo.GTFS_CHECK_COL)); //gtfs
+                saveValues.add((Boolean)stopTableModel.getValueAt(i, StopTableInfo.OSM_CHECK_COL)); //osm
             }
             finalCheckboxes.put(selectedGtfs, saveValues);
 
