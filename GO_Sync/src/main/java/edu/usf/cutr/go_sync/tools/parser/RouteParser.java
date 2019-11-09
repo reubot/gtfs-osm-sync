@@ -31,6 +31,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author Khoa Tran
  */
 public class RouteParser extends DefaultHandler {
+
     private Hashtable tempTag;
     private HashSet<RelationMember> tempMembers;
     private ArrayList<AttributesImpl> xmlRelations;

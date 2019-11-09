@@ -242,9 +242,9 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                 gtfsStop.setLon(osmStop.getLon());
                 gtfsStop.addAndOverwriteTags(osmStop.getTags());
                 // some stops id are accidentally overwritten. We need to keep the original stop_id
-                gtfsStop.addAndOverwriteTag("gtfs_id", gtfs.toString());
+                gtfsStop.addAndOverwriteTag(tag_defs.GTFS_STOP_ID_KEY, gtfs.toString());
             }
-            if(gtfsStop.toString().equals("none") || gtfsStop.getStopID().equals("") || gtfsStop.getTag("gtfs_id").equals("none")){
+            if(gtfsStop.toString().equals("none") || gtfsStop.getStopID().equals("") || gtfsStop.getTag(tag_defs.GTFS_STOP_ID_KEY).equals("none")){
                 System.out.println();
             }
 
@@ -544,7 +544,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             String routeId = (String)osmtag.get("gtfs_route_id");
             String routeShortName = (String)osmtag.get("ref");
             String operator = (String)osmtag.get("operator");  //tag_defs.GTFS_OPERATOR_KEY); //FIXME use tag_defs
-            String network = (String)osmtag.get("network"); //(tag_defs.GTFS_NETWORK_KEY);    //FIXME use tag_defs
+            String network = (String)osmtag.get(tag_defs.OSM_NETWORK_KEY);    //FIXME use tag_defs
 //            System.out.println(osm + " routeId " + routeId + routeKeys.contains(routeId) +  "routeShortName " + routeShortName + routeNameKeys.contains(routeShortName) + operator + network);
             if((routeKeys.contains(routeId) ||routeNameKeys.contains(routeShortName))
                     && (
@@ -636,12 +636,12 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
 //            }
 //            Hashtable<String, String> osmtag = new Hashtable<String, String>(OSMTags.get(osmindex));
             String osmOperator = (String)osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
-            String osmStopID = (String)osmtag.get("gtfs_id");
+            String osmStopID = (String)osmtag.get(tag_defs.GTFS_STOP_ID_KEY);
             //add leading 0's
             if(osmStopID!=null) {
                 if (!osmStopID.equals("missing")) {
                     osmStopID = OsmFormatter.getValidBusStopId(osmStopID);
-                    osmtag.put("gtfs_id", osmStopID);
+                    osmtag.put(tag_defs.GTFS_STOP_ID_KEY, osmStopID);
                 }
             }
 
@@ -796,7 +796,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                                             es.addTag("note", "Please add gtfs_id after removing FIXME");
                                         }
                                         if (osmStopID==null) {
-                                            es.addAndOverwriteTag("gtfs_id","missing");
+                                            es.addAndOverwriteTag(tag_defs.GTFS_STOP_ID_KEY,"missing");
                                         }
 
                                         modify.add(es);
@@ -900,14 +900,14 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                     Hashtable<String, String> newTags = s.getTags();
                     ArrayList<String> newTagKeys = new ArrayList<String>(newTags.keySet());
                     for (String newTagKey : newTagKeys) {
-                        if (newTagKey.equals("gtfs_id")) tempStopId = newTags.get("gtfs_id");
+                        if (newTagKey.equals(tag_defs.GTFS_STOP_ID_KEY)) tempStopId = newTags.get(tag_defs.GTFS_STOP_ID_KEY);
 
                         newTags.put(newTagKey, "");
                     }
                     s.addAndOverwriteTags(newTags);
                     // add Osm tags, the rest remains empty
                     s.addAndOverwriteTags(arr.first().getTags());
-                    if(tempStopId!=null) s.addAndOverwriteTag("gtfs_id", tempStopId);
+                    if(tempStopId!=null) s.addAndOverwriteTag(tag_defs.GTFS_STOP_ID_KEY, tempStopId);
                     report.put(s, arr);
                 }
             }

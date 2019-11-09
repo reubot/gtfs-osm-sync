@@ -241,13 +241,13 @@ public class WriteFile {
                     else if(keys[j].equals("stop_lon")) content = st.getLon();
                     // gtfs stop_url is mapped to source_ref tag in OSM
                     else if(keys[j].equals("url")){
-//                        else if(keys[j].equals("stop_url")){                    	
+//                        else if(keys[j].equals("stop_url")){
                         content = st.getTag("url");
                         st.removeTag("url");
                     }
-                    else if(keys[j].equals("transport:zone")){
-                    	content = st.getTag("transport:zone");
-                    	st.removeTag("transport:zone");
+                    else if(keys[j].equals(tag_defs.OSM_ZONE_KEY)){
+                    	content = st.getTag(tag_defs.OSM_ZONE_KEY);
+                    	st.removeTag(tag_defs.OSM_ZONE_KEY);
                     }
                     else {
                         content = st.getTag("gtfs_"+keys[j]);
@@ -268,7 +268,7 @@ public class WriteFile {
                             st.removeTag("name");
                             st.removeTag("source");
                             st.removeTag("highway");
-                            st.removeTag("gtfs_id");
+                            st.removeTag(tag_defs.GTFS_STOP_ID_KEY);
 
                             output.write(",");
                             ArrayList<String> tagKeys = new ArrayList<String>();
