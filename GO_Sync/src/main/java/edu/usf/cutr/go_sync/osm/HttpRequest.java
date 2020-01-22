@@ -192,7 +192,7 @@ public class HttpRequest {
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
     	String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
         String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( relation[\"route\"=\"ferry\"];" +
-                //"  relation[\"route\"=\"bus\"];" +
+                "  relation[\"route\"=\"bus\"];" +
                 "); out meta;";
 //        String[] hosts = {"http://www.overpass-api.de/api/xapi_meta","http://overpass.openstreetmap.ru/cgi/xapi_meta"};
         String[] hosts = {"http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
