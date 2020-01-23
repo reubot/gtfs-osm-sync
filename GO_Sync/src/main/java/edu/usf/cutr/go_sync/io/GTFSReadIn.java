@@ -357,6 +357,7 @@ public class GTFSReadIn {
                         keysIndex.put("name",routeLongNameKey);
 //                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
                 }
+                // FIXME handle strings properly
                 else {
                     boolean lastIndexEmpty=false;
                     thisLine = thisLine.trim();
@@ -397,7 +398,7 @@ public class GTFSReadIn {
                                         // https://wiki.openstreetmap.org/wiki/Relation:route#Route_types_.28route.29
                                         case 0: route_value = "light_rail";	break;// 0: Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
                                         case 1:	route_value = "subway";     break;	// Subway, Metro. Any underground rail system within a metropolitan area.
-                                        case 2: route_value = "railway";    break;	// Rail. Used for intercity or long-distance travel.
+                                        case 2: route_value = "train";      break;	// Rail. Used for intercity or long-distance travel.
                                         case 3: route_value = "bus";        break;	// Bus. Used for short- and long-distance bus routes.
                                         case 4: route_value = "ferry";      break;	// Ferry. Used for short- and long-distance boat service.
                                         case 5: route_value = "cable_car";  break;	// Cable car. Used for street-level cable cars where the cable runs beneath the car.
