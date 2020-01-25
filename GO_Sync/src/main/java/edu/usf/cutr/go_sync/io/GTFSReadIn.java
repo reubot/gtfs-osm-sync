@@ -17,18 +17,16 @@ Copyright 2010 University of South Florida
 package edu.usf.cutr.go_sync.io;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import edu.usf.cutr.go_sync.tag_defs;
 import edu.usf.cutr.go_sync.object.OperatorInfo;
 import edu.usf.cutr.go_sync.object.Route;
 import edu.usf.cutr.go_sync.object.Stop;
 import edu.usf.cutr.go_sync.tools.OsmFormatter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 public class GTFSReadIn {
     private static Hashtable<String, Route> allRoutes;
@@ -50,7 +48,6 @@ public class GTFSReadIn {
         return allRoutes.keySet();
     }
 
-
     public String readAgency(String agency_fName)
     //public Hashtable<String, Route> readRoutes(String routes_fName)
     {
@@ -60,66 +57,84 @@ public class GTFSReadIn {
         try {
             BufferedReader br = new BufferedReader(new FileReader(agency_fName));
             boolean isFirstLine = true;
-            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer>();
-            while ((thisLine = br.readLine()) != null) {
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    thisLine = thisLine.replace("\"", "");
-                    String[] keys = thisLine.split(",");
-                    for(int i=0; i<keys.length; i++){
-                        if(keys[i].equals("agency_id")) agencyIdKey = i;
-                        else {
-                            if(keys[i].equals(tag_defs.GTFS_NETWORK_KEY)) agencyNameKey = i;
-                            String t = "gtfs_"+keys[i];
-                            keysIndex.put(t, i);
-                        }
-                    }
-//                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
-                }
-                else {
-                    boolean lastIndexEmpty=false;
-                    thisLine = thisLine.trim();
-                    if(thisLine.contains("\"")) {
-                         String[] temp = thisLine.split("\"");
-                         for(int x=0; x<temp.length; x++){
-                             if(x%2==1) temp[x] = temp[x].replace(",", "");
-                         }
-                         thisLine = "";
-                         for(int x=0; x<temp.length; x++){
-                             thisLine = thisLine + temp[x];
-                         }
-                    }
-                    elements = thisLine.split(",");
-                    if(thisLine.charAt(thisLine.length()-1)==',') lastIndexEmpty=true;
-                    String agencyName;
-                    if (elements[agencyNameKey] == null || elements[agencyNameKey].equals(""))
-                        agencyName = elements[agencyIdKey];
-                    else agencyName = elements[agencyNameKey];
-
-                    br.close();
-                    return agencyName;
-                    /*
-                    Route r = new Route(elements[agencyIdKey], agencyName, OperatorInfo.getFullName());
-                    HashSet<String> keys = new HashSet<String>();
-                    keys.addAll(keysIndex.keySet());
-                    Iterator<String> it = keys.iterator();
-                    try {
-                        while(it.hasNext()){
-                            String k = (String)it.next();
-                            String v = null;
-                            if(!lastIndexEmpty) v = elements[(Integer)keysIndex.get(k)];
-                            if ((v!=null) && (!v.equals(""))) r.addTag(k, v);
-                        }
-                    } catch(Exception e){
-                        System.out.println("Error occurred! Please check your GTFS input files");
-                        System.out.println(e.toString());
-                        System.exit(0);
-                    }
-                    routes.put(elements[agencyIdKey], r);
-                    */
-                }
+            CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
+            Map<String, Integer> keysIndex = parser.getHeaderMap();
+//                    for(int i=0; i<keys.length; i++){
+//                        if(keys[i].equals("agency_id")) agencyIdKey = i;
+//                        else {
+//                            if(keys[i].equals(tag_defs.GTFS_NETWORK_KEY)) agencyNameKey = i;
+//                            String t = "gtfs_"+keys[i];
+//                            keysIndex.put(t, i);
+//                        }
+            for (CSVRecord csvRecord : parser) {
+                String agencyName;
+                if (csvRecord.get(tag_defs.GTFS_NETWORK_KEY) == null ||
+                    csvRecord.get(tag_defs.GTFS_NETWORK_KEY).isEmpty())
+                    agencyName = csvRecord.get(tag_defs.GTFS_NETWORK_ID_KEY);
+                else agencyName = csvRecord.get(tag_defs.GTFS_NETWORK_KEY);
+                br.close();
+                return agencyName;
             }
-            br.close();
+///
+//            while ((thisLine = br.readLine()) != null) {
+//                if (isFirstLine) {
+//                    isFirstLine = false;
+//                    thisLine = thisLine.replace("\"", "");
+//                    String[] keys = thisLine.split(",");
+//                    for(int i=0; i<keys.length; i++){
+//                        if(keys[i].equals("agency_id")) agencyIdKey = i;
+//                        else {
+//                            if(keys[i].equals(tag_defs.GTFS_NETWORK_KEY)) agencyNameKey = i;
+//                            String t = "gtfs_"+keys[i];
+//                            keysIndex.put(t, i);
+//                        }
+//                    }
+////                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
+//                }
+//                else {
+//                    boolean lastIndexEmpty=false;
+//                    thisLine = thisLine.trim();
+//                    if(thisLine.contains("\"")) {
+//                        String[] temp = thisLine.split("\"");
+//                        for(int x=0; x<temp.length; x++){
+//                            if(x%2==1) temp[x] = temp[x].replace(",", "");
+//                        }
+//                        thisLine = "";
+//                        for(int x=0; x<temp.length; x++){
+//                            thisLine = thisLine + temp[x];
+//                        }
+//                    }
+//                    elements = thisLine.split(",");
+//                    if(thisLine.charAt(thisLine.length()-1)==',') lastIndexEmpty=true;
+//                    String agencyName;
+//                    if (elements[agencyNameKey] == null || elements[agencyNameKey].equals(""))
+//                        agencyName = elements[agencyIdKey];
+//                    else agencyName = elements[agencyNameKey];
+//
+//                    br.close();
+//                    return agencyName;
+//                    /*
+//                    Route r = new Route(elements[agencyIdKey], agencyName, OperatorInfo.getFullName());
+//                    HashSet<String> keys = new HashSet<String>();
+//                    keys.addAll(keysIndex.keySet());
+//                    Iterator<String> it = keys.iterator();
+//                    try {
+//                        while(it.hasNext()){
+//                            String k = (String)it.next();
+//                            String v = null;
+//                            if(!lastIndexEmpty) v = elements[(Integer)keysIndex.get(k)];
+//                            if ((v!=null) && (!v.equals(""))) r.addTag(k, v);
+//                        }
+//                    } catch(Exception e){
+//                        System.out.println("Error occurred! Please check your GTFS input files");
+//                        System.out.println(e.toString());
+//                        System.exit(0);
+//                    }
+//                    routes.put(elements[agencyIdKey], r);
+//                    */
+//                }
+//            }
+//            br.close();
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
@@ -127,7 +142,84 @@ public class GTFSReadIn {
         }
         return null;
     }
-
+//
+//    public String readAgency(String agency_fName)
+//    //public Hashtable<String, Route> readRoutes(String routes_fName)
+//    {
+//        String thisLine;
+//        String [] elements;
+//        int agencyIdKey=-1, agencyNameKey=-1;
+//        try {
+//            BufferedReader br = new BufferedReader(new FileReader(agency_fName));
+//            boolean isFirstLine = true;
+//            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer>();
+//            while ((thisLine = br.readLine()) != null) {
+//                if (isFirstLine) {
+//                    isFirstLine = false;
+//                    thisLine = thisLine.replace("\"", "");
+//                    String[] keys = thisLine.split(",");
+//                    for(int i=0; i<keys.length; i++){
+//                        if(keys[i].equals("agency_id")) agencyIdKey = i;
+//                        else {
+//                            if(keys[i].equals(tag_defs.GTFS_NETWORK_KEY)) agencyNameKey = i;
+//                            String t = "gtfs_"+keys[i];
+//                            keysIndex.put(t, i);
+//                        }
+//                    }
+////                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
+//                }
+//                else {
+//                    boolean lastIndexEmpty=false;
+//                    thisLine = thisLine.trim();
+//                    if(thisLine.contains("\"")) {
+//                         String[] temp = thisLine.split("\"");
+//                         for(int x=0; x<temp.length; x++){
+//                             if(x%2==1) temp[x] = temp[x].replace(",", "");
+//                         }
+//                         thisLine = "";
+//                         for(int x=0; x<temp.length; x++){
+//                             thisLine = thisLine + temp[x];
+//                         }
+//                    }
+//                    elements = thisLine.split(",");
+//                    if(thisLine.charAt(thisLine.length()-1)==',') lastIndexEmpty=true;
+//                    String agencyName;
+//                    if (elements[agencyNameKey] == null || elements[agencyNameKey].equals(""))
+//                        agencyName = elements[agencyIdKey];
+//                    else agencyName = elements[agencyNameKey];
+//
+//                    br.close();
+//                    return agencyName;
+//                    /*
+//                    Route r = new Route(elements[agencyIdKey], agencyName, OperatorInfo.getFullName());
+//                    HashSet<String> keys = new HashSet<String>();
+//                    keys.addAll(keysIndex.keySet());
+//                    Iterator<String> it = keys.iterator();
+//                    try {
+//                        while(it.hasNext()){
+//                            String k = (String)it.next();
+//                            String v = null;
+//                            if(!lastIndexEmpty) v = elements[(Integer)keysIndex.get(k)];
+//                            if ((v!=null) && (!v.equals(""))) r.addTag(k, v);
+//                        }
+//                    } catch(Exception e){
+//                        System.out.println("Error occurred! Please check your GTFS input files");
+//                        System.out.println(e.toString());
+//                        System.exit(0);
+//                    }
+//                    routes.put(elements[agencyIdKey], r);
+//                    */
+//                }
+//            }
+//            br.close();
+//        }
+//        catch (IOException e) {
+//            System.err.println("Error: " + e);
+//            return null;
+//        }
+//        return null;
+//    }
+//
     public List<Stop> readBusStop(String fName, String agencyName, String routes_fName, String trips_fName, String stop_times_fName){
         Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>();
         Hashtable<String, HashSet<Route>> id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);

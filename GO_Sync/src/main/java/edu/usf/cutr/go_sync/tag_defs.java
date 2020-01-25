@@ -8,6 +8,7 @@ public class tag_defs {
 	public final static String GTFS_STOP_ID_KEY = "gtfs_id";
     public final static String GTFS_OPERATOR_KEY = "network";
     public final static String GTFS_NETWORK_KEY  = "agency_name";
+    public final static String GTFS_NETWORK_ID_KEY  = "agency_id";
     public final static String  OSM_NETWORK_KEY  = "network";
     public final static String GTFS_ZONE_KEY  = "zone_id";
     public final static String  OSM_ZONE_KEY  = "transport:zone";
