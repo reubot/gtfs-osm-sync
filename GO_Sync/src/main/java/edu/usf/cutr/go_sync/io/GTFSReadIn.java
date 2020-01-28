@@ -406,8 +406,78 @@ public class GTFSReadIn {
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(routes_fName),"UTF-8"));
-            boolean isFirstLine = true;
+            boolean isFirstLine = false;//true;
             Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer> ();
+            thisLine = br.readLine();
+            StringReader sr = new StringReader(thisLine);
+            CSVParser parser = CSVParser.parse(sr, CSVFormat.DEFAULT.withHeader(//"route_id","route_short_name","route_long_name","route_desc","route_type","route_url","color","route_text_color"
+            ));
+            Hashtable<String, Integer> CSVkeysIndex = new Hashtable<>();
+            Map<String, Integer> CSVkeysMap =  parser.getHeaderMap();
+//            CSVkeysIndex.putAll(
+//                    CSVKeysMap.entrySet();
+//            );
+            List<String> CSVkeysList = parser.getHeaderNames();
+            ArrayList<String> CSVkeysListNew = new ArrayList<>(CSVkeysList);
+            String[] keysn =  new String[CSVkeysList.size()];
+            keysn = CSVkeysList.toArray(keysn);
+            for(int i=0; i<keysn.length; i++) {
+                //read keys
+                switch (keysn[i]) {
+                    case "route_id":
+                        routeIdKey = i;
+                        break;
+                    case tag_defs.GTFS_ROUTE_URL_KEY:
+                        keysIndex.put(tag_defs.OSM_URL_KEY, i);
+                        break;
+                    case "route_type":
+                        keysIndex.put(tag_defs.OSM_ROUTE_TYPE_KEY, i);
+                        break;
+                    case tag_defs.GTFS_COLOUR_KEY:
+                    case tag_defs.GTFS_COLOR_KEY:
+                        keysIndex.put(tag_defs.OSM_COLOUR_KEY, i);
+                        break;
+                    case tag_defs.GTFS_ROUTE_NUM:
+                        routeShortNameKey = i;
+                        break;
+                    case tag_defs.GTFS_ROUTE_NAME:
+                        routeLongNameKey = i;
+                        break;
+                    default:
+                        String t = "gtfs_" + keysn[i];
+                        keysIndex.put(t, i);
+                        break;
+                }
+            }
+            if (routeLongNameKey != -1)
+                keysIndex.put("name",routeLongNameKey);
+//                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
+
+/*
+            for (Map.Entry<String, Integer> x : CSVkeysIndex.entrySet())
+            {
+                System.out.print(x.getKey());
+                switch (x.getKey()) {
+                    case tag_defs.GTFS_ROUTE_URL_KEY:
+                        CSVkeysIndex.put(tag_defs.OSM_URL_KEY, x.getValue());
+                        CSVkeysIndex.remove(x);
+                        break;
+
+                }
+            }
+
+            for (Map.Entry<String,Integer> x :  parser.getHeaderMap().entrySet())
+            {
+                System.out.print(x);
+            }
+            for (String  x :  CSVkeysListNew)
+            {
+                System.out.println(x);
+            }
+            for (CSVRecord csvRecord : parser) {
+                System.out.println(csvRecord.toMap());
+            }
+*/
             while ((thisLine = br.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
@@ -430,6 +500,7 @@ public class GTFSReadIn {
                                 keysIndex.put(tag_defs.OSM_ROUTE_TYPE_KEY, i);
                                 break;
                             case tag_defs.GTFS_COLOUR_KEY:
+                            case tag_defs.GTFS_COLOR_KEY:
                                 keysIndex.put(tag_defs.OSM_COLOUR_KEY, i);
                                 break;
                             case tag_defs.GTFS_ROUTE_NUM:

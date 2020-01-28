@@ -22,7 +22,8 @@ public class tag_defs {
     public final static String  OSM_ROUTE_NUM   = "ref";
     public final static String GTFS_ROUTE_NAME  = "route_long_name";
     public final static String  OSM_ROUTE_NAME  = "name";
-    public final static String GTFS_COLOUR_KEY  = "route_color";
+    public final static String GTFS_COLOR_KEY  = "route_color";
+    public final static String GTFS_COLOUR_KEY  = "route_colour";
     public final static String  OSM_COLOUR_KEY  = "colour";
     public final static String GTFS_WHEELCHAIR_KEY = "wheelchair_boarding";
     public final static String OSM_WHEELCHAIR_KEY = "wheelchair";
