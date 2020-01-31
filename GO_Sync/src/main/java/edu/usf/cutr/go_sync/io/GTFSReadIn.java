@@ -410,14 +410,14 @@ public class GTFSReadIn {
             Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer> ();
             thisLine = br.readLine();
             StringReader sr = new StringReader(thisLine);
-            CSVParser parser = CSVParser.parse(sr, CSVFormat.DEFAULT.withHeader(//"route_id","route_short_name","route_long_name","route_desc","route_type","route_url","color","route_text_color"
+            CSVParser headerParser = CSVParser.parse(sr, CSVFormat.DEFAULT.withHeader(//"route_id","route_short_name","route_long_name","route_desc","route_type","route_url","color","route_text_color"
             ));
             Hashtable<String, Integer> CSVkeysIndex = new Hashtable<>();
-            Map<String, Integer> CSVkeysMap =  parser.getHeaderMap();
+            Map<String, Integer> CSVkeysMap =  headerParser.getHeaderMap();
 //            CSVkeysIndex.putAll(
 //                    CSVKeysMap.entrySet();
 //            );
-            List<String> CSVkeysList = parser.getHeaderNames();
+            List<String> CSVkeysList = headerParser.getHeaderNames();
             ArrayList<String> CSVkeysListNew = new ArrayList<>(CSVkeysList);
             String[] keysn =  new String[CSVkeysList.size()];
             keysn = CSVkeysList.toArray(keysn);
@@ -466,7 +466,7 @@ public class GTFSReadIn {
                 }
             }
 
-            for (Map.Entry<String,Integer> x :  parser.getHeaderMap().entrySet())
+            for (Map.Entry<String,Integer> x :  headerParser.getHeaderMap().entrySet())
             {
                 System.out.print(x);
             }
@@ -474,10 +474,21 @@ public class GTFSReadIn {
             {
                 System.out.println(x);
             }
-            for (CSVRecord csvRecord : parser) {
+            for (CSVRecord csvRecord : headerParser) {
                 System.out.println(csvRecord.toMap());
             }
 */
+            {
+                CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader(keysn));
+                for (CSVRecord csvRecord : parser)
+                {
+//                    for (Map.Entry<String, Integer> x : CSVkeysIndex.entrySet())
+//                    cvsRecord.toMap<>();
+                    Iterator<String> iter = csvRecord.iterator();
+                    Map<String,String> hm = csvRecord.toMap();
+                    elements =  new String[hm.size()];
+                    elements = hm.values().toArray(elements);
+/*
             while ((thisLine = br.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
@@ -536,6 +547,7 @@ public class GTFSReadIn {
                     }
                     elements = thisLine.split(",");
                     if(thisLine.charAt(thisLine.length()-1)==',') lastIndexEmpty=true;
+                    */
                     String routeName;
                     if(elements[routeShortNameKey]==null || elements[routeShortNameKey].equals("")) routeName = elements[routeIdKey];
                     else routeName = elements[routeShortNameKey];
