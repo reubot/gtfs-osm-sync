@@ -221,6 +221,7 @@ public class GTFSReadIn {
 //    }
 //
     public List<Stop> readBusStop(String fName, String agencyName, String routes_fName, String trips_fName, String stop_times_fName){
+        long tStart = System.currentTimeMillis();
         Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>();
         Hashtable<String, HashSet<Route>> id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
         stopIDs.putAll(id);
@@ -390,6 +391,9 @@ public class GTFSReadIn {
         catch (IOException e) {
             System.err.println("Error: " + e);
         }
+        long tDelta = System.currentTimeMillis() - tStart;
+//        this.setMessage("Completed in "+ tDelta /1000.0 + "seconds");
+        System.out.println("GTFSReadIn Completed in "+ tDelta /1000.0 + "seconds");
         return stops;
     }
 
