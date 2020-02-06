@@ -619,21 +619,38 @@ public class GTFSReadIn {
         String thisLine;
         String [] elements;
         // hashtable String vs. String
-        Hashtable<String,String> tripIDs = new Hashtable<String,String>();
+        HashMap<String,String> tripIDs = new HashMap<String,String>();
 
         // trips.txt read-in
         try {
             int tripIdKey=-1, routeIdKey=-1;
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trips_fName),"UTF-8"));
             boolean isFirstLine = true;
-            while ((thisLine = br.readLine()) != null) {
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    if (thisLine.startsWith(UTF8_BOM)) {
-                        thisLine = thisLine.substring(1);
-                    }
-                    thisLine = thisLine.replace("\"", "");
-                    String[] keys = thisLine.split(",");
+            CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
+            for (CSVRecord csvRecord : parser) {
+
+                String tripId = csvRecord.get(tag_defs.GTFS_TRIP_ID_KEY);
+                // not sure if tripId is unique in trips.txt, e.g. can 1 trip_id has multiple route_id
+                if (tripIDs.containsKey(tripId)) {
+                    System.out.println("Repeat "+tripId);
+                }
+                tripIDs.put(tripId, csvRecord.get(tag_defs.GTFS_ROUTE_ID_KEY));
+
+/*
+            {
+//                {
+//                    List<String> CSVkeysList = headerParser.getHeaderNames();
+//                    ArrayList<String> CSVkeysListNew = new ArrayList<>(CSVkeysList);
+//                    String[] keysn =  new String[CSVkeysList.size()];
+//                    keys = CSVkeysList.toArray(keysn);
+//            while ((thisLine = br.readLine()) != null) {
+//                if (isFirstLine) {
+//                    isFirstLine = false;
+//                    if (thisLine.startsWith(UTF8_BOM)) {
+//                        thisLine = thisLine.substring(1);
+//                    }
+//                    thisLine = thisLine.replace("\"", "");
+//                    String[] keys = thisLine.split(",");
                     for(int i=0; i<keys.length; i++){
                         if(keys[i].equals("route_id")) routeIdKey = i;
                         else if(keys[i].equals("trip_id")) tripIdKey = i;
@@ -657,6 +674,7 @@ public class GTFSReadIn {
                     }
                     tripIDs.put(elements[tripIdKey], elements[routeIdKey]);
                 }
+                */
             }
         }
         catch (IOException e) {
@@ -668,7 +686,50 @@ public class GTFSReadIn {
         // stop_times.txt read-in
         int stopIdKey=-1, tripIdKey = -1;
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(stop_times_fName),"UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(stop_times_fName), "UTF-8"));
+
+            // TODO copt from read routes
+            CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
+/*
+            {
+                Map<String, Integer> CSVkeysMap = parser.getHeaderMap();
+
+            tripIdKey = CSVkeysMap.get(tag_defs.GTFS_TRIP_ID_KEY);
+            stopIdKey = CSVkeysMap.get(tag_defs.GTFS_TRIPS_STOP_ID_KEY);
+            for (CSVRecord csvRecord : parser) {
+                Map<String, String> hm = csvRecord.toMap();
+                elements = new String[hm.size()];
+                elements = hm.values().toArray(elements);
+                String trip = elements[tripIdKey];
+                HashSet<Route> routes = new HashSet<Route>();
+                Route tr = null;
+                if (tripIDs.get(trip) != null) tr = allRoutes.get(tripIDs.get(trip));
+                if (tr != null) routes.add(tr);
+                String sid = OsmFormatter.getValidBusStopId(elements[stopIdKey]);
+                if (stopIDs.containsKey(sid)) {
+                    routes.addAll(stopIDs.get(sid));
+                    stopIDs.remove(sid);
+                }
+                stopIDs.put(sid, routes);
+            }
+        }*/
+
+            for (CSVRecord csvRecord : parser) {
+                // This seems to be the fastest method using csvparser
+                String trip = csvRecord.get(tag_defs.GTFS_TRIP_ID_KEY);
+                HashSet<Route> routes = new HashSet<Route>();
+                Route tr = null;
+                if (tripIDs.get(trip) != null) tr = allRoutes.get(tripIDs.get(trip));
+                if (tr != null) routes.add(tr);
+                String sid = OsmFormatter.getValidBusStopId(csvRecord.get(tag_defs.GTFS_TRIPS_STOP_ID_KEY));
+                if (stopIDs.containsKey(sid)) {
+                    routes.addAll(stopIDs.get(sid));
+                    stopIDs.remove(sid);
+                }
+                stopIDs.put(sid, routes);
+            }
+
+            /*
             boolean isFirstLine = true;
             while ((thisLine = br.readLine()) != null) {
                 if (isFirstLine) {
@@ -707,7 +768,7 @@ public class GTFSReadIn {
                     }
                     stopIDs.put(sid, routes);
                 }
-            }
+            }*/
         }
         catch (IOException e) {
             System.err.println("Error: " + e);

@@ -39,6 +39,16 @@ public class tag_defs {
     public final static String GTFS_ROUTE_URL_KEY  = "route_url";
     public final static String  OSM_URL_KEY  = "url";
 //
+
+    //https://developers.google.com/transit/gtfs/reference#tripstxt
+    public final static String GTFS_ROUTE_ID_KEY = "route_id";
+    public final static String GTFS_SERVICE_ID_KEY = "service_id";
+    public final static String GTFS_TRIP_ID_KEY = "trip_id";
+    public final static String GTFS_TRIPS_STOP_ID_KEY = "stop_id";
+
+
+
+
 public enum primative_type {
     NODE, RELATION, WAY
 }
