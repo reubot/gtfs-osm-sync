@@ -231,17 +231,34 @@ public class GTFSReadIn {
         int stopIdKey=-1, stopNameKey=-1, stopLatKey=-1, stopLonKey=-1;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fName),"UTF-8"));
-            boolean isFirstLine = true;
-            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer>();
-            while ((thisLine = br.readLine()) != null) {
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    if (thisLine.startsWith(UTF8_BOM)) {
-                        thisLine = thisLine.substring(1);
-                    }
-                    OperatorInfo.setGtfsFields(thisLine);
-                    thisLine = thisLine.replace("\"", "");
-                    String[] keys = thisLine.split(",");
+            boolean isFirstLine = false;//true;
+            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer> ();
+            thisLine = br.readLine();
+            StringReader sr = new StringReader(thisLine);
+            CSVParser headerParser = CSVParser.parse(sr, CSVFormat.DEFAULT.withHeader(//"route_id","route_short_name","route_long_name","route_desc","route_type","route_url","color","route_text_color"
+            ));
+            Hashtable<String, Integer> CSVkeysIndex = new Hashtable<>();
+            Map<String, Integer> CSVkeysMap =  headerParser.getHeaderMap();
+//            CSVkeysIndex.putAll(
+//                    CSVKeysMap.entrySet();
+//            );
+            List<String> CSVkeysList = headerParser.getHeaderNames();
+            ArrayList<String> CSVkeysListNew = new ArrayList<>(CSVkeysList);
+            String[] keys =  new String[CSVkeysList.size()];
+            keys = CSVkeysList.toArray(keys);
+
+//            boolean isFirstLine = true;
+//            Hashtable<String,Integer> keysIndex = new Hashtable<String,Integer>();
+//            while ((thisLine = br.readLine()) != null) {
+//                if (isFirstLine) {
+//                    isFirstLine = false;
+//                    if (thisLine.startsWith(UTF8_BOM)) {
+//                        thisLine = thisLine.substring(1);
+//                    }
+//                    OperatorInfo.setGtfsFields(thisLine);
+//                    thisLine = thisLine.replace("\"", "");
+//                    String[] keys = thisLine.split(",");
+            {
                     for(int i=0; i<keys.length; i++){
                         switch (keys[i]) {
                             case "stop_id":
@@ -277,7 +294,8 @@ public class GTFSReadIn {
                     System.out.println(keysIndex.toString());
 //                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
                 }
-                else {
+            while ((thisLine = br.readLine()) != null) {
+//                else {
                     boolean lastIndexEmpty=false;
                     thisLine = thisLine.trim();
 
@@ -298,9 +316,9 @@ public class GTFSReadIn {
                     //add leading 0's to gtfs_id
                     String tempStopId = OsmFormatter.getValidBusStopId(elements[stopIdKey]);
                     Stop s = new Stop(tempStopId, agencyName, elements[stopNameKey],elements[stopLatKey],elements[stopLonKey]);
-                    HashSet<String> keys = new HashSet<String>();
-                    keys.addAll(keysIndex.keySet());
-                    Iterator it = keys.iterator();
+                    HashSet<String> keysn = new HashSet<String>();
+                    keysn.addAll(keysIndex.keySet());
+                    Iterator it = keysn.iterator();
                     try {
                         while(it.hasNext()){
                         	String k = (String)it.next();
@@ -322,7 +340,7 @@ public class GTFSReadIn {
                                 if (k.equals(tag_defs.OSM_WHEELCHAIR_KEY)) {
                                     String parent = "";
 
-                                    if (keys.contains("gtfs_parent_station"))
+                                    if (keysn.contains("gtfs_parent_station"))
                                         parent = elements[keysIndex.get(k)];
                                     if (parent.isEmpty()) {
                                         switch (Integer.parseInt(v)) {
@@ -386,7 +404,7 @@ public class GTFSReadIn {
 
 //                    System.out.println(thisLine);
                 }
-            }
+//            }
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
