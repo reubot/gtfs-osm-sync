@@ -294,26 +294,37 @@ public class GTFSReadIn {
                     System.out.println(keysIndex.toString());
 //                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
                 }
-            while ((thisLine = br.readLine()) != null) {
+//            while ((thisLine = br.readLine()) != null) {
 //                else {
-                    boolean lastIndexEmpty=false;
-                    thisLine = thisLine.trim();
+            CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader(keys));
+            for (CSVRecord csvRecord : parser)
+            {
+//                    for (Map.Entry<String, Integer> x : CSVkeysIndex.entrySet())
+//                    cvsRecord.toMap<>();
+                Iterator<String> iter = csvRecord.iterator();
+                Map<String,String> hm = csvRecord.toMap();
+                elements =  new String[hm.size()];
+                elements = hm.values().toArray(elements);
+/*                    boolean lastIndexEmpty=false;
+//                    thisLine = thisLine.trim();
+//
+//                    if(thisLine.contains("\"")) {
+//                         String[] temp = thisLine.split("\"");
+//                         for(int x=0; x<temp.length; x++){
+//                             if(x%2==1) temp[x] = temp[x].replace(",", "");
+//                         }
+//                         thisLine = "";
+//                         for(int x=0; x<temp.length; x++){
+//                             thisLine = thisLine + temp[x];
+//                         }
+//                    }
+//                    elements = thisLine.split(",");
 
-                    if(thisLine.contains("\"")) {
-                         String[] temp = thisLine.split("\"");
-                         for(int x=0; x<temp.length; x++){
-                             if(x%2==1) temp[x] = temp[x].replace(",", "");
-                         }
-                         thisLine = "";
-                         for(int x=0; x<temp.length; x++){
-                             thisLine = thisLine + temp[x];
-                         }
-                    }
-                    elements = thisLine.split(",");
+
                     //System.out.println(elements.length);
                    // for (int zxc = 0; zxc< elements.length-1; zxc++) {System.out.print(elements[zxc]+ ",");}System.out.print(elements[elements.length] );
                     if(thisLine.charAt(thisLine.length()-1)==',') lastIndexEmpty=true;
-                    //add leading 0's to gtfs_id
+ */                    //add leading 0's to gtfs_id
                     String tempStopId = OsmFormatter.getValidBusStopId(elements[stopIdKey]);
                     Stop s = new Stop(tempStopId, agencyName, elements[stopNameKey],elements[stopLatKey],elements[stopLonKey]);
                     HashSet<String> keysn = new HashSet<String>();
