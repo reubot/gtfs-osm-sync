@@ -37,7 +37,9 @@ public class tag_defs {
     public final static String GTFS_ROUTE_URL_KEY  = "route_url";
     public final static String  OSM_URL_KEY  = "url";
 //
-
+public enum primative_type {
+    NODE, RELATION, WAY
+}
 
 }
 
