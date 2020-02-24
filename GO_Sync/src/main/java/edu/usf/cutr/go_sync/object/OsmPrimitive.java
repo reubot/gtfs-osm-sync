@@ -17,6 +17,8 @@ Copyright 2010 University of South Florida
 
 package edu.usf.cutr.go_sync.object;
 
+import edu.usf.cutr.go_sync.tag_defs;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -29,6 +31,11 @@ public class OsmPrimitive {
     Hashtable osmTags;
     //TODO change reportCategory to enum
     private String status, osmVersion, osmid, reportCategory, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
+    private enum RC {
+        UPLOAD_CONFLICT, UPLOAD_NO_CONFLICT, MODIFY, NOTHING_NEW
+    }
+
+    tag_defs.primative_type type = null;
     public OsmPrimitive(){
         osmTags = new Hashtable();
     }
@@ -161,4 +168,15 @@ public class OsmPrimitive {
     public String getLastEditedOsmDate(){
         return lastEditedOsmDate;
     }
+
+    public void setType(tag_defs.primative_type t)
+    {
+        type = t;
+    }
+
+    public tag_defs.primative_type getType()
+    {
+        return type;
+    }
+
 }

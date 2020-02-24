@@ -37,12 +37,13 @@ public class BusStopParser extends DefaultHandler{
         xmlNodes = new ArrayList<AttributesImpl>();
         xmlTags = new ArrayList<Hashtable>();
     }
-    
+
     @Override public void startElement(String namespaceURI, String localName, String qname, Attributes attributes) throws SAXException {
         if (qname.equals("node") || qname.equals("changeset")) {
             attImplNode = new AttributesImpl(attributes);
             xmlNodes.add(attImplNode);
             tempTag = new Hashtable();      // start to collect tags of that node
+
         }
         if (qname.equals("tag")) {
             AttributesImpl attImpl = new AttributesImpl(attributes);

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import edu.usf.cutr.go_sync.object.RelationMember;
+import edu.usf.cutr.go_sync.tag_defs;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -35,6 +36,7 @@ public class RouteParser extends DefaultHandler {
     private Hashtable tempTag;
     private HashSet<RelationMember> tempMembers;
     private ArrayList<AttributesImpl> xmlRelations;
+    private ArrayList<tag_defs.primative_type> xmlType;
     //xmlTags<String, String> ----------- xmlMembers<String(refID), AttributesImpl>
     private ArrayList<Hashtable> xmlTags;
     private ArrayList<HashSet<RelationMember>> xmlMembers;
@@ -42,6 +44,7 @@ public class RouteParser extends DefaultHandler {
         xmlRelations = new ArrayList<AttributesImpl>();
         xmlTags = new ArrayList<Hashtable>();
         xmlMembers = new ArrayList<HashSet<RelationMember>>();
+        xmlType = new ArrayList<tag_defs.primative_type>();
     }
     @Override public void startElement(String namespaceURI, String localName, String qname, Attributes attributes) throws SAXException {
         if (qname.equals("relation")) {
@@ -49,6 +52,7 @@ public class RouteParser extends DefaultHandler {
             xmlRelations.add(attImpl);
             tempTag = new Hashtable();      // start to collect tags of that relation
             tempMembers = new HashSet<RelationMember>();
+            xmlType.add(tag_defs.primative_type.RELATION);
         }
         if (tempTag!=null && qname.equals("tag")) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
