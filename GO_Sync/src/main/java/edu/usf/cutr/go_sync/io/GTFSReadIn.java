@@ -351,8 +351,10 @@ public class GTFSReadIn {
                                         case 2: route_value = "train";      break;	// Rail. Used for intercity or long-distance travel.
                                         case 3: route_value = "bus";        break;	// Bus. Used for short- and long-distance bus routes.
                                         case 4: route_value = "ferry";      break;	// Ferry. Used for short- and long-distance boat service.
+                                        // TODO use arialway
                                         case 5: route_value = "cable_car";  break;	// Cable car. Used for street-level cable cars where the cable runs beneath the car.
                                         case 6: route_value = "gondola";    break;	// Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
+                                        // TODO use railway=funicular
                                         case 7: route_value = "funicular";  break;	// Funicular. Any rail system designed for steep inclines.
                                         default: route_value = v; break;
                                     }
@@ -446,13 +448,28 @@ public class GTFSReadIn {
         return stopIDs;
     }
 
+    private class hashCodeCompare implements  Comparator
+    {
+        @Override
+        public int compare(Object o, Object t1) {
+            return o.hashCode() - t1.hashCode();
+        }
+    }
+
     public String getRoutesInTextByBusStop(HashSet<Route> r) {
         String text="";
+
         if (r!=null) {
+            TreeSet<String> routeRefSet = new TreeSet<String>(new hashCodeCompare());
             ArrayList<Route> routes = new ArrayList<Route>();
             //convert from hashset to arraylist
             routes.addAll(r);
+            for (Route rr:routes)
+            {
+                routeRefSet.add(rr.getRouteRef());
+            }
             //ordering by hashcode
+            /*
             for (int i=0; i<routes.size()-1; i++) {
                 int k=i;
                 for (int j=i+1; j<routes.size(); j++) {
@@ -465,9 +482,14 @@ public class GTFSReadIn {
                 routes.set(k, temp);
             }
 
-            //to text
+             */
+
+            /*to text
             for (int i=0; i<routes.size(); i++) {
                 text = text + ";" + routes.get(i).getRouteRef();
+            }*/
+            for (String routeText: routeRefSet) {
+                text = text + ";" + routeText;
             }
             //delete the 1st semi-colon
             if (!text.isEmpty()) {
