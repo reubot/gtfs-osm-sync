@@ -355,11 +355,12 @@ public class GTFSReadIn {
                                         case 2: route_value = "train";      break;	// Rail. Used for intercity or long-distance travel.
                                         case 3: route_value = "bus";        break;	// Bus. Used for short- and long-distance bus routes.
                                         case 4: route_value = "ferry";      break;	// Ferry. Used for short- and long-distance boat service.
-                                        // TODO use arialway
-                                        case 5: route_value = "cable_car";  break;	// Cable car. Used for street-level cable cars where the cable runs beneath the car.
-                                        case 6: route_value = "gondola";    break;	// Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
+                                        case 5: route_value = "tram";  break;	// Cable car. Used for street-level cable cars where the cable runs beneath the car.
+                                        case 6: k = "aerialway";
+                                                route_value = "yes";    break;	// Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
                                         // TODO use railway=funicular
-                                        case 7: route_value = "funicular";  break;	// Funicular. Any rail system designed for steep inclines.
+                                        case 7: k = "railway";
+                                                route_value = "funicular";  break;	// Funicular. Any rail system designed for steep inclines.
                                         default: route_value = v; break;
                                     }
                                     v = route_value;
@@ -463,8 +464,19 @@ public class GTFSReadIn {
             routes.addAll(r);
             for (Route rr:routes)
             {
-                if (rr.containsKey(tag_defs.OSM_ROUTE_TYPE_KEY))
-                    keys.put(rr.getTag(tag_defs.OSM_ROUTE_TYPE_KEY),"yes");
+                if (rr.containsKey(tag_defs.OSM_ROUTE_TYPE_KEY)) {
+                    keys.put(rr.getTag(tag_defs.OSM_ROUTE_TYPE_KEY), "yes");
+                    if (rr.getTag(tag_defs.OSM_ROUTE_TYPE_KEY) == "ferry")
+                        keys.put("amenity","ferry_terminal");
+                }
+                if (rr.containsKey("aerialway"))
+                     keys.put("aerialway","station");
+                if (rr.containsKey("railway") && rr.getTag("railway") == "funicular")
+                {
+                    keys.put("railway","station");
+                    keys.put("station","funicular");
+                }
+
             }
         }
         return keys;
