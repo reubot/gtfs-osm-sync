@@ -238,6 +238,10 @@ public class GTFSReadIn {
 
                     stops.add(s);
 
+                    HashMap<String,String> modes = getModeTagsByBusStop(stopIDs.get(tempStopId));
+                    if (!r.isEmpty()) s.addTags(modes);
+
+
 
 //                    System.out.println(thisLine);
                 }
@@ -446,6 +450,24 @@ public class GTFSReadIn {
             System.err.println("Error: " + e);
         }
         return stopIDs;
+    }
+
+    //TODO implement  this
+    // https://wiki.openstreetmap.org/wiki/Public_transport
+    public HashMap<String,String> getModeTagsByBusStop(HashSet<Route> r) {
+        HashMap<String,String> keys = new HashMap<String,String>();
+        if (r!=null) {
+            TreeSet<String> routeRefSet = new TreeSet<String>(new hashCodeCompare());
+            ArrayList<Route> routes = new ArrayList<Route>();
+            //convert from hashset to arraylist
+            routes.addAll(r);
+            for (Route rr:routes)
+            {
+                if (rr.containsKey(tag_defs.OSM_ROUTE_TYPE_KEY))
+                    keys.put(rr.getTag(tag_defs.OSM_ROUTE_TYPE_KEY),"yes");
+            }
+        }
+        return keys;
     }
 
     private class hashCodeCompare implements  Comparator
