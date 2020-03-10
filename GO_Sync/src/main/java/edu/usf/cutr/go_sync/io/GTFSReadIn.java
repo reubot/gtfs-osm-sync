@@ -18,6 +18,7 @@ package edu.usf.cutr.go_sync.io;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import edu.usf.cutr.go_sync.tag_defs;
 import edu.usf.cutr.go_sync.object.OperatorInfo;
@@ -30,8 +31,8 @@ import org.apache.commons.csv.CSVRecord;
 
 public class GTFSReadIn {
     private static Hashtable<String, Route> allRoutes;
-    private final String ROUTE_KEY = "route_ref";
-    private final String NTD_ID_KEY = "ntd_id";
+    private static final String ROUTE_KEY = "route_ref";
+    private static final String NTD_ID_KEY = "ntd_id";
     private static final String UTF8_BOM = "\uFEFF";
 //TODO read agency.txt
 
@@ -51,21 +52,12 @@ public class GTFSReadIn {
     public String readAgency(String agency_fName)
     //public Hashtable<String, Route> readRoutes(String routes_fName)
     {
-        String thisLine;
-        String [] elements;
-        int agencyIdKey=-1, agencyNameKey=-1;
         try {
             BufferedReader br = new BufferedReader(new FileReader(agency_fName));
             boolean isFirstLine = true;
             CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
             Map<String, Integer> keysIndex = parser.getHeaderMap();
-//                    for(int i=0; i<keys.length; i++){
-//                        if(keys[i].equals("agency_id")) agencyIdKey = i;
-//                        else {
-//                            if(keys[i].equals(tag_defs.GTFS_NETWORK_KEY)) agencyNameKey = i;
-//                            String t = "gtfs_"+keys[i];
-//                            keysIndex.put(t, i);
-//                        }
+
             for (CSVRecord csvRecord : parser) {
                 String agencyName;
                 if (csvRecord.get(tag_defs.GTFS_NETWORK_KEY) == null ||
@@ -85,9 +77,8 @@ public class GTFSReadIn {
 
     public List<Stop> readBusStop(String fName, String agencyName, String routes_fName, String trips_fName, String stop_times_fName){
         long tStart = System.currentTimeMillis();
-        Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>();
         Hashtable<String, HashSet<Route>> id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
-        stopIDs.putAll(id);
+        Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>(id);
 
         String thisLine;
         String [] elements;
@@ -100,7 +91,6 @@ public class GTFSReadIn {
             StringReader sr = new StringReader(thisLine);
             CSVParser headerParser = CSVParser.parse(sr, CSVFormat.DEFAULT.withHeader(//"route_id","route_short_name","route_long_name","route_desc","route_type","route_url","color","route_text_color"
             ));
-            Hashtable<String, Integer> CSVkeysIndex = new Hashtable<>();
             Map<String, Integer> CSVkeysMap =  headerParser.getHeaderMap();
 //            CSVkeysIndex.putAll(
 //                    CSVKeysMap.entrySet();
@@ -164,8 +154,7 @@ public class GTFSReadIn {
  */                    //add leading 0's to gtfs_id
                     String tempStopId = OsmFormatter.getValidBusStopId(elements[stopIdKey]);
                     Stop s = new Stop(tempStopId, agencyName, elements[stopNameKey],elements[stopLatKey],elements[stopLonKey]);
-                    HashSet<String> keysn = new HashSet<String>();
-                    keysn.addAll(keysIndex.keySet());
+                    HashSet<String> keysn = new HashSet<String>(keysIndex.keySet());
                     Iterator it = keysn.iterator();
                     try {
                         while(it.hasNext()){
@@ -174,7 +163,7 @@ public class GTFSReadIn {
                             String v = null;
                             //if(!lastIndexEmpty) v = elements[(Integer)keysIndex.get(k)];
                             if(keysIndex.get(k) < elements.length) v = elements[keysIndex.get(k)];
-                            if ((v!=null) && (!v.equals(""))) {
+                            if ((v!=null) && (!v.isEmpty())) {
                                 if (k.equals(tag_defs.OSM_STOP_TYPE_KEY))
                                 {
                                     switch(Integer.parseInt(v))
@@ -275,7 +264,7 @@ public class GTFSReadIn {
             StringReader sr = new StringReader(thisLine);
             CSVParser headerParser = CSVParser.parse(sr, CSVFormat.DEFAULT.withHeader(//"route_id","route_short_name","route_long_name","route_desc","route_type","route_url","color","route_text_color"
             ));
-            Hashtable<String, Integer> CSVkeysIndex = new Hashtable<>();
+//            Hashtable<String, Integer> CSVkeysIndex = new Hashtable<>();
             Map<String, Integer> CSVkeysMap =  headerParser.getHeaderMap();
 //            CSVkeysIndex.putAll(
 //                    CSVKeysMap.entrySet();
@@ -328,19 +317,19 @@ public class GTFSReadIn {
                     elements = hm.values().toArray(elements);
 
                     String routeName;
-                    if(elements[routeShortNameKey]==null || elements[routeShortNameKey].equals("")) routeName = elements[routeIdKey];
+                    if(elements[routeShortNameKey]==null || elements[routeShortNameKey].isEmpty()) routeName = elements[routeIdKey];
                     else routeName = elements[routeShortNameKey];
                     Route r = new Route(elements[routeIdKey], routeName, OperatorInfo.getFullName());
-                    HashSet<String> keys = new HashSet<String>();
-                    keys.addAll(keysIndex.keySet());
+                    HashSet<String> keys = new HashSet<String>(keysIndex.keySet());
                     Iterator<String> it = keys.iterator();
+                    final Pattern colourPattern = Pattern.compile("^[a-fA-F0-9]+$");
                     try {
                         while(it.hasNext()){
                             String k = it.next();
                             String v = null;
                             int ki = keysIndex.get(k);
                             if(/*!(lastIndexEmpty && */ki <elements.length) v = elements[ki];
-                            if ((v!=null) && (!v.equals("")))
+                            if ((v!=null) && (!v.isEmpty()))
                             {
                                 if (k.equals(tag_defs.OSM_ROUTE_TYPE_KEY))
                                 {
@@ -368,7 +357,7 @@ public class GTFSReadIn {
                                 //prepend hex colours
 //                                if (k.equals(tag_defs.OSM_COLOUR_KEY))
 //                                    System.out.println(tag_defs.OSM_COLOUR_KEY + " "+ v + " #"+v);
-                                if (k.equals(tag_defs.OSM_COLOUR_KEY) && ((v.length() == 3 || v.length() == 6) && v.matches("^[a-fA-F0-9]+$")) )
+                                if (k.equals(tag_defs.OSM_COLOUR_KEY) && ((v.length() == 3 || v.length() == 6) && colourPattern.matcher(v).matches()))//"^[a-fA-F0-9]+$")) )
                                 {
                                     v = "#".concat(v);
                                 }
@@ -458,10 +447,8 @@ public class GTFSReadIn {
     public HashMap<String,String> getModeTagsByBusStop(HashSet<Route> r) {
         HashMap<String,String> keys = new HashMap<String,String>();
         if (r!=null) {
-            TreeSet<String> routeRefSet = new TreeSet<String>(new hashCodeCompare());
-            ArrayList<Route> routes = new ArrayList<Route>();
             //convert from hashset to arraylist
-            routes.addAll(r);
+            ArrayList<Route> routes = new ArrayList<Route>(r);
             for (Route rr:routes)
             {
                 if (rr.containsKey(tag_defs.OSM_ROUTE_TYPE_KEY)) {
@@ -495,9 +482,8 @@ public class GTFSReadIn {
 
         if (r!=null) {
             TreeSet<String> routeRefSet = new TreeSet<String>(new hashCodeCompare());
-            ArrayList<Route> routes = new ArrayList<Route>();
             //convert from hashset to arraylist
-            routes.addAll(r);
+            ArrayList<Route> routes = new ArrayList<Route>(r);
             for (Route rr:routes)
             {
                 routeRefSet.add(rr.getRouteRef());
