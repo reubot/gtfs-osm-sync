@@ -304,6 +304,7 @@ public class GTFSReadIn {
 //                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
 
             {
+                final Pattern colourPattern = Pattern.compile("^[a-fA-F0-9]+$");
                 CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader(keysn));
                 for (CSVRecord csvRecord : parser)
                 {
@@ -320,7 +321,6 @@ public class GTFSReadIn {
                     Route r = new Route(elements[routeIdKey], routeName, OperatorInfo.getFullName());
                     HashSet<String> keys = new HashSet<String>(keysIndex.keySet());
                     Iterator<String> it = keys.iterator();
-                    final Pattern colourPattern = Pattern.compile("^[a-fA-F0-9]+$");
                     try {
                         while(it.hasNext()){
                             String k = it.next();
