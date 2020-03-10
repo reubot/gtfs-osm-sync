@@ -48,7 +48,7 @@ public class GTFSReadIn {
     public static Set<String> getAllRoutesID(){
         return allRoutes.keySet();
     }
-
+//TODO handle multiple agencies
     public String readAgency(String agency_fName)
     //public Hashtable<String, Route> readRoutes(String routes_fName)
     {
@@ -130,7 +130,6 @@ public class GTFSReadIn {
                             default:
                                 String t = "gtfs_" + keys[i];
                                 keysIndex.put(t, i);
-
                         }
                     }
                     System.out.println(keysIndex.toString());
@@ -196,7 +195,6 @@ public class GTFSReadIn {
                                         }
                                         s.addTag(k, v);
                                     }
-
 
                                 } else
 
@@ -402,8 +400,6 @@ public class GTFSReadIn {
                     System.out.println("Repeat "+tripId);
                 }
                 tripIDs.put(tripId, csvRecord.get(tag_defs.GTFS_ROUTE_ID_KEY));
-
-
             }
         }
         catch (IOException e) {
@@ -419,7 +415,6 @@ public class GTFSReadIn {
 
             CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
 
-
             for (CSVRecord csvRecord : parser) {
                 // This seems to be the fastest method using csvparser
                 String trip = csvRecord.get(tag_defs.GTFS_TRIP_ID_KEY);
@@ -434,7 +429,6 @@ public class GTFSReadIn {
                 }
                 stopIDs.put(sid, routes);
             }
-
         }
         catch (IOException e) {
             System.err.println("Error: " + e);
@@ -463,7 +457,6 @@ public class GTFSReadIn {
                     keys.put("railway","station");
                     keys.put("station","funicular");
                 }
-
             }
         }
         return keys;
@@ -488,33 +481,7 @@ public class GTFSReadIn {
             {
                 routeRefSet.add(rr.getRouteRef());
             }
-            //ordering by hashcode
-            /*
-            for (int i=0; i<routes.size()-1; i++) {
-                int k=i;
-                for (int j=i+1; j<routes.size(); j++) {
-                    if (routes.get(k).getRouteRef().hashCode() > routes.get(j).getRouteRef().hashCode()) {
-                        k = j;
-                    }
-                }
-                Route temp = routes.get(i);
-                routes.set(i, routes.get(k));
-                routes.set(k, temp);
-            }
-
-             */
-
-            /*to text
-            for (int i=0; i<routes.size(); i++) {
-                text = text + ";" + routes.get(i).getRouteRef();
-            }*/
-            for (String routeText: routeRefSet) {
-                text = text + ";" + routeText;
-            }
-            //delete the 1st semi-colon
-            if (!text.isEmpty()) {
-                text = text.substring(1);
-            }
+            text = String.join(";",routeRefSet);
         }
         return text;
     }
