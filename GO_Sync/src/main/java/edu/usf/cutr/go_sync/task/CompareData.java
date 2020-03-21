@@ -29,14 +29,13 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Comparator;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
 
-import org.w3c.tidy.Report;
 import org.xml.sax.helpers.AttributesImpl;
 
 import edu.usf.cutr.go_sync.tools.OsmDistance;
@@ -626,14 +625,16 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
         }
         int currentTotalProgress=0;
 //        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
+        AtomicInteger osmindex= new AtomicInteger();
         OSMTags.parallelStream().forEach(osmtag -> {
             if(this.flagIsDone)
                 return;
-//            if((osmindex%timeToUpdate)==0) {
+            osmindex.getAndIncrement();
+            if((osmindex.get()%timeToUpdate)==0) {
 //                currentTotalProgress += progressToUpdate;
-//                updateProgress(progressToUpdate);
-//                this.setMessage("Comparing "+osmindex+"/"+totalOsmNode+" ...");
-//            }
+                updateProgress(progressToUpdate);
+                this.setMessage("Comparing "+osmindex.get()+"/"+totalOsmNode+" ...");
+            }
 //            Hashtable<String, String> osmtag = new Hashtable<String, String>(OSMTags.get(osmindex));
             String osmOperator = (String)osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
             String osmStopID = (String)osmtag.get(tag_defs.GTFS_STOP_ID_KEY);
