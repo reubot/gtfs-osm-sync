@@ -62,6 +62,9 @@ public class HttpRequest {
     private static final int SLEEP_TIME = 500;
     private static final String API_VERSION ="0.6";
     private static final String OSM_HOST = "https://openstreetmap.org/api/0.6/";
+    private static final String[] overpass_hosts = {"http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
+
+
 
     private ArrayList<AttributesImpl> existingNodes = new ArrayList<AttributesImpl>();
     private ArrayList<AttributesImpl> existingRelations = new ArrayList<AttributesImpl>();
@@ -152,13 +155,13 @@ public class HttpRequest {
 "<print mode=\"meta\"/>";
 
     	content = content.replace("left", left).replace("right",right).replace("bottom", bottom).replace("north",top);
-      String[] hosts = {"http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
+//      String[] hosts = {"http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
 
       System.out.println(content);
         try {
             // get data from server
             //String s = sendRequest(hosts, urlSuffix, "GET", "");
-        	String s = sendRequest(hosts, "", "POST", content);
+        	String s = sendRequest(overpass_hosts, "", "POST", content);
 
             InputSource inputSource = new InputSource(new StringReader(s));
             // get data from file - need to remove this for REAL APPLICATION
@@ -186,6 +189,46 @@ public class HttpRequest {
             return existingBusTags;
         return null;
     }
+    public ArrayList<AttributesImpl> getExistingStopWaysRelations(String left, String bottom, String right, String top) throws InterruptedException{
+//        String urlSuffix = "/api/0.6/relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
+//        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
+//        String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
+
+        String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( +" +
+                "relation[public_transport=station];" +
+                "relation[public_transport=platform];" +
+                "way[public_transport=station];"+
+                "way[public_transport=platform];"+
+                "way[amenity=bus_station];"+
+                "way[amenity=ferry_terminal];"+
+            "); (._;>;); out meta;";
+//        String[] hosts = {"http://www.overpass-api.de/api/xapi_meta","http://overpass.openstreetmap.ru/cgi/xapi_meta"};
+
+        System.out.println(content);
+        try {
+            // get data from server
+
+            String s = sendRequest(overpass_hosts, "", "POST", content);
+            InputSource inputSource = new InputSource(new StringReader(s));
+            // get data from file - need to remove this for REAL APPLICATION
+//            InputSource inputSource = new InputSource("DataFromServerRELATION.osm");
+            RouteParser par = new RouteParser();
+            SAXParserFactory.newInstance().newSAXParser().parse(inputSource, par);
+            existingRelations.addAll(par.getRelations());
+            existingRelationTags.addAll(par.getTags());
+            existingRelationMembers.addAll(par.getMembers());
+
+        } catch(IOException e) {
+            System.out.println(e);
+        } catch(SAXException e) {
+            System.out.println(e);
+        } catch(ParserConfigurationException e) {
+            System.out.println(e);
+        }
+        if (!existingRelations.isEmpty()) return existingRelations;
+        System.out.println("null relations");
+        return null;
+    }
 
     public ArrayList<AttributesImpl> getExistingBusRelations(String left, String bottom, String right, String top) throws InterruptedException{
 //        String urlSuffix = "/api/0.6/relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
@@ -195,13 +238,12 @@ public class HttpRequest {
                 "  relation[\"route\"=\"bus\"];" +
                 "); out meta;";
 //        String[] hosts = {"http://www.overpass-api.de/api/xapi_meta","http://overpass.openstreetmap.ru/cgi/xapi_meta"};
-        String[] hosts = {"http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
 
         System.out.println(content);
         try {
             // get data from server
 
-            String s = sendRequest(hosts, "", "POST", content);
+            String s = sendRequest(overpass_hosts, "", "POST", content);
             InputSource inputSource = new InputSource(new StringReader(s));
             // get data from file - need to remove this for REAL APPLICATION
 //            InputSource inputSource = new InputSource("DataFromServerRELATION.osm");
