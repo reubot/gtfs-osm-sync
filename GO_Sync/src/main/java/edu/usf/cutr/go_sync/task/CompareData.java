@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JTextArea;
@@ -77,10 +78,16 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
     // key is gtfs, value is container of potential osm matches, sorted by distance from gtfs stop
     private Hashtable<Stop, TreeSet<Stop>> report =
         new Hashtable<Stop, TreeSet<Stop>>();
-    private HashSet<Stop> noUpload = new HashSet<Stop>();
-    private HashSet<Stop> upload = new HashSet<Stop>();
-    private HashSet<Stop> modify = new HashSet<Stop>();
-    private HashSet<Stop> delete = new HashSet<Stop>();
+
+
+    private ConcurrentHashMap.KeySetView<Stop, Boolean> noUpload = ConcurrentHashMap.newKeySet();
+    private ConcurrentHashMap.KeySetView<Stop, Boolean> upload = ConcurrentHashMap.newKeySet();
+    private ConcurrentHashMap.KeySetView<Stop, Boolean> modify = ConcurrentHashMap.newKeySet();
+    private ConcurrentHashMap.KeySetView<Stop, Boolean> delete = ConcurrentHashMap.newKeySet();
+//    private HashSet<Stop> noUpload = new HashSet<Stop>();
+//    private HashSet<Stop> upload = new HashSet<Stop>();
+//    private HashSet<Stop> modify = new HashSet<Stop>();
+//    private HashSet<Stop> delete = new HashSet<Stop>();
     private Hashtable<String, Route> routes = new Hashtable<String, Route>();
     private Hashtable<String, Route> agencyRoutes = new Hashtable<String, Route>();
     private Hashtable<String, Route> existingRoutes = new Hashtable<String, Route>();
@@ -951,6 +958,9 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             ArrayList<AttributesImpl> tempOSMRelations = osmRequest.getExistingBusRelations(Double.toString(minLon), Double.toString(minLat),
                     Double.toString(maxLon), Double.toString(maxLat));
             if(this.flagIsDone) return;
+            long tDelta = System.currentTimeMillis() - tStart;
+            System.out.println("OSM Downloads Completed in "+ tDelta /1000.0 + "seconds");
+            tStart = System.currentTimeMillis();
             progressMonitor.setNote("");
             if (tempOSMNodes!=null) {
                 OSMNodes.addAll(tempOSMNodes);
@@ -1064,7 +1074,12 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             ArrayList<Stop> arr = new ArrayList<Stop>(entry.getValue());
             reportArrays.put(key, arr);
         }
-    	ReportViewer rv = new ReportViewer(GTFSstops, reportArrays, upload, modify, delete, routes, agencyRoutes, existingRoutes, taskOutput);
+        ReportViewer rv = new ReportViewer(GTFSstops, reportArrays,
+                new HashSet<Stop>(upload),
+                new HashSet<Stop>(modify),
+                new HashSet<Stop>(delete),
+                routes, agencyRoutes, existingRoutes, taskOutput);
+//    	ReportViewer rv = new ReportViewer(GTFSstops, reportArrays, upload, modify, delete, routes, agencyRoutes, existingRoutes, taskOutput);
         String info = "Active OSM bus stop mappers:\n"+osmActiveUsers.toString()+"\n\n";
         info += "There are currently "+OSMNodes.size()+" OSM stops in the region\n\n";
         info += "Transit agency GTFS dataset has "+GTFSstops.size()+" stops";
