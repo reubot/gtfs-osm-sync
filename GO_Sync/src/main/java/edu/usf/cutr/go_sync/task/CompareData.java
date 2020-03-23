@@ -939,6 +939,13 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
             if(this.flagIsDone) return;
             progressMonitor.setNote("");
             updateProgress(10);
+            this.setMessage("Getting existing stations...");
+            progressMonitor.setNote("This might take several minutes...");
+            ArrayList<AttributesImpl> tempOSMstations = osmRequest.getExistingStopWaysRelations(Double.toString(minLon), Double.toString(minLat),
+                    Double.toString(maxLon), Double.toString(maxLat));
+            if(this.flagIsDone) return;
+            progressMonitor.setNote("");
+            updateProgress(15);
             this.setMessage("Getting existing bus routes...");
             progressMonitor.setNote("This might take several minutes...");
             ArrayList<AttributesImpl> tempOSMRelations = osmRequest.getExistingBusRelations(Double.toString(minLon), Double.toString(minLat),

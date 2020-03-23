@@ -33,7 +33,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class RouteParser extends DefaultHandler {
 
-    private Hashtable tempTag;
+    private Hashtable<String,String> tempTag;
     private HashSet<RelationMember> tempMembers;
     private ArrayList<AttributesImpl> xmlRelations;
     private ArrayList<tag_defs.primative_type> xmlType;
@@ -47,18 +47,18 @@ public class RouteParser extends DefaultHandler {
         xmlType = new ArrayList<tag_defs.primative_type>();
     }
     @Override public void startElement(String namespaceURI, String localName, String qname, Attributes attributes) throws SAXException {
-        if (qname.equals("relation")) {
+        if (qname.equals(tag_defs.XML_RELATION)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
             xmlRelations.add(attImpl);
             tempTag = new Hashtable();      // start to collect tags of that relation
             tempMembers = new HashSet<RelationMember>();
             xmlType.add(tag_defs.primative_type.RELATION);
         }
-        if (tempTag!=null && qname.equals("tag")) {
+        if (tempTag!=null && qname.equals(tag_defs.XML_TAG)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
             tempTag.put(attImpl.getValue("k"), attImpl.getValue("v"));         // insert key and value of that tag into Hashtable
         }
-        if (tempMembers!=null && qname.equals("member")) {
+        if (tempMembers!=null && qname.equals(tag_defs.XML_MEMBER)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
             RelationMember rm = new RelationMember(attImpl.getValue("ref"),attImpl.getValue("type"),attImpl.getValue("role"));
             rm.setStatus("OSM server");
@@ -67,7 +67,7 @@ public class RouteParser extends DefaultHandler {
     }
 
     @Override public void endElement (String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("relation")) {
+        if (qName.equals(tag_defs.XML_RELATION)) {
             xmlTags.add(tempTag);
             xmlMembers.add(tempMembers);
             tempTag = null;

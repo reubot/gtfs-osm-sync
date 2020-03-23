@@ -67,10 +67,13 @@ public class HttpRequest {
 
 
     private ArrayList<AttributesImpl> existingNodes = new ArrayList<AttributesImpl>();
+    private ArrayList<AttributesImpl> existingStations = new ArrayList<AttributesImpl>();
     private ArrayList<AttributesImpl> existingRelations = new ArrayList<AttributesImpl>();
     private ArrayList<Hashtable> existingBusTags = new ArrayList<Hashtable>();
+    private ArrayList<Hashtable> existingStationTags = new ArrayList<Hashtable>();
     private ArrayList<Hashtable> existingRelationTags = new ArrayList<Hashtable>();
     private ArrayList<HashSet<RelationMember>> existingRelationMembers = new ArrayList<HashSet<RelationMember>>();
+    private ArrayList<HashSet<RelationMember>> existingStationMembers = new ArrayList<HashSet<RelationMember>>();
 
     private HashSet<Stop> revertDelete = new HashSet<Stop>();
     private HashSet<Stop> revertModify = new HashSet<Stop>();
@@ -194,13 +197,13 @@ public class HttpRequest {
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
 //        String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 
-        String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( +" +
+        String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( " +
                 "relation[public_transport=station];" +
                 "relation[public_transport=platform];" +
-                "way[public_transport=station];"+
-                "way[public_transport=platform];"+
-                "way[amenity=bus_station];"+
-                "way[amenity=ferry_terminal];"+
+//                "way[public_transport=station];"+
+//                "way[public_transport=platform];"+
+//                "way[amenity=bus_station];"+
+//                "way[amenity=ferry_terminal];"+
             "); (._;>;); out meta;";
 //        String[] hosts = {"http://www.overpass-api.de/api/xapi_meta","http://overpass.openstreetmap.ru/cgi/xapi_meta"};
 
@@ -214,9 +217,9 @@ public class HttpRequest {
 //            InputSource inputSource = new InputSource("DataFromServerRELATION.osm");
             RouteParser par = new RouteParser();
             SAXParserFactory.newInstance().newSAXParser().parse(inputSource, par);
-            existingRelations.addAll(par.getRelations());
-            existingRelationTags.addAll(par.getTags());
-            existingRelationMembers.addAll(par.getMembers());
+            existingStations.addAll(par.getRelations());
+            existingStationTags.addAll(par.getTags());
+            existingStationMembers.addAll(par.getMembers());
 
         } catch(IOException e) {
             System.out.println(e);
@@ -225,7 +228,7 @@ public class HttpRequest {
         } catch(ParserConfigurationException e) {
             System.out.println(e);
         }
-        if (!existingRelations.isEmpty()) return existingRelations;
+        if (!existingStations.isEmpty()) return existingStations;
         System.out.println("null relations");
         return null;
     }
