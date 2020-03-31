@@ -36,23 +36,23 @@ public class RouteParser extends DefaultHandler {
     private Hashtable<String,String> tempTag;
     private HashSet<RelationMember> tempMembers;
     private ArrayList<AttributesImpl> xmlRelations;
-    private ArrayList<tag_defs.primative_type> xmlType;
+    private ArrayList<tag_defs.primative_type> xmlTypes;
     //xmlTags<String, String> ----------- xmlMembers<String(refID), AttributesImpl>
-    private ArrayList<Hashtable> xmlTags;
+    private ArrayList<Hashtable<String,String>> xmlTags;
     private ArrayList<HashSet<RelationMember>> xmlMembers;
     public RouteParser(){
         xmlRelations = new ArrayList<AttributesImpl>();
-        xmlTags = new ArrayList<Hashtable>();
+        xmlTags = new ArrayList<Hashtable<String,String>>();
         xmlMembers = new ArrayList<HashSet<RelationMember>>();
-        xmlType = new ArrayList<tag_defs.primative_type>();
+        xmlTypes = new ArrayList<tag_defs.primative_type>();
     }
     @Override public void startElement(String namespaceURI, String localName, String qname, Attributes attributes) throws SAXException {
         if (qname.equals(tag_defs.XML_RELATION)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
             xmlRelations.add(attImpl);
-            tempTag = new Hashtable();      // start to collect tags of that relation
+            tempTag = new Hashtable<String,String>();      // start to collect tags of that relation
             tempMembers = new HashSet<RelationMember>();
-            xmlType.add(tag_defs.primative_type.RELATION);
+            xmlTypes.add(tag_defs.primative_type.RELATION);
         }
         if (tempTag!=null && qname.equals(tag_defs.XML_TAG)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
@@ -79,11 +79,16 @@ public class RouteParser extends DefaultHandler {
         return xmlRelations;
     }
 
-    public ArrayList<Hashtable> getTags(){
+    public ArrayList<Hashtable<String, String>> getTags(){
         return xmlTags;
     }
 
     public ArrayList<HashSet<RelationMember>> getMembers(){
         return xmlMembers;
     }
+
+    public ArrayList<tag_defs.primative_type> getTypes(){
+        return xmlTypes;
+    }
+
 }

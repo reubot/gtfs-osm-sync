@@ -19,6 +19,7 @@ package edu.usf.cutr.go_sync.tools.parser;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import edu.usf.cutr.go_sync.tag_defs;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -29,23 +30,25 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author Khoa Tran
  */
 public class BusStopParser extends DefaultHandler{
-    private Hashtable tempTag;
+    private Hashtable<String,String> tempTag;
     private AttributesImpl attImplNode;
     private ArrayList<AttributesImpl> xmlNodes;
-    private ArrayList<Hashtable> xmlTags;
+    private ArrayList<Hashtable<String,String>> xmlTags;
+    private ArrayList<tag_defs.primative_type> xmlTypes;
     public BusStopParser(){
         xmlNodes = new ArrayList<AttributesImpl>();
-        xmlTags = new ArrayList<Hashtable>();
+        xmlTags = new ArrayList<Hashtable<String,String>>();
+        xmlTypes = new ArrayList<tag_defs.primative_type>();
     }
 
     @Override public void startElement(String namespaceURI, String localName, String qname, Attributes attributes) throws SAXException {
-        if (qname.equals("node") || qname.equals("changeset")) {
+        if (qname.equals(tag_defs.XML_NODE) || qname.equals("changeset")) {
             attImplNode = new AttributesImpl(attributes);
             xmlNodes.add(attImplNode);
-            tempTag = new Hashtable();      // start to collect tags of that node
-
+            tempTag = new Hashtable<String,String>();      // start to collect tags of that node
+            xmlTypes.add(tag_defs.primative_type.NODE);
         }
-        if (qname.equals("tag")) {
+        if (qname.equals(tag_defs.XML_TAG)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
             //                System.out.println(attImpl.getValue("k") + attImpl.getValue("v"));
             tempTag.put(attImpl.getValue("k"), attImpl.getValue("v"));         // insert key and value of that tag into Hashtable
@@ -53,7 +56,7 @@ public class BusStopParser extends DefaultHandler{
     }
 
     @Override public void endElement (String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("node")) {
+        if (qName.equals(tag_defs.XML_NODE)) {
             xmlTags.add(tempTag);
         }
     }
@@ -62,7 +65,7 @@ public class BusStopParser extends DefaultHandler{
         return attImplNode;
     }
 
-    public Hashtable getTagsOneNode(){
+    public Hashtable<String,String> getTagsOneNode(){
         return tempTag;
     }
 
@@ -70,7 +73,12 @@ public class BusStopParser extends DefaultHandler{
         return xmlNodes;
     }
 
-    public ArrayList<Hashtable> getTags(){
+    public ArrayList<Hashtable<String, String>> getTags(){
         return xmlTags;
     }
+
+    public ArrayList<tag_defs.primative_type> getTypes(){
+        return xmlTypes;
+    }
+
 }

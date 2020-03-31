@@ -72,6 +72,8 @@ public class HttpRequest {
     private ArrayList<Hashtable> existingBusTags = new ArrayList<Hashtable>();
     private ArrayList<Hashtable> existingStationTags = new ArrayList<Hashtable>();
     private ArrayList<Hashtable> existingRelationTags = new ArrayList<Hashtable>();
+    private ArrayList<tag_defs.primative_type> existingStopTypes = new ArrayList<>();
+    private ArrayList<tag_defs.primative_type> existingStationTypes = new ArrayList<>();
     private ArrayList<HashSet<RelationMember>> existingRelationMembers = new ArrayList<HashSet<RelationMember>>();
     private ArrayList<HashSet<RelationMember>> existingStationMembers = new ArrayList<HashSet<RelationMember>>();
 
@@ -173,6 +175,7 @@ public class HttpRequest {
             SAXParserFactory.newInstance().newSAXParser().parse(inputSource, par);
             existingNodes.addAll(par.getNodes());
             existingBusTags.addAll(par.getTags());
+            existingStopTypes.addAll(par.getTypes());
         } catch(IOException e) {
             System.out.println(e);
         } catch(SAXException e) {
@@ -219,6 +222,7 @@ public class HttpRequest {
             SAXParserFactory.newInstance().newSAXParser().parse(inputSource, par);
             existingStations.addAll(par.getRelations());
             existingStationTags.addAll(par.getTags());
+            existingStationTypes.addAll(par.getTypes());
             existingStationMembers.addAll(par.getMembers());
 
         } catch(IOException e) {
