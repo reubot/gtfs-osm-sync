@@ -18,6 +18,7 @@ Copyright 2010 University of South Florida
 package edu.usf.cutr.go_sync.tools.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import edu.usf.cutr.go_sync.object.RelationMember;
@@ -33,16 +34,16 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class RouteParser extends DefaultHandler {
 
-    private Hashtable<String,String> tempTag;
+    private HashMap<String,String> tempTag;
     private HashSet<RelationMember> tempMembers;
     private ArrayList<AttributesImpl> xmlRelations;
     private ArrayList<tag_defs.primative_type> xmlTypes;
     //xmlTags<String, String> ----------- xmlMembers<String(refID), AttributesImpl>
-    private ArrayList<Hashtable<String,String>> xmlTags;
+    private ArrayList<HashMap<String, String>> xmlTags;
     private ArrayList<HashSet<RelationMember>> xmlMembers;
     public RouteParser(){
         xmlRelations = new ArrayList<AttributesImpl>();
-        xmlTags = new ArrayList<Hashtable<String,String>>();
+        xmlTags = new ArrayList<HashMap<String, String>>();
         xmlMembers = new ArrayList<HashSet<RelationMember>>();
         xmlTypes = new ArrayList<tag_defs.primative_type>();
     }
@@ -50,13 +51,13 @@ public class RouteParser extends DefaultHandler {
         if (qname.equals(tag_defs.XML_RELATION)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
             xmlRelations.add(attImpl);
-            tempTag = new Hashtable<String,String>();      // start to collect tags of that relation
+            tempTag = new HashMap<String, String>();      // start to collect tags of that relation
             tempMembers = new HashSet<RelationMember>();
             xmlTypes.add(tag_defs.primative_type.RELATION);
         }
         if (tempTag!=null && qname.equals(tag_defs.XML_TAG)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
-            tempTag.put(attImpl.getValue("k"), attImpl.getValue("v"));         // insert key and value of that tag into Hashtable
+            tempTag.put(attImpl.getValue("k"), attImpl.getValue("v"));         // insert key and value of that tag into HashMap
         }
         if (tempMembers!=null && qname.equals(tag_defs.XML_MEMBER)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
@@ -79,7 +80,7 @@ public class RouteParser extends DefaultHandler {
         return xmlRelations;
     }
 
-    public ArrayList<Hashtable<String, String>> getTags(){
+    public ArrayList<HashMap<String, String>> getTags(){
         return xmlTags;
     }
 

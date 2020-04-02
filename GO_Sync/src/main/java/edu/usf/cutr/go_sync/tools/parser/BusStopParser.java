@@ -18,7 +18,7 @@ Copyright 2010 University of South Florida
 package edu.usf.cutr.go_sync.tools.parser;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import edu.usf.cutr.go_sync.tag_defs;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
@@ -30,14 +30,14 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author Khoa Tran
  */
 public class BusStopParser extends DefaultHandler{
-    private Hashtable<String,String> tempTag;
+    private HashMap<String,String> tempTag;
     private AttributesImpl attImplNode;
     private ArrayList<AttributesImpl> xmlNodes;
-    private ArrayList<Hashtable<String,String>> xmlTags;
+    private ArrayList<HashMap<String,String>> xmlTags;
     private ArrayList<tag_defs.primative_type> xmlTypes;
     public BusStopParser(){
         xmlNodes = new ArrayList<AttributesImpl>();
-        xmlTags = new ArrayList<Hashtable<String,String>>();
+        xmlTags = new ArrayList<HashMap<String,String>>();
         xmlTypes = new ArrayList<tag_defs.primative_type>();
     }
 
@@ -45,13 +45,13 @@ public class BusStopParser extends DefaultHandler{
         if (qname.equals(tag_defs.XML_NODE) || qname.equals("changeset")) {
             attImplNode = new AttributesImpl(attributes);
             xmlNodes.add(attImplNode);
-            tempTag = new Hashtable<String,String>();      // start to collect tags of that node
+            tempTag = new HashMap<String,String>();      // start to collect tags of that node
             xmlTypes.add(tag_defs.primative_type.NODE);
         }
         if (qname.equals(tag_defs.XML_TAG)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
             //                System.out.println(attImpl.getValue("k") + attImpl.getValue("v"));
-            tempTag.put(attImpl.getValue("k"), attImpl.getValue("v"));         // insert key and value of that tag into Hashtable
+            tempTag.put(attImpl.getValue("k"), attImpl.getValue("v"));         // insert key and value of that tag into HashMap
         }
     }
 
@@ -65,7 +65,7 @@ public class BusStopParser extends DefaultHandler{
         return attImplNode;
     }
 
-    public Hashtable<String,String> getTagsOneNode(){
+    public HashMap<String,String> getTagsOneNode(){
         return tempTag;
     }
 
@@ -73,7 +73,7 @@ public class BusStopParser extends DefaultHandler{
         return xmlNodes;
     }
 
-    public ArrayList<Hashtable<String, String>> getTags(){
+    public ArrayList<HashMap<String, String>> getTags(){
         return xmlTags;
     }
 

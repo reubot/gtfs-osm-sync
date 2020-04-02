@@ -18,11 +18,9 @@ package edu.usf.cutr.go_sync.osm;
 
 import edu.usf.cutr.go_sync.io.OsmPrinter;
 import edu.usf.cutr.go_sync.io.WriteFile;
-import java.util.ArrayList;
 
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -47,8 +45,6 @@ import edu.usf.cutr.go_sync.object.Route;
 import edu.usf.cutr.go_sync.object.Session;
 import org.xml.sax.SAXException;
 //import sun.misc.BASE64Encoder;
-import java.util.Base64;
-import java.util.Base64.Encoder;
 import edu.usf.cutr.go_sync.tools.parser.BusStopParser;
 import edu.usf.cutr.go_sync.tools.parser.ChangesetDownloadParser;
 import edu.usf.cutr.go_sync.tools.parser.OsmVersionParser;
@@ -69,9 +65,9 @@ public class HttpRequest {
     private ArrayList<AttributesImpl> existingNodes = new ArrayList<AttributesImpl>();
     private ArrayList<AttributesImpl> existingStations = new ArrayList<AttributesImpl>();
     private ArrayList<AttributesImpl> existingRelations = new ArrayList<AttributesImpl>();
-    private ArrayList<Hashtable> existingBusTags = new ArrayList<Hashtable>();
-    private ArrayList<Hashtable> existingStationTags = new ArrayList<Hashtable>();
-    private ArrayList<Hashtable> existingRelationTags = new ArrayList<Hashtable>();
+    private ArrayList<HashMap<String, String>> existingBusTags = new ArrayList<HashMap<String, String>>();
+    private ArrayList<HashMap<String, String>> existingStationTags = new ArrayList<HashMap<String, String>>();
+    private ArrayList<HashMap> existingRelationTags = new ArrayList<HashMap>();
     private ArrayList<tag_defs.primative_type> existingStopTypes = new ArrayList<>();
     private ArrayList<tag_defs.primative_type> existingStationTypes = new ArrayList<>();
     private ArrayList<HashSet<RelationMember>> existingRelationMembers = new ArrayList<HashSet<RelationMember>>();
@@ -189,7 +185,7 @@ public class HttpRequest {
     }
 
     // this method needs to be invoked after getExistingBusStops
-    public ArrayList<Hashtable> getExistingBusStopsTags(){
+    public ArrayList<HashMap<String, String>> getExistingBusStopsTags(){
         System.out.println("tags = "+existingBusTags.size());
         if (!existingBusTags.isEmpty() )
             return existingBusTags;
@@ -273,7 +269,7 @@ public class HttpRequest {
     }
 
     // this method needs to be invoked after getExistingBusRelations
-    public ArrayList<Hashtable> getExistingBusRelationTags(){
+    public ArrayList<HashMap> getExistingBusRelationTags(){
         System.out.println("relation tags = "+existingRelationTags.size());
         if (!existingRelationTags.isEmpty() )
             return existingRelationTags;
@@ -355,7 +351,7 @@ public class HttpRequest {
             BusStopParser par = new BusStopParser();
             SAXParserFactory.newInstance().newSAXParser().parse(inputSource, par);
             AttributesImpl attImplNode = par.getOneNode();
-            Hashtable tags = par.getTagsOneNode();
+            HashMap tags = par.getTagsOneNode();
             st = new Stop(null,(String)tags.get(tag_defs.GTFS_OPERATOR_KEY),(String)tags.get("name"),
                     attImplNode.getValue("lat"),attImplNode.getValue("lon"));
             st.addTags(tags);

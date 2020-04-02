@@ -23,14 +23,7 @@ import edu.usf.cutr.go_sync.osm.*;
 import edu.usf.cutr.go_sync.io.GTFSReadIn;
 
 import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Comparator;
-import java.util.TreeSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -70,14 +63,14 @@ public class CompareData extends OsmTask{
     private List<String> GTFSstopsIDs = new ArrayList<String>();
     private ArrayList<AttributesImpl> OSMNodes = new ArrayList<AttributesImpl>();
 //    private ArrayList<Hashtable<String, String>> OSMTags = new ArrayList<Hashtable<String, String>>();
-    private ArrayList<Hashtable> OSMTags = new ArrayList<Hashtable>();
+    private ArrayList<HashMap> OSMTags = new ArrayList<HashMap>();
     private ArrayList<AttributesImpl> OSMRelations = new ArrayList<AttributesImpl>();
 //    private ArrayList<Hashtable<String, String>> OSMRelationTags = new ArrayList<Hashtable<String, String>>();
-private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
+private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
     private ArrayList<HashSet<RelationMember>> OSMRelationMembers = new ArrayList<HashSet<RelationMember>>();
     // key is gtfs, value is container of potential osm matches, sorted by distance from gtfs stop
-    private Hashtable<Stop, TreeSet<Stop>> report =
-        new Hashtable<Stop, TreeSet<Stop>>();
+    private ConcurrentHashMap<Stop, TreeSet<Stop>> report =
+        new ConcurrentHashMap<>();
 
 
     private ConcurrentHashMap.KeySetView<Stop, Boolean> noUpload = ConcurrentHashMap.newKeySet();
@@ -301,7 +294,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
 
     /** compare osmtag with new gtfs tag
      */
-    public Hashtable<String,String> compareOsmTags(Hashtable<String,String> osmtag, OsmPrimitive p) {
+    public Hashtable<String,String> compareOsmTags(HashMap<String,String> osmtag, OsmPrimitive p) {
         Hashtable<String,String> diff = new Hashtable<String,String>();
         Hashtable<String,String> t = new Hashtable<String,String>();
         Iterator<String> it = p.keySet().iterator();
@@ -545,7 +538,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
         for(int osm=0; osm<OSMRelations.size(); osm++){
             if(this.flagIsDone) return;
             AttributesImpl osmRelation = OSMRelations.get(osm);
-            Hashtable osmtag = new Hashtable(OSMRelationTags.get(osm));
+            HashMap osmtag = new HashMap(OSMRelationTags.get(osm));
             String routeLongName = (String)osmtag.get("name");
             String routeId = (String)osmtag.get("gtfs_route_id");
             String routeShortName = (String)osmtag.get("ref");
