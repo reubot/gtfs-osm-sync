@@ -20,7 +20,6 @@ package edu.usf.cutr.go_sync.object;
 import edu.usf.cutr.go_sync.tag_defs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -32,12 +31,20 @@ import java.util.Hashtable;
 public class OsmPrimitive {
     Hashtable osmTags;
     //TODO change reportCategory to enum
-    private String status, osmVersion, osmid, reportCategory, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
-    private enum RC {
+    private String statusString, osmVersion, osmid, reportCategory, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
+    public enum RC {
         UPLOAD_CONFLICT, UPLOAD_NO_CONFLICT, MODIFY, NOTHING_NEW
     }
+    /* only has 4 possible value: n=new; m=modify; d=delete; e=empty
+     * used for upload osmchange
+     * */
+    public enum status {
+        NEW, MODIFY, DELETE, EMPTY
+    }
 
-    tag_defs.primative_type type = null;
+    private tag_defs.primative_type type = null;
+    private RC reportCategoryEnum;
+    private status statusEnum;
     public OsmPrimitive(){
         osmTags = new Hashtable();
     }
@@ -120,11 +127,11 @@ public class OsmPrimitive {
      * used for upload osmchange
      * */
     public void setStatus(String v){
-        status = v;
+        statusString = v;
     }
 
     public String getStatus(){
-        return status;
+        return statusString;
     }
 
     public void setOsmVersion(String v){
@@ -182,14 +189,27 @@ public class OsmPrimitive {
         return lastEditedOsmDate;
     }
 
-    public void setType(tag_defs.primative_type t)
-    {
+    public void setType(tag_defs.primative_type t) {
         type = t;
     }
 
-    public tag_defs.primative_type getType()
-    {
+    public tag_defs.primative_type getType() {
         return type;
     }
 
+    public void setReportCategoryEnum(RC e) {
+        reportCategoryEnum = e;
+    }
+
+    public RC getReportCategoryEnum() {
+        return reportCategoryEnum;
+    }
+
+    public void setStatusEnum(status statusEnum) {
+        this.statusEnum = statusEnum;
+    }
+
+    public status getStatusEnum() {
+        return statusEnum;
+    }
 }

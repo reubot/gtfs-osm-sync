@@ -7,7 +7,13 @@ public class tag_defs {
     public final static String XML_TAG      = "tag";
     public final static String XML_MEMBER   = "member";
     public final static String XML_NODE     = "node";
-//https://developers.google.com/transit/gtfs/reference/
+    public final static String XML_WAY      = "way";
+
+    public final static String LAT      = "lat";
+    public final static String LON      = "lon";
+
+
+    //https://developers.google.com/transit/gtfs/reference/
 //https://wiki.openstreetmap.org/wiki/Proposed_features/Public_Transport
 	public final static String GTFS_STOP_ID_KEY = "gtfs_id";
     public final static String GTFS_OPERATOR_KEY = "network";
