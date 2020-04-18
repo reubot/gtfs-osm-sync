@@ -694,7 +694,8 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                             es.setOsmId(node.getValue("id"));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
-
+                            // for comparing tag
+                            Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
                             if (distance>ERROR_TO_ZERO) {
 //                                Stop ns = new Stop(gtfsStop);
 //                                ns.addTags(osmtag);
@@ -709,9 +710,9 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
 //                                es.setLastEditedOsmUser(node.getValue("user"));
 //                                es.setLastEditedOsmDate(node.getValue("timestamp"));
 
-                                // for comparing tag
-                                Hashtable<String,String> diff = compareOsmTags(osmtag, gtfsStop);
-                                if (diff.size()==0) {
+//                                // for comparing tag
+//                                Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
+                                if (diff.isEmpty()) {
                                     es.setReportText("Stop already exists in OSM but with different location." +
                                             "\n ACTION: Modify OSM stop with new location!");
                                 } else {
@@ -743,8 +744,8 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
 //                                es.setLastEditedOsmUser(node.getValue("user"));
 //                                es.setLastEditedOsmDate(node.getValue("timestamp"));
 
-                                // for comparing tag
-                                Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
+//                                // for comparing tag
+//                                Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
                                 if (diff.isEmpty()) {
                                     es.setReportText("Stop already exists in OSM. Nothing new from last upload.\n" +
                                             "\t   " + es.printOSMStop() +
