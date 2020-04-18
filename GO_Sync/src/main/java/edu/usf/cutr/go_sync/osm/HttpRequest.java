@@ -25,6 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import edu.usf.cutr.go_sync.object.Stop;
+import edu.usf.cutr.go_sync.tools.parser.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -45,10 +46,6 @@ import edu.usf.cutr.go_sync.object.Route;
 import edu.usf.cutr.go_sync.object.Session;
 import org.xml.sax.SAXException;
 //import sun.misc.BASE64Encoder;
-import edu.usf.cutr.go_sync.tools.parser.BusStopParser;
-import edu.usf.cutr.go_sync.tools.parser.ChangesetDownloadParser;
-import edu.usf.cutr.go_sync.tools.parser.OsmVersionParser;
-import edu.usf.cutr.go_sync.tools.parser.RouteParser;
 import edu.usf.cutr.go_sync.tag_defs;
 /**
  *
@@ -71,7 +68,7 @@ public class HttpRequest {
     private ArrayList<tag_defs.primative_type> existingStopTypes = new ArrayList<>();
     private ArrayList<tag_defs.primative_type> existingStationTypes = new ArrayList<>();
     private ArrayList<HashSet<RelationMember>> existingRelationMembers = new ArrayList<HashSet<RelationMember>>();
-    private ArrayList<HashSet<RelationMember>> existingStationMembers = new ArrayList<HashSet<RelationMember>>();
+    private HashMap<String,HashSet<RelationMember>> existingStationMembers = new HashMap<String,HashSet<RelationMember>>();
 
     private HashSet<Stop> revertDelete = new HashSet<Stop>();
     private HashSet<Stop> revertModify = new HashSet<Stop>();
@@ -191,6 +188,13 @@ public class HttpRequest {
             return existingBusTags;
         return null;
     }
+
+    public ArrayList<HashMap<String, String>> getExistingStationTags(){
+        System.out.println("existingStationTags tags = "+existingStationTags.size());
+        if (!existingStationTags.isEmpty() )
+            return existingStationTags;
+        return null;
+    }
     public ArrayList<AttributesImpl> getExistingStopWaysRelations(String left, String bottom, String right, String top) throws InterruptedException{
 //        String urlSuffix = "/api/0.6/relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
@@ -214,19 +218,25 @@ public class HttpRequest {
             InputSource inputSource = new InputSource(new StringReader(s));
             // get data from file - need to remove this for REAL APPLICATION
 //            InputSource inputSource = new InputSource("DataFromServerRELATION.osm");
-            RouteParser par = new RouteParser();
+            StationParser par = new StationParser();
             SAXParserFactory.newInstance().newSAXParser().parse(inputSource, par);
             existingStations.addAll(par.getRelations());
             existingStationTags.addAll(par.getTags());
             existingStationTypes.addAll(par.getTypes());
-            existingStationMembers.addAll(par.getMembers());
+            existingStationMembers.putAll(par.getMembers());
 
+//            existingNodes.addAll(existingStations);
+//            existingBusTags.addAll(existingStationTags);
+//            existingStopTypes.addAll(existingStationTypes);
+//            existingNodes=existingStations;
+//            existingBusTags=(existingStationTags);
+//            existingStopTypes=(existingStationTypes);
         } catch(IOException e) {
-            System.out.println(e);
+            System.out.println(e.getStackTrace());
         } catch(SAXException e) {
-            System.out.println(e);
+            System.out.println(e.getStackTrace());
         } catch(ParserConfigurationException e) {
-            System.out.println(e);
+            System.out.println(e.getStackTrace());
         }
         if (!existingStations.isEmpty()) return existingStations;
         System.out.println("null relations");
