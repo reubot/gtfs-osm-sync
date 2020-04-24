@@ -59,15 +59,17 @@ public class HttpRequest {
 
 
 
-    private ArrayList<AttributesImpl> existingNodes = new ArrayList<AttributesImpl>();
+    private HashMap<String,AttributesImpl> existingNodes = new HashMap<>();
     private ArrayList<AttributesImpl> existingStations = new ArrayList<AttributesImpl>();
     private ArrayList<AttributesImpl> existingRelations = new ArrayList<AttributesImpl>();
-    private ArrayList<HashMap<String, String>> existingBusTags = new ArrayList<HashMap<String, String>>();
     private ArrayList<HashMap<String, String>> existingStationTags = new ArrayList<HashMap<String, String>>();
     private ArrayList<HashMap> existingRelationTags = new ArrayList<HashMap>();
-    private ArrayList<tag_defs.primative_type> existingStopTypes = new ArrayList<>();
+    private HashMap<String,HashMap<String,String>> existingNodesTags = new HashMap<>();
+
     private ArrayList<tag_defs.primative_type> existingStationTypes = new ArrayList<>();
     private ArrayList<HashSet<RelationMember>> existingRelationMembers = new ArrayList<HashSet<RelationMember>>();
+    private HashMap<String,tag_defs.primative_type> existingStopTypes = new HashMap<>();
+
     private HashMap<String,HashSet<RelationMember>> existingStationMembers = new HashMap<String,HashSet<RelationMember>>();
 
     private HashSet<Stop> revertDelete = new HashSet<Stop>();
@@ -108,7 +110,7 @@ public class HttpRequest {
         }
     }
 
-    public ArrayList<AttributesImpl> getExistingBusStops(String left, String bottom, String right, String top) throws InterruptedException{
+    public HashMap<String, AttributesImpl> getExistingBusStops(String left, String bottom, String right, String top) throws InterruptedException{
         //http://open.mapquestapi.com/xapi/
         //"http://www.informationfreeway.org"
 //        String urlSuffix = "/api/0.6/node[highway=bus_stop][bbox="+left+","+bottom+","+right+","+top+"]";
@@ -166,9 +168,11 @@ public class HttpRequest {
 //            InputSource inputSource = new InputSource("DataFromServer.osm");
             BusStopParser par = new BusStopParser();
             SAXParserFactory.newInstance().newSAXParser().parse(inputSource, par);
-            existingNodes.addAll(par.getNodes());
-            existingBusTags.addAll(par.getTags());
-            existingStopTypes.addAll(par.getTypes());
+
+            existingNodes.putAll(par.getNodesMap());
+            existingNodesTags.putAll(par.getTagsMap());
+            existingStopTypes.putAll(par.getTypesMap());
+
         } catch(IOException e) {
             System.out.println(e);
         } catch(SAXException e) {
@@ -182,10 +186,10 @@ public class HttpRequest {
     }
 
     // this method needs to be invoked after getExistingBusStops
-    public ArrayList<HashMap<String, String>> getExistingBusStopsTags(){
-        System.out.println("tags = "+existingBusTags.size());
-        if (!existingBusTags.isEmpty() )
-            return existingBusTags;
+    public HashMap<String, HashMap<String, String>> getExistingBusStopsTags(){
+        System.out.println("tags = "+ existingNodesTags.size());
+        if (!existingNodesTags.isEmpty() )
+            return existingNodesTags;
         return null;
     }
 

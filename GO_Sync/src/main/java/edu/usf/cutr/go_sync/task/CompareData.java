@@ -61,12 +61,11 @@ public class CompareData extends OsmTask{
     long tStart = System.currentTimeMillis();
     private List<Stop> GTFSstops = new ArrayList<Stop>();
     private List<String> GTFSstopsIDs = new ArrayList<String>();
-    private ArrayList<AttributesImpl> OSMNodes = new ArrayList<AttributesImpl>();
-//    private ArrayList<Hashtable<String, String>> OSMTags = new ArrayList<Hashtable<String, String>>();
-    private ArrayList<HashMap> OSMTags = new ArrayList<HashMap>();
+    private HashMap<String, AttributesImpl> OSMNodes = new HashMap<>();
+    private HashMap<String,HashMap> OSMTags = new HashMap<>();
     private ArrayList<AttributesImpl> OSMRelations = new ArrayList<AttributesImpl>();
 //    private ArrayList<Hashtable<String, String>> OSMRelationTags = new ArrayList<Hashtable<String, String>>();
-private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
+    private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
     private ArrayList<HashSet<RelationMember>> OSMRelationMembers = new ArrayList<HashSet<RelationMember>>();
     // key is gtfs, value is container of potential osm matches, sorted by distance from gtfs stop
     private ConcurrentHashMap<Stop, TreeSet<Stop>> report =
@@ -626,10 +625,12 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
         int currentTotalProgress=0;
 //        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
         AtomicInteger osmindex= new AtomicInteger();
-        OSMTags.parallelStream().
-                forEach(osmtag -> {
+        OSMTags.entrySet().parallelStream().
+                forEach(osmtagEntry -> {
             if(this.flagIsDone)
                 return;
+            HashMap osmtag = osmtagEntry.getValue();
+            String osmid = osmtagEntry.getKey();
             osmindex.getAndIncrement();
             if((osmindex.get()%timeToUpdate)==0) {
 //                currentTotalProgress += progressToUpdate;
@@ -665,10 +666,8 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                 osmOperator = "missing";
             }
             String osmStopName = (String)osmtag.get("name");
-//            AttributesImpl node = OSMNodes.get(osmindex);
 // FIXME This breaks if there are nodes with identical tags
-            int index = OSMTags.indexOf(osmtag);
-            AttributesImpl node = OSMNodes.get(index);
+            AttributesImpl node = OSMNodes.get(osmid);
             String osmID = node.getValue("id");
             String version = Integer.toString(Integer.parseInt(node.getValue("version")));
             if (isOp) {
@@ -964,16 +963,15 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
             updateProgress(5);
             this.setMessage("Getting existing bus stops...");
             progressMonitor.setNote("This might take several minutes...");
-            ArrayList<AttributesImpl> tempOSMNodes = osmRequest.getExistingBusStops(Double.toString(minLon), Double.toString(minLat),
+            HashMap<String, AttributesImpl> tempOSMNodes = osmRequest.getExistingBusStops(Double.toString(minLon), Double.toString(minLat),
                     Double.toString(maxLon), Double.toString(maxLat));
             if(this.flagIsDone) return;
             progressMonitor.setNote("");
             updateProgress(10);
             this.setMessage("Getting existing stations...");
             progressMonitor.setNote("This might take several minutes...");
-// R
-//            ArrayList<AttributesImpl> tempOSMstations = osmRequest.getExistingStopWaysRelations(Double.toString(minLon), Double.toString(minLat),
-//                    Double.toString(maxLon), Double.toString(maxLat));
+            ArrayList<AttributesImpl> tempOSMstations = osmRequest.getExistingStopWaysRelations(Double.toString(minLon), Double.toString(minLat),
+                    Double.toString(maxLon), Double.toString(maxLat));
             if(this.flagIsDone) return;
             progressMonitor.setNote("");
             updateProgress(15);
@@ -987,8 +985,8 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
             tStart = System.currentTimeMillis();
             progressMonitor.setNote("");
             if (tempOSMNodes!=null) {
-                OSMNodes.addAll(tempOSMNodes);
-                OSMTags.addAll(osmRequest.getExistingBusStopsTags());
+                OSMNodes.putAll(tempOSMNodes);
+                OSMTags.putAll(osmRequest.getExistingBusStopsTags());
 //                FIXME station comparison is broken
 //                OSMNodes.addAll(tempOSMstations);
 //                OSMTags.addAll(osmRequest.getExistingStationTags());
