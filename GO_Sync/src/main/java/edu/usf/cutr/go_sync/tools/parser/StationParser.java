@@ -69,6 +69,7 @@ public class StationParser extends DefaultHandler {
         if (qname.equals(tag_defs.XML_RELATION)) {
             id = attImpl.getValue("id");
             xmlRelations.add(attImpl);
+            xmlRelationsMap.put(id,attImpl);
             tempTag = new HashMap<String, String>();      // start to collect tags of that relation
             tempMembers = new HashSet<RelationMember>();
             tempMembersID = new ArrayList<String>();

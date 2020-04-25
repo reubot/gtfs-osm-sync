@@ -970,7 +970,7 @@ public class CompareData extends OsmTask{
             updateProgress(10);
             this.setMessage("Getting existing stations...");
             progressMonitor.setNote("This might take several minutes...");
-            ArrayList<AttributesImpl> tempOSMstations = osmRequest.getExistingStopWaysRelations(Double.toString(minLon), Double.toString(minLat),
+            HashMap<String, AttributesImpl> tempOSMstations = osmRequest.getExistingStopWaysRelations(Double.toString(minLon), Double.toString(minLat),
                     Double.toString(maxLon), Double.toString(maxLat));
             if(this.flagIsDone) return;
             progressMonitor.setNote("");
@@ -988,8 +988,8 @@ public class CompareData extends OsmTask{
                 OSMNodes.putAll(tempOSMNodes);
                 OSMTags.putAll(osmRequest.getExistingBusStopsTags());
 //                FIXME station comparison is broken
-//                OSMNodes.addAll(tempOSMstations);
-//                OSMTags.addAll(osmRequest.getExistingStationTags());
+                OSMNodes.putAll(tempOSMstations);
+                OSMTags.putAll(osmRequest.getExistingStationTags());
                 System.out.println("Existing Nodes = "+OSMNodes.size());
                 System.out.println("New Nodes = "+GTFSstops.size());
                 compareBusStopData();
