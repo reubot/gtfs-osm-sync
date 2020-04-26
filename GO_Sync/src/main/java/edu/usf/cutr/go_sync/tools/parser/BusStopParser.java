@@ -35,6 +35,10 @@ public class BusStopParser extends DefaultHandler{
     private ArrayList<AttributesImpl> xmlNodes;
     private ArrayList<HashMap<String,String>> xmlTags;
     private ArrayList<tag_defs.primative_type> xmlTypes;
+    private HashMap<String,AttributesImpl> xmlNodesMap = new HashMap<>();
+    private HashMap<String,HashMap<String,String>> xmlTagsMap = new HashMap<>();
+    private HashMap<String,tag_defs.primative_type> xmlTypesMap = new HashMap<>();
+
     public BusStopParser(){
         xmlNodes = new ArrayList<AttributesImpl>();
         xmlTags = new ArrayList<HashMap<String,String>>();
@@ -45,8 +49,11 @@ public class BusStopParser extends DefaultHandler{
         if (qname.equals(tag_defs.XML_NODE) || qname.equals("changeset")) {
             attImplNode = new AttributesImpl(attributes);
             xmlNodes.add(attImplNode);
+            String osmid = attImplNode.getValue("id");
+            xmlNodesMap.put(osmid,attImplNode);
             tempTag = new HashMap<String,String>();      // start to collect tags of that node
             xmlTypes.add(tag_defs.primative_type.NODE);
+            xmlTypesMap.put(osmid,tag_defs.primative_type.NODE);
         }
         if (qname.equals(tag_defs.XML_TAG)) {
             AttributesImpl attImpl = new AttributesImpl(attributes);
@@ -58,6 +65,7 @@ public class BusStopParser extends DefaultHandler{
     @Override public void endElement (String uri, String localName, String qName) throws SAXException {
         if (qName.equals(tag_defs.XML_NODE)) {
             xmlTags.add(tempTag);
+            xmlTagsMap.put(attImplNode.getValue("id"),tempTag);
         }
     }
 
@@ -73,12 +81,23 @@ public class BusStopParser extends DefaultHandler{
         return xmlNodes;
     }
 
+    public HashMap<String, AttributesImpl> getNodesMap() {
+        return xmlNodesMap;
+    }
+
     public ArrayList<HashMap<String, String>> getTags(){
         return xmlTags;
+    }
+
+    public HashMap<String, HashMap<String, String>> getTagsMap() {
+        return xmlTagsMap;
     }
 
     public ArrayList<tag_defs.primative_type> getTypes(){
         return xmlTypes;
     }
 
+    public HashMap<String, tag_defs.primative_type> getTypesMap() {
+        return xmlTypesMap;
+    }
 }

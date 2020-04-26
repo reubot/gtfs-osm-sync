@@ -61,12 +61,11 @@ public class CompareData extends OsmTask{
     long tStart = System.currentTimeMillis();
     private List<Stop> GTFSstops = new ArrayList<Stop>();
     private List<String> GTFSstopsIDs = new ArrayList<String>();
-    private ArrayList<AttributesImpl> OSMNodes = new ArrayList<AttributesImpl>();
-//    private ArrayList<Hashtable<String, String>> OSMTags = new ArrayList<Hashtable<String, String>>();
-    private ArrayList<HashMap> OSMTags = new ArrayList<HashMap>();
+    private HashMap<String, AttributesImpl> OSMNodes = new HashMap<>();
+    private HashMap<String,HashMap> OSMTags = new HashMap<>();
     private ArrayList<AttributesImpl> OSMRelations = new ArrayList<AttributesImpl>();
 //    private ArrayList<Hashtable<String, String>> OSMRelationTags = new ArrayList<Hashtable<String, String>>();
-private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
+    private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
     private ArrayList<HashSet<RelationMember>> OSMRelationMembers = new ArrayList<HashSet<RelationMember>>();
     // key is gtfs, value is container of potential osm matches, sorted by distance from gtfs stop
     private ConcurrentHashMap<Stop, TreeSet<Stop>> report =
@@ -88,6 +87,8 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
     private HttpRequest osmRequest;
     private HashSet<String> osmActiveUsers = new HashSet<String>();
     private Hashtable<String,String> osmIdToGtfsId = new Hashtable<String,String>();
+
+    private HashMap<String,tag_defs.primative_type> OSMNodesType = new HashMap<>();
 
     private final double ERROR_TO_ZERO = 0.5;       // acceptable error while calculating distance ~= consider as 0
     private /*final*/ double DELTA = 0.004;   // ~400m in Lat and 400m in Lon       0.00001 ~= 1.108m in Lat and 0.983 in Lon
@@ -626,10 +627,12 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
         int currentTotalProgress=0;
 //        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
         AtomicInteger osmindex= new AtomicInteger();
-        OSMTags.parallelStream().
-                forEach(osmtag -> {
+        OSMTags.entrySet().parallelStream().
+                forEach(osmtagEntry -> {
             if(this.flagIsDone)
                 return;
+            HashMap osmtag = osmtagEntry.getValue();
+            String osmid = osmtagEntry.getKey();
             osmindex.getAndIncrement();
             if((osmindex.get()%timeToUpdate)==0) {
 //                currentTotalProgress += progressToUpdate;
@@ -665,10 +668,8 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                 osmOperator = "missing";
             }
             String osmStopName = (String)osmtag.get("name");
-//            AttributesImpl node = OSMNodes.get(osmindex);
 // FIXME This breaks if there are nodes with identical tags
-            int index = OSMTags.indexOf(osmtag);
-            AttributesImpl node = OSMNodes.get(index);
+            AttributesImpl node = OSMNodes.get(osmid);
             String osmID = node.getValue("id");
             String version = Integer.toString(Integer.parseInt(node.getValue("version")));
             if (isOp) {
@@ -685,13 +686,16 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                             Stop ns = new Stop(gtfsStop);
                             ns.addTags(osmtag);
                             ns.setOsmId(node.getValue("id"));
+                            ns.setType(OSMNodesType.get(osmID));
                             ns.setOsmVersion(version);
 
                             osmActiveUsers.add(node.getValue("user"));
 
+                            // existing OSM Stop
                             Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
                             es.addTags(osmtag);
                             es.setOsmId(node.getValue("id"));
+                            es.setType(OSMNodesType.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             // for comparing tag
@@ -727,6 +731,7 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                                 }
                                 modify.add(ns);
                                 ns.setReportCategory(ReportCategory.MODIFY);
+                                ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -751,6 +756,7 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                                             "\t   " + es.printOSMStop() +
                                             "\n ACTION: No upload!");
                                     ns.setReportCategory(ReportCategory.NOTHING_NEW);
+                                    ns.setReportCategoryEnum(OsmPrimitive.RC.NOTHING_NEW);
                                     addToReport(ns, es, true);
                                     noUpload.add(ns);
                                     osmIdToGtfsId.put(node.getValue("id"), gtfsStop.getStopID());
@@ -765,6 +771,7 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                                     modify.add(ns);
                                     osmActiveUsers.add(node.getValue("user"));
                                     ns.setReportCategory(ReportCategory.MODIFY);
+                                    ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
                                     addToReport(ns, es, true);
                                 }
                                 break;
@@ -773,12 +780,13 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                         // stop_id == null OR OSMnode does NOT have same stop id
                         else {
                             Stop ns = new Stop(gtfsStop);
-
                             osmActiveUsers.add(node.getValue("user"));
+                            ns.setType(OSMNodesType.get(osmID));
 
                             Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
                             es.addTags(osmtag);
                             es.setOsmId(node.getValue("id"));
+                            es.setType(OSMNodesType.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             es.setOsmVersion(version);
@@ -844,6 +852,7 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                                 // check for osm id in gtfs db here,  if not in gtfs stops, add as potential match TODO bounding boxes still show up
                                 if (!GTFSstopsIDs.contains(osmStopID)) {
                                     ns.setReportCategory(ReportCategory.UPLOAD_CONFLICT);
+                                    ns.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_CONFLICT);
                                     addToReport(ns, es, false);
                                 }
                             }
@@ -871,6 +880,7 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
 
 
                                 ns.setReportCategory(ReportCategory.MODIFY);
+                                ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -905,8 +915,10 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
 //            if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportKeys.contains(GTFSstops.get(i))) ) {
             if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportIDs.contains(GTFSstops.get(i).getStopID())) ) {
                 Stop n = new Stop(GTFSstops.get(i));
+                n.setType(OSMNodesType.get(tag_defs.primative_type.NODE));
                 n.setReportText("New upload with no conflicts");
                 n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
+                n.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                 upload.add(n);
 
                 addToReport(n, null, false);
@@ -964,16 +976,15 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
             updateProgress(5);
             this.setMessage("Getting existing bus stops...");
             progressMonitor.setNote("This might take several minutes...");
-            ArrayList<AttributesImpl> tempOSMNodes = osmRequest.getExistingBusStops(Double.toString(minLon), Double.toString(minLat),
+            HashMap<String, AttributesImpl> tempOSMNodes = osmRequest.getExistingBusStops(Double.toString(minLon), Double.toString(minLat),
                     Double.toString(maxLon), Double.toString(maxLat));
             if(this.flagIsDone) return;
             progressMonitor.setNote("");
             updateProgress(10);
             this.setMessage("Getting existing stations...");
             progressMonitor.setNote("This might take several minutes...");
-// R
-//            ArrayList<AttributesImpl> tempOSMstations = osmRequest.getExistingStopWaysRelations(Double.toString(minLon), Double.toString(minLat),
-//                    Double.toString(maxLon), Double.toString(maxLat));
+            HashMap<String, AttributesImpl> tempOSMstations = osmRequest.getExistingStopWaysRelations(Double.toString(minLon), Double.toString(minLat),
+                    Double.toString(maxLon), Double.toString(maxLat));
             if(this.flagIsDone) return;
             progressMonitor.setNote("");
             updateProgress(15);
@@ -987,11 +998,13 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
             tStart = System.currentTimeMillis();
             progressMonitor.setNote("");
             if (tempOSMNodes!=null) {
-                OSMNodes.addAll(tempOSMNodes);
-                OSMTags.addAll(osmRequest.getExistingBusStopsTags());
+                OSMNodes.putAll(tempOSMNodes);
+                OSMTags.putAll(osmRequest.getExistingBusStopsTags());
+                OSMNodesType.putAll(osmRequest.getExistingNodesTypes());
 //                FIXME station comparison is broken
-//                OSMNodes.addAll(tempOSMstations);
-//                OSMTags.addAll(osmRequest.getExistingStationTags());
+                OSMNodes.putAll(tempOSMstations);
+                OSMTags.putAll(osmRequest.getExistingStationTags());
+                OSMNodesType.putAll(osmRequest.getExistingStationTypes());
                 System.out.println("Existing Nodes = "+OSMNodes.size());
                 System.out.println("New Nodes = "+GTFSstops.size());
                 compareBusStopData();
@@ -1013,6 +1026,7 @@ private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
                     Stop n = new Stop(GTFSstops.get(i));
                     n.setReportText("New upload with no conflicts");
                     n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
+                    n.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                     upload.add(n);
                     addToReport(n, null, false);
                 }

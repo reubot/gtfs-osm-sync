@@ -16,10 +16,7 @@ import edu.usf.cutr.go_sync.gui.object.RouteMemberTableModel;
 import edu.usf.cutr.go_sync.gui.object.StopTableInfo;
 import edu.usf.cutr.go_sync.gui.object.TagReportTableModel;
 import edu.usf.cutr.go_sync.io.WriteFile;
-import edu.usf.cutr.go_sync.object.RelationMember;
-import edu.usf.cutr.go_sync.object.Route;
-import edu.usf.cutr.go_sync.object.Stop;
-import edu.usf.cutr.go_sync.object.ReportCategory;
+import edu.usf.cutr.go_sync.object.*;
 import edu.usf.cutr.go_sync.osm.HttpRequest;
 import edu.usf.cutr.go_sync.task.UploadData;
 import edu.usf.cutr.go_sync.tools.OsmDistance;
@@ -2927,6 +2924,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                         st.setOsmVersion(selectedOsmStop.getOsmVersion());
                     }
                     st.setReportCategory(ReportCategory.MODIFY);
+                    st.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
                     usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
                 }
                 finalStopsAccepted.put(selectedGtfs,st);

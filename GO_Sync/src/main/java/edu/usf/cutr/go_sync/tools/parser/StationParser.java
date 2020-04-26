@@ -49,6 +49,10 @@ public class StationParser extends DefaultHandler {
     private ArrayList<tag_defs.primative_type> xmlTypes;
     //xmlTags<String, String> ----------- xmlMembers<String(refID), AttributesImpl>
     private ArrayList<HashMap<String, String>> xmlTags;
+    private HashMap<String,AttributesImpl> xmlRelationsMap = new HashMap<>();
+    private HashMap<String,HashMap<String,String>> xmlTagsMap = new HashMap<>();
+    private HashMap<String,tag_defs.primative_type> xmlTypesMap = new HashMap<>();
+
     private HashMap<String, HashSet<RelationMember>> xmlMembers;
     String id;
 
@@ -65,11 +69,14 @@ public class StationParser extends DefaultHandler {
         if (qname.equals(tag_defs.XML_RELATION)) {
             id = attImpl.getValue("id");
             xmlRelations.add(attImpl);
+            xmlRelationsMap.put(id,attImpl);
             tempTag = new HashMap<String, String>();      // start to collect tags of that relation
             tempMembers = new HashSet<RelationMember>();
             tempMembersID = new ArrayList<String>();
             xmlTypes.add(tag_defs.primative_type.RELATION);
-    }
+            xmlTypesMap.put(id,tag_defs.primative_type.RELATION);
+
+        }
 
         if(qname.equals(tag_defs.XML_WAY)) {
             id = attImpl.getValue("id");
@@ -110,6 +117,7 @@ public class StationParser extends DefaultHandler {
 
         if (qName.equals(tag_defs.XML_RELATION)) {
             xmlTags.add(tempTag);
+            xmlTagsMap.put(id,tempTag);
             xmlMembers.put(id,tempMembers);
             HashSet<EuclideanDoublePoint> tempPoints = new HashSet<>();
             for (String memberID : tempMembersID)
@@ -151,6 +159,18 @@ public class StationParser extends DefaultHandler {
 
     public ArrayList<tag_defs.primative_type> getTypes(){
         return xmlTypes;
+    }
+
+    public HashMap<String, AttributesImpl> getRelationsMap() {
+        return xmlRelationsMap;
+    }
+
+    public HashMap<String, HashMap<String, String>> getTagsMap() {
+        return xmlTagsMap;
+    }
+
+    public HashMap<String, tag_defs.primative_type> getTypesMap() {
+        return xmlTypesMap;
     }
 
 }
