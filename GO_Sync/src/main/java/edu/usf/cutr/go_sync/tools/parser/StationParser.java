@@ -74,7 +74,7 @@ public class StationParser extends DefaultHandler {
             tempMembers = new HashSet<RelationMember>();
             tempMembersID = new ArrayList<String>();
             xmlTypes.add(tag_defs.primative_type.RELATION);
-            xmlTypesMap.put(id,tag_defs.primative_type.NODE);
+            xmlTypesMap.put(id,tag_defs.primative_type.RELATION);
 
         }
 

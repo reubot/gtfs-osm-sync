@@ -53,6 +53,7 @@ public class Route extends OsmPrimitive implements Comparable{
         if(r.getOsmId()!=null) this.setOsmId(r.getOsmId());
         if(r.getOsmVersion()!=null) this.setOsmVersion(r.getOsmVersion());
         if(r.getReportCategory()!=null) this.setReportCategory(r.getReportCategory());
+        if(r.getReportCategoryEnum()!=null) this.setReportCategoryEnum(r.getReportCategoryEnum());
         if(r.getReportText()!=null) this.setReportText(r.getReportText());
         if(getStatus()!=null) this.setStatus(r.getStatus());
         this.setLastEditedOsmDate(r.getLastEditedOsmDate());

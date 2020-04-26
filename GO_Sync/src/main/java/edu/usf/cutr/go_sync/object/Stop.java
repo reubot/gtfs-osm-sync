@@ -28,7 +28,7 @@ import edu.usf.cutr.go_sync.tag_defs;
  */
 
 public class Stop extends OsmPrimitive implements Comparable{
-	private final double ERROR_TO_ZERO = 0.5;	
+	private final double ERROR_TO_ZERO = 0.5;
 	private final String GTFS_STOP_ID_KEY	= tag_defs.GTFS_STOP_ID_KEY;
     private final String GTFS_OPERATOR_KEY	= tag_defs.GTFS_OPERATOR_KEY;
     private final String GTFS_NAME_KEY		= tag_defs.GTFS_NAME_KEY;
@@ -50,7 +50,7 @@ public class Stop extends OsmPrimitive implements Comparable{
 //        if (!stopID.contains("place")) osmTags.put("url", "http://translink.com.au/stop/"+stopID);
 //        osmTags.put("url", "http://translink.com.au/stop/"+stopID);
 //        osmTags.put("source", "http://translink.com.au/about-translink/reporting-and-publications/public-transport-performance-data");
-        
+
 //       osmTags.put("network", getOperatorName());
 //      osmTags.put(GTFS_OPERATOR_KEY, "");
         this.lat = lat;
@@ -66,14 +66,14 @@ public class Stop extends OsmPrimitive implements Comparable{
         this.osmTags.put(GTFS_STOP_ID_KEY, s.getStopID());
         this.osmTags.put(GTFS_OPERATOR_KEY, s.getOperatorName());
         this.osmTags.put(GTFS_NAME_KEY, s.getStopName());
-        
+
 //        this.osmTags.put("url", "http://translink.com.au/stop/"+s.getStopID());
-//        if (!s.getStopID().contains("place")) this.osmTags.put("url", "http://translink.com.au/stop/"+s.getStopID()); 
+//        if (!s.getStopID().contains("place")) this.osmTags.put("url", "http://translink.com.au/stop/"+s.getStopID());
 //        this.osmTags.put("url", s.getTag("source_ref"));
 //        System.out.println(s.getTag("source_ref"));
 //        this.osmTags.put("source", "http://translink.com.au/about-translink/reporting-and-publications/public-transport-performance-data");
 
-        
+
 //        this.osmTags.put("network", s.getOperatorName());
 //        this.osmTags.put(GTFS_OPERATOR_KEY, "");
         this.lat = s.lat;
@@ -81,10 +81,12 @@ public class Stop extends OsmPrimitive implements Comparable{
         this.setOsmId(s.getOsmId());
         this.setOsmVersion(s.getOsmVersion());
         this.setReportCategory(s.getReportCategory());
+        this.setReportCategoryEnum(s.getReportCategoryEnum());
         this.setReportText(s.getReportText());
         this.setStatus(s.getStatus());
         this.setLastEditedOsmDate(s.getLastEditedOsmDate());
         this.setLastEditedOsmUser(s.getLastEditedOsmUser());
+        this.setType(s.getType());
         routes = new HashSet<Route>();
         routes.addAll(s.getRoutes());
     }

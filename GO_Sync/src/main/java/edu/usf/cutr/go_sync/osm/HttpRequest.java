@@ -679,4 +679,13 @@ public class HttpRequest {
         }
         return responseText.toString();
     }
+
+    public HashMap<String, tag_defs.primative_type> getExistingNodesTypes() {
+        return existingStopTypes;
+    }
+
+    public HashMap<String, tag_defs.primative_type> getExistingStationTypes() {
+        return existingStationTypes;
+    }
+
 }

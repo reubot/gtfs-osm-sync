@@ -88,6 +88,8 @@ public class CompareData extends OsmTask{
     private HashSet<String> osmActiveUsers = new HashSet<String>();
     private Hashtable<String,String> osmIdToGtfsId = new Hashtable<String,String>();
 
+    private HashMap<String,tag_defs.primative_type> OSMNodesType = new HashMap<>();
+
     private final double ERROR_TO_ZERO = 0.5;       // acceptable error while calculating distance ~= consider as 0
     private /*final*/ double DELTA = 0.004;   // ~400m in Lat and 400m in Lon       0.00001 ~= 1.108m in Lat and 0.983 in Lon
     private /*final*/ double RANGE = 400;         // FIXME bus stop is within 400 meters
@@ -684,13 +686,16 @@ public class CompareData extends OsmTask{
                             Stop ns = new Stop(gtfsStop);
                             ns.addTags(osmtag);
                             ns.setOsmId(node.getValue("id"));
+                            ns.setType(OSMNodesType.get(osmID));
                             ns.setOsmVersion(version);
 
                             osmActiveUsers.add(node.getValue("user"));
 
+                            // existing OSM Stop
                             Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
                             es.addTags(osmtag);
                             es.setOsmId(node.getValue("id"));
+                            es.setType(OSMNodesType.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             // for comparing tag
@@ -726,6 +731,7 @@ public class CompareData extends OsmTask{
                                 }
                                 modify.add(ns);
                                 ns.setReportCategory(ReportCategory.MODIFY);
+                                ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -750,6 +756,7 @@ public class CompareData extends OsmTask{
                                             "\t   " + es.printOSMStop() +
                                             "\n ACTION: No upload!");
                                     ns.setReportCategory(ReportCategory.NOTHING_NEW);
+                                    ns.setReportCategoryEnum(OsmPrimitive.RC.NOTHING_NEW);
                                     addToReport(ns, es, true);
                                     noUpload.add(ns);
                                     osmIdToGtfsId.put(node.getValue("id"), gtfsStop.getStopID());
@@ -764,6 +771,7 @@ public class CompareData extends OsmTask{
                                     modify.add(ns);
                                     osmActiveUsers.add(node.getValue("user"));
                                     ns.setReportCategory(ReportCategory.MODIFY);
+                                    ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
                                     addToReport(ns, es, true);
                                 }
                                 break;
@@ -772,12 +780,13 @@ public class CompareData extends OsmTask{
                         // stop_id == null OR OSMnode does NOT have same stop id
                         else {
                             Stop ns = new Stop(gtfsStop);
-
                             osmActiveUsers.add(node.getValue("user"));
+                            ns.setType(OSMNodesType.get(osmID));
 
                             Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
                             es.addTags(osmtag);
                             es.setOsmId(node.getValue("id"));
+                            es.setType(OSMNodesType.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             es.setOsmVersion(version);
@@ -843,6 +852,7 @@ public class CompareData extends OsmTask{
                                 // check for osm id in gtfs db here,  if not in gtfs stops, add as potential match TODO bounding boxes still show up
                                 if (!GTFSstopsIDs.contains(osmStopID)) {
                                     ns.setReportCategory(ReportCategory.UPLOAD_CONFLICT);
+                                    ns.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_CONFLICT);
                                     addToReport(ns, es, false);
                                 }
                             }
@@ -870,6 +880,7 @@ public class CompareData extends OsmTask{
 
 
                                 ns.setReportCategory(ReportCategory.MODIFY);
+                                ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -904,8 +915,10 @@ public class CompareData extends OsmTask{
 //            if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportKeys.contains(GTFSstops.get(i))) ) {
             if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportIDs.contains(GTFSstops.get(i).getStopID())) ) {
                 Stop n = new Stop(GTFSstops.get(i));
+                n.setType(OSMNodesType.get(tag_defs.primative_type.NODE));
                 n.setReportText("New upload with no conflicts");
                 n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
+                n.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                 upload.add(n);
 
                 addToReport(n, null, false);
@@ -987,9 +1000,11 @@ public class CompareData extends OsmTask{
             if (tempOSMNodes!=null) {
                 OSMNodes.putAll(tempOSMNodes);
                 OSMTags.putAll(osmRequest.getExistingBusStopsTags());
+                OSMNodesType.putAll(osmRequest.getExistingNodesTypes());
 //                FIXME station comparison is broken
                 OSMNodes.putAll(tempOSMstations);
                 OSMTags.putAll(osmRequest.getExistingStationTags());
+                OSMNodesType.putAll(osmRequest.getExistingStationTypes());
                 System.out.println("Existing Nodes = "+OSMNodes.size());
                 System.out.println("New Nodes = "+GTFSstops.size());
                 compareBusStopData();
@@ -1011,6 +1026,7 @@ public class CompareData extends OsmTask{
                     Stop n = new Stop(GTFSstops.get(i));
                     n.setReportText("New upload with no conflicts");
                     n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
+                    n.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                     upload.add(n);
                     addToReport(n, null, false);
                 }
