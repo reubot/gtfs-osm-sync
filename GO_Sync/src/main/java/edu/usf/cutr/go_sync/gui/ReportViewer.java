@@ -479,12 +479,12 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         unci=0; mi=0; nui=0;
         for (int i=0; i<routeKeys.size(); i++) {
             gtfsRouteAll[i] = finalRoutes.get(routeKeys.get(i));
-            String status = gtfsRouteAll[i].getStatus();
-            if (status.equals("n")) {
+            OsmPrimitive.status status = gtfsRouteAll[i].getStatus();
+            if (status.equals(OsmPrimitive.status.NEW)) {
                 unci++;
-            } else if (status.equals("m")) {
+            } else if (status.equals(OsmPrimitive.status.MODIFY)) {
                 mi++;
-            } else if (status.equals("e")) {
+            } else if (status.equals(OsmPrimitive.status.EMPTY)) {
                 nui++;
             }
         }
@@ -495,14 +495,14 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         unci=0; mi=0; nui=0;
         for (int i=0; i<routeKeys.size(); i++) {
             Route tempr = finalRoutes.get(routeKeys.get(i));
-            String status = tempr.getStatus();
-            if (status.equals("n")) {
+            OsmPrimitive.status status = tempr.getStatus();
+            if (status.equals(OsmPrimitive.status.NEW)) {
                 gtfsRouteUploadNoConflict[unci] = tempr;
                 unci++;
-            } else if (status.equals("m")) {
+            } else if (status.equals(OsmPrimitive.status.MODIFY)) {
                 gtfsRouteModify[mi] = tempr;
                 mi++;
-            } else if (status.equals("e")) {
+            } else if (status.equals(OsmPrimitive.status.EMPTY)) {
                 gtfsRouteNoUpload[nui] = tempr;
                 nui++;
             }

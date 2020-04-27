@@ -35,9 +35,9 @@ public class OsmPrimitive {
     public enum RC {
         UPLOAD_CONFLICT, UPLOAD_NO_CONFLICT, MODIFY, NOTHING_NEW
     }
-    /* only has 4 possible value: n=new; m=modify; d=delete; e=empty
+    /** only has 4 possible value: n=new; m=modify; d=delete; e=empty
      * used for upload osmchange
-     * */
+     */
     public enum status {
         NEW, MODIFY, DELETE, EMPTY
     }
@@ -126,14 +126,21 @@ public class OsmPrimitive {
     /* only has 4 possible value: n=new; m=modify; d=delete; e=empty
      * used for upload osmchange
      * */
-    public void setStatus(String v){
-        statusString = v;
+//    public void setStatus(String v){
+//        statusString = v;
+//    }
+//
+//    public String getStatus(){
+//        return statusString;
+//    }
+
+    public void setStatus/*Enum*/(status statusEnum) {
+        this.statusEnum = statusEnum;
     }
 
-    public String getStatus(){
-        return statusString;
+    public status getStatus/*Enum*/() {
+        return statusEnum;
     }
-
     public void setOsmVersion(String v){
         osmVersion = v;
     }
@@ -164,6 +171,7 @@ public class OsmPrimitive {
     public String getReportCategory(){
         return reportCategory;
     }
+
 
     public void setReportText(String v){
         reportText = v;
@@ -205,11 +213,5 @@ public class OsmPrimitive {
         return reportCategoryEnum;
     }
 
-    public void setStatusEnum(status statusEnum) {
-        this.statusEnum = statusEnum;
-    }
 
-    public status getStatusEnum() {
-        return statusEnum;
-    }
 }

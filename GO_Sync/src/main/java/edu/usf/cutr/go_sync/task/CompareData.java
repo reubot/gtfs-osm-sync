@@ -488,7 +488,7 @@ public class CompareData extends OsmTask{
                         rm.setStatus("GTFS dataset");
                         rm.setGtfsId(st.getStopID());
                         r.addOsmMember(rm);
-                        r.setStatus("n");
+                        r.setStatus(OsmPrimitive.status.NEW);
                         routes.put(rios.getRouteId(), r);
                     }
                 }
@@ -588,14 +588,14 @@ public class CompareData extends OsmTask{
 
                 Hashtable diff = compareOsmTags(osmtag, r);
                 if(!em.containsAll(r.getOsmMembers()) || diff.size()!=0){
-                    r.setStatus("m");
+                    r.setStatus(OsmPrimitive.status.MODIFY);
                     r.setOsmVersion(osmRelation.getValue("version"));
                     r.setOsmId(osmRelation.getValue("id"));
                     r.addOsmMembers(em);
                     r.addTags(osmtag);
                 }
                 else {
-                    r.setStatus("e");
+                    r.setStatus(OsmPrimitive.status.EMPTY);
                 }
 
                 routes.remove((String)r.getRouteId());
