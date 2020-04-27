@@ -237,7 +237,7 @@ public class CompareData extends OsmTask{
             tree.add(osmStop);
 
             // set stop value to osm value as default (only affect modify category)
-            if(gtfsStop.getReportCategory().equals(ReportCategory.MODIFY)){
+            if(gtfsStop.getReportCategory().equals(OsmPrimitive.RC.MODIFY)){
                 gtfsStop.setLat(osmStop.getLat());
                 gtfsStop.setLon(osmStop.getLon());
                 gtfsStop.addAndOverwriteTags(osmStop.getTags());
@@ -455,8 +455,8 @@ public class CompareData extends OsmTask{
         for (Stop st : reportKeys) {
             if(this.flagIsDone) return;
 //            Stop st = reportKeys.get(i);
-            String category = st.getReportCategory();
-            if (category.equals(ReportCategory.MODIFY) || category.equals(ReportCategory.NOTHING_NEW)) {
+            OsmPrimitive.RC category = st.getReportCategory();
+            if (category.equals(OsmPrimitive.RC.MODIFY) || category.equals(OsmPrimitive.RC.NOTHING_NEW)) {
                 ArrayList<Route> routeInOneStop = new ArrayList<Route>();
                 if(st.getRoutes()!=null) {
                     routeInOneStop.addAll(st.getRoutes());
@@ -730,8 +730,7 @@ public class CompareData extends OsmTask{
                                     modify.remove(ns);
                                 }
                                 modify.add(ns);
-                                ns.setReportCategory(ReportCategory.MODIFY);
-                                ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
+                                ns.setReportCategory(OsmPrimitive.RC.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -755,8 +754,7 @@ public class CompareData extends OsmTask{
                                     es.setReportText("Stop already exists in OSM. Nothing new from last upload.\n" +
                                             "\t   " + es.printOSMStop() +
                                             "\n ACTION: No upload!");
-                                    ns.setReportCategory(ReportCategory.NOTHING_NEW);
-                                    ns.setReportCategoryEnum(OsmPrimitive.RC.NOTHING_NEW);
+                                    ns.setReportCategory(OsmPrimitive.RC.NOTHING_NEW);
                                     addToReport(ns, es, true);
                                     noUpload.add(ns);
                                     osmIdToGtfsId.put(node.getValue("id"), gtfsStop.getStopID());
@@ -770,8 +768,7 @@ public class CompareData extends OsmTask{
                                     }
                                     modify.add(ns);
                                     osmActiveUsers.add(node.getValue("user"));
-                                    ns.setReportCategory(ReportCategory.MODIFY);
-                                    ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
+                                    ns.setReportCategory(OsmPrimitive.RC.MODIFY);
                                     addToReport(ns, es, true);
                                 }
                                 break;
@@ -851,8 +848,7 @@ public class CompareData extends OsmTask{
                                 }
                                 // check for osm id in gtfs db here,  if not in gtfs stops, add as potential match TODO bounding boxes still show up
                                 if (!GTFSstopsIDs.contains(osmStopID)) {
-                                    ns.setReportCategory(ReportCategory.UPLOAD_CONFLICT);
-                                    ns.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_CONFLICT);
+                                    ns.setReportCategory(OsmPrimitive.RC.UPLOAD_CONFLICT);
                                     addToReport(ns, es, false);
                                 }
                             }
@@ -879,8 +875,7 @@ public class CompareData extends OsmTask{
                                         "\n ACTION: Modify OSM stop["+node.getValue("id")+"] with expected gtfs_id and operator!");
 
 
-                                ns.setReportCategory(ReportCategory.MODIFY);
-                                ns.setReportCategoryEnum(OsmPrimitive.RC.MODIFY);
+                                ns.setReportCategory(OsmPrimitive.RC.MODIFY);
                                 addToReport(ns, es, true);
                                 break;
                             }
@@ -917,8 +912,7 @@ public class CompareData extends OsmTask{
                 Stop n = new Stop(GTFSstops.get(i));
                 n.setType(OSMNodesType.get(tag_defs.primative_type.NODE));
                 n.setReportText("New upload with no conflicts");
-                n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
-                n.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
+                n.setReportCategory(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                 upload.add(n);
 
                 addToReport(n, null, false);
@@ -933,8 +927,8 @@ public class CompareData extends OsmTask{
         for(int i=0; i<reportKeys.size(); i++){
             if(this.flagIsDone) return;
             Stop s = new Stop(reportKeys.get(i));
-            String category = s.getReportCategory();
-            if(category.equals(ReportCategory.MODIFY)){
+            OsmPrimitive.RC category = s.getReportCategory();
+            if(category.equals(OsmPrimitive.RC.MODIFY)){
                 TreeSet<Stop> arr = report.get(s);
                 if(arr.size()==1) {
                     String tempStopId=null;
@@ -1025,8 +1019,7 @@ public class CompareData extends OsmTask{
                     if(this.flagIsDone) return;
                     Stop n = new Stop(GTFSstops.get(i));
                     n.setReportText("New upload with no conflicts");
-                    n.setReportCategory(ReportCategory.UPLOAD_NO_CONFLICT);
-                    n.setReportCategoryEnum(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
+                    n.setReportCategory(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                     upload.add(n);
                     addToReport(n, null, false);
                 }

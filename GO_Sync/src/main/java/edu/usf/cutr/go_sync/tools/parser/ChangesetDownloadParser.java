@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import edu.usf.cutr.go_sync.object.RelationMember;
-import edu.usf.cutr.go_sync.object.ReportCategory;
 import edu.usf.cutr.go_sync.object.Stop;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
@@ -45,8 +44,8 @@ public class ChangesetDownloadParser extends DefaultHandler{
     @Override public void startElement(String namespaceURI, String localName, String qname, Attributes attributes) throws SAXException {
         if (qname.equals("create")) {
             status="create";
-        } else if (qname.equals(ReportCategory.MODIFY)) {
-            status=ReportCategory.MODIFY;
+        } else if (qname.equals("modify")) {
+            status="modify";
         } else if (qname.equals("delete")) {
             status="delete";
         } else if (qname.equals("node")) {
@@ -58,7 +57,7 @@ public class ChangesetDownloadParser extends DefaultHandler{
             s.setOsmVersion(version);
             if (status.equals("create")) {
                 delete.add(s);
-            } else if (status.equals(ReportCategory.MODIFY)) {
+            } else if (status.equals("modify")) {
                 modify.add(s);
             } else if (status.equals("delete")) {
                 upload.add(s);
@@ -67,7 +66,7 @@ public class ChangesetDownloadParser extends DefaultHandler{
     }
 
     @Override public void endElement (String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("create") || qName.equals(ReportCategory.MODIFY) || qName.equals("delete")) {
+        if (qName.equals("create") || qName.equals("modify") || qName.equals("delete")) {
             status = "";
         }
     }

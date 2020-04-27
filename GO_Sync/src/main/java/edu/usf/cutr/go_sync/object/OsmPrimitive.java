@@ -32,6 +32,16 @@ public class OsmPrimitive {
     Hashtable osmTags;
     //TODO change reportCategory to enum
     private String statusString, osmVersion, osmid, reportCategory, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
+
+    /**
+     * For stop:
+     *      1) MODIFY
+     *      2) NOTHING_NEW
+     *      3) UPLOAD_CONFLICT
+     *      4) UPLOAD_NO_CONFLICT
+     * */
+
+
     public enum RC {
         UPLOAD_CONFLICT, UPLOAD_NO_CONFLICT, MODIFY, NOTHING_NEW
     }
@@ -164,13 +174,22 @@ public class OsmPrimitive {
      *      3) UPLOAD_CONFLICT
      *      4) UPLOAD_NO_CONFLICT
      * */
-    public void setReportCategory(String v){
-        reportCategory = v;
+
+    public void setReportCategory/*Enum*/(RC e) {
+        reportCategoryEnum = e;
     }
 
-    public String getReportCategory(){
-        return reportCategory;
+    public RC getReportCategory/*Enum*/() {
+        return reportCategoryEnum;
     }
+
+//    public void setReportCategory(String v){
+//        reportCategory = v;
+//    }
+//
+//    public String getReportCategory(){
+//        return reportCategory;
+//    }
 
 
     public void setReportText(String v){
@@ -204,14 +223,5 @@ public class OsmPrimitive {
     public tag_defs.primative_type getType() {
         return type;
     }
-
-    public void setReportCategoryEnum(RC e) {
-        reportCategoryEnum = e;
-    }
-
-    public RC getReportCategoryEnum() {
-        return reportCategoryEnum;
-    }
-
 
 }
