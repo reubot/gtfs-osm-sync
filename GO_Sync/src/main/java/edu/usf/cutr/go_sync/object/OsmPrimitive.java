@@ -30,8 +30,7 @@ import java.util.Hashtable;
  */
 public class OsmPrimitive {
     Hashtable osmTags;
-    //TODO change reportCategory to enum
-    private String statusString, osmVersion, osmid, reportCategory, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
+    private String statusString, osmVersion, osmid, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
 
     /**
      * For stop:
