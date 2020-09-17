@@ -30,14 +30,23 @@ import java.util.Hashtable;
  */
 public class OsmPrimitive {
     Hashtable osmTags;
-    //TODO change reportCategory to enum
-    private String statusString, osmVersion, osmid, reportCategory, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
+    private String statusString, osmVersion, osmid, reportText, lastEditedOsmUser="", lastEditedOsmDate="";
+
+    /**
+     * For stop:
+     *      1) MODIFY
+     *      2) NOTHING_NEW
+     *      3) UPLOAD_CONFLICT
+     *      4) UPLOAD_NO_CONFLICT
+     * */
+
+
     public enum RC {
         UPLOAD_CONFLICT, UPLOAD_NO_CONFLICT, MODIFY, NOTHING_NEW
     }
-    /* only has 4 possible value: n=new; m=modify; d=delete; e=empty
+    /** only has 4 possible value: n=new; m=modify; d=delete; e=empty
      * used for upload osmchange
-     * */
+     */
     public enum status {
         NEW, MODIFY, DELETE, EMPTY
     }
@@ -126,14 +135,21 @@ public class OsmPrimitive {
     /* only has 4 possible value: n=new; m=modify; d=delete; e=empty
      * used for upload osmchange
      * */
-    public void setStatus(String v){
-        statusString = v;
+//    public void setStatus(String v){
+//        statusString = v;
+//    }
+//
+//    public String getStatus(){
+//        return statusString;
+//    }
+
+    public void setStatus/*Enum*/(status statusEnum) {
+        this.statusEnum = statusEnum;
     }
 
-    public String getStatus(){
-        return statusString;
+    public status getStatus/*Enum*/() {
+        return statusEnum;
     }
-
     public void setOsmVersion(String v){
         osmVersion = v;
     }
@@ -157,13 +173,23 @@ public class OsmPrimitive {
      *      3) UPLOAD_CONFLICT
      *      4) UPLOAD_NO_CONFLICT
      * */
-    public void setReportCategory(String v){
-        reportCategory = v;
+
+    public void setReportCategory/*Enum*/(RC e) {
+        reportCategoryEnum = e;
     }
 
-    public String getReportCategory(){
-        return reportCategory;
+    public RC getReportCategory/*Enum*/() {
+        return reportCategoryEnum;
     }
+
+//    public void setReportCategory(String v){
+//        reportCategory = v;
+//    }
+//
+//    public String getReportCategory(){
+//        return reportCategory;
+//    }
+
 
     public void setReportText(String v){
         reportText = v;
@@ -197,19 +223,4 @@ public class OsmPrimitive {
         return type;
     }
 
-    public void setReportCategoryEnum(RC e) {
-        reportCategoryEnum = e;
-    }
-
-    public RC getReportCategoryEnum() {
-        return reportCategoryEnum;
-    }
-
-    public void setStatusEnum(status statusEnum) {
-        this.statusEnum = statusEnum;
-    }
-
-    public status getStatusEnum() {
-        return statusEnum;
-    }
 }

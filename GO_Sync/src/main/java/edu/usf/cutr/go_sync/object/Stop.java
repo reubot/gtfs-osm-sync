@@ -81,7 +81,7 @@ public class Stop extends OsmPrimitive implements Comparable{
         this.setOsmId(s.getOsmId());
         this.setOsmVersion(s.getOsmVersion());
         this.setReportCategory(s.getReportCategory());
-        this.setReportCategoryEnum(s.getReportCategoryEnum());
+//        this.setReportCategoryEnum(s.getReportCategoryEnum());
         this.setReportText(s.getReportText());
         this.setStatus(s.getStatus());
         this.setLastEditedOsmDate(s.getLastEditedOsmDate());
