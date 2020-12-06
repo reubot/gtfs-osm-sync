@@ -17,6 +17,7 @@ Copyright 2010 University of South Florida
 
 package edu.usf.cutr.go_sync.tools.parser;
 
+import edu.usf.cutr.go_sync.object.OsmPrimitive;
 import edu.usf.cutr.go_sync.object.RelationMember;
 import edu.usf.cutr.go_sync.tag_defs;
 import edu.usf.cutr.go_sync.tools.EuclideanDoublePoint;
@@ -25,35 +26,38 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 /**
  *
  * @author Khoa Tran
  */
 public class StationParser extends DefaultHandler {
-
+//TODO use OsmPrimative for nodes , only use EuclideanDoublePoint for calculating centroid
     private HashMap<String, String> tempTag;
     private HashSet<RelationMember> tempMembers;
     private ArrayList<String> tempMembersID;
     private ArrayList<AttributesImpl> xmlRelations;
     //    private ArrayList<String> xmlRelationID = new String[];
     private HashMap<String, EuclideanDoublePoint> xmlNodes = new HashMap<>();
+    private HashMap<String, OsmPrimitive> xmlNodesPrimative = new HashMap<>();
     private HashMap<String, HashSet<EuclideanDoublePoint>> xmlWays = new HashMap<>();
+    private HashSet<EuclideanDoublePoint> xmlWayMemberNodes;
+    private HashSet<OsmPrimitive> tempWayMemberNodes;
     private HashSet<EuclideanDoublePoint> tempWayMembers;
 
     private ArrayList<tag_defs.primative_type> xmlTypes;
     //xmlTags<String, String> ----------- xmlMembers<String(refID), AttributesImpl>
     private ArrayList<HashMap<String, String>> xmlTags;
-    private HashMap<String,AttributesImpl> xmlRelationsMap = new HashMap<>();
-    private HashMap<String,HashMap<String,String>> xmlTagsMap = new HashMap<>();
-    private HashMap<String,tag_defs.primative_type> xmlTypesMap = new HashMap<>();
+    private HashMap<String, AttributesImpl> xmlStationsMap = new HashMap<>();
+    private HashMap<String, HashMap<String, String>> xmlTagsMap = new HashMap<>();
+    private HashMap<String, tag_defs.primative_type> xmlTypesMap = new HashMap<>();
 
     private HashMap<String, HashSet<RelationMember>> xmlMembers;
+    private HashMap<String, HashSet<OsmPrimitive>> xmlWayMembers;
+    AttributesImpl tempattImpl;
     String id;
 
     public StationParser() {
@@ -69,22 +73,23 @@ public class StationParser extends DefaultHandler {
         if (qname.equals(tag_defs.XML_RELATION)) {
             id = attImpl.getValue("id");
             xmlRelations.add(attImpl);
-            xmlRelationsMap.put(id,attImpl);
+            xmlStationsMap.put(id, attImpl);
             tempTag = new HashMap<String, String>();      // start to collect tags of that relation
             tempMembers = new HashSet<RelationMember>();
             tempMembersID = new ArrayList<String>();
             xmlTypes.add(tag_defs.primative_type.RELATION);
-            xmlTypesMap.put(id,tag_defs.primative_type.RELATION);
+            xmlTypesMap.put(id, tag_defs.primative_type.RELATION);
 
         }
 
-        if(qname.equals(tag_defs.XML_WAY)) {
+        if (qname.equals(tag_defs.XML_WAY)) {
             id = attImpl.getValue("id");
+            tempattImpl = new AttributesImpl(attributes);
             tempWayMembers = new HashSet<EuclideanDoublePoint>();
         }
 
         if (qname.equals("nd")) {
-            String ndId  = attImpl.getValue("ref");
+            String ndId = attImpl.getValue("ref");
             if (xmlNodes.containsKey(ndId))
                 tempWayMembers.add(xmlNodes.get(ndId));
         }
@@ -92,27 +97,54 @@ public class StationParser extends DefaultHandler {
             double[] geopoint = new double[2];
             geopoint[0] = Double.parseDouble(attImpl.getValue(tag_defs.LAT));
             geopoint[1] = Double.parseDouble(attImpl.getValue(tag_defs.LON));
-            xmlNodes.put(attImpl.getValue("id"),new EuclideanDoublePoint(geopoint));
-            tempTag = new HashMap<String,String>();      // start to collect tags of that node
-        //    xmlTypes.add(tag_defs.primative_type.NODE);
+            xmlNodes.put(attImpl.getValue("id"), new EuclideanDoublePoint(geopoint));
+            tempTag = new HashMap<String, String>();      // start to collect tags of that node
+            //    xmlTypes.add(tag_defs.primative_type.NODE);
         }
-        if (tempTag!=null && qname.equals(tag_defs.XML_TAG)) {
+        if (tempTag != null && qname.equals(tag_defs.XML_TAG)) {
             tempTag.put(attImpl.getValue("k"), attImpl.getValue("v"));         // insert key and value of that tag into HashMap
         }
-        if (tempMembers!=null && qname.equals(tag_defs.XML_MEMBER)) {
-            RelationMember rm = new RelationMember(attImpl.getValue("ref"),attImpl.getValue("type"),attImpl.getValue("role"));
+        if (tempMembers != null && qname.equals(tag_defs.XML_MEMBER)) {
+            RelationMember rm = new RelationMember(attImpl.getValue("ref"), attImpl.getValue("type"), attImpl.getValue("role"));
             rm.setStatus("OSM server");
             tempMembersID.add(attImpl.getValue("ref"));
             tempMembers.add(rm);
         }
     }
 
+    private HashSet<EuclideanDoublePoint> getChildren( ArrayList<String> tempMembersIDlocal) {
+        {
+            HashSet<EuclideanDoublePoint> tempPoints = new HashSet<>();
+            for (String memberID : tempMembersIDlocal) {
+                if (xmlNodes.containsKey(memberID))
+                    tempPoints.add(xmlNodes.get(memberID));
+                if (xmlWays.containsKey(memberID))
+                    tempPoints.addAll(xmlWays.get(memberID));
+
+            }
+            return tempPoints;
+        }
+
+}
+
+
     @Override public void endElement (String uri, String localName, String qName) throws SAXException {
-//TODO handle way
+//TODO handle way in the same manner as replations
         if (qName.equals(tag_defs.XML_WAY)) {
             xmlWays.put(id,tempWayMembers);
+            xmlTagsMap.put(id,tempTag);
+
+//            if (tempTag.containsKey("public_transport")) {
+//                EuclideanDoublePoint centroid = new EuclideanDoublePoint(new double[2]).centroidOf(tempWayMembers);
+////            AttributesImpl tempImpl =  xmlRelations.get(xmlRelations.size()-1);
+//                tempattImpl.addAttribute("",tag_defs.LAT,tag_defs.LAT,"CDATA",Double.toString(centroid.getPoint()[0]));
+//                tempattImpl.addAttribute("",tag_defs.LON,tag_defs.LON,"CDATA",Double.toString(centroid.getPoint()[1]));
+//                xmlStationsMap.put(id, tempattImpl);
+//                xmlTypesMap.put(id, tag_defs.primative_type.WAY);
+//            }
             id = null;
             tempWayMembers = null;
+
         }
 
         if (qName.equals(tag_defs.XML_RELATION)) {
@@ -162,7 +194,7 @@ public class StationParser extends DefaultHandler {
     }
 
     public HashMap<String, AttributesImpl> getRelationsMap() {
-        return xmlRelationsMap;
+        return xmlStationsMap;
     }
 
     public HashMap<String, HashMap<String, String>> getTagsMap() {

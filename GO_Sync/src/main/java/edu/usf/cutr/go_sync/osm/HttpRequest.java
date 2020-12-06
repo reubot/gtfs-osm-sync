@@ -244,9 +244,12 @@ public class HttpRequest {
         } catch(ParserConfigurationException e) {
             System.out.println(e.getStackTrace());
         }
-        if (!existingStations.isEmpty()) return existingStations;
-        System.out.println("null relations");
-        return null;
+        if (existingStations.isEmpty()){
+            System.out.println("null relations");
+            return null;
+        }
+
+        return existingStations;
     }
 
     public ArrayList<AttributesImpl> getExistingBusRelations(String left, String bottom, String right, String top) throws InterruptedException{
@@ -280,7 +283,7 @@ public class HttpRequest {
             System.out.println(e);
         }
         if (!existingRelations.isEmpty()) return existingRelations;
-        System.out.println("null relations");
+        System.out.println("null bus relations");
         return null;
     }
 
@@ -652,11 +655,13 @@ public class HttpRequest {
                 }
 
             } catch (ConnectException e) {
+                e.printStackTrace();
                 System.out.println(e.toString());
                 taskOutput.append(e.toString()+"\n");
                 retry ++;
                 continue;
             } catch (SocketTimeoutException e) {
+                e.printStackTrace();
                 System.out.println(e.toString());
                 taskOutput.append(e.toString()+"\n");
                 retry ++;
