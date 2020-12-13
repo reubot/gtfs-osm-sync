@@ -104,11 +104,11 @@ public class HttpRequest {
                 System.out.println("The current api does not support version " + API_VERSION);
             }
         } catch(IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(SAXException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(ParserConfigurationException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -176,11 +176,11 @@ public class HttpRequest {
             existingStopTypes.putAll(par.getTypesMap());
 
         } catch(IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(SAXException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(ParserConfigurationException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         if (!existingNodes.isEmpty()) return existingNodes;
         System.out.println("null nodes");
@@ -276,11 +276,11 @@ public class HttpRequest {
             existingRelationMembers.addAll(par.getMembers());
 
         } catch(IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(SAXException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(ParserConfigurationException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         if (!existingRelations.isEmpty()) return existingRelations;
         System.out.println("null bus relations");
@@ -336,11 +336,11 @@ public class HttpRequest {
                 revertUpload.add(ns);
             }
         } catch(IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(SAXException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(ParserConfigurationException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -381,11 +381,11 @@ public class HttpRequest {
                 st.setOsmId("-"+attImplNode.getValue("id"));
             }
         } catch(IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(SAXException e) {
-            System.out.println(e);
+            e.printStackTrace();
         } catch(ParserConfigurationException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return st;
     }

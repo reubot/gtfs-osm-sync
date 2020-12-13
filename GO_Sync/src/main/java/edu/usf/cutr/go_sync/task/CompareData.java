@@ -522,7 +522,6 @@ public class CompareData extends OsmTask{
                 routesByShortName.put(ri.getRouteRef(),ri);}
             catch (Exception e)
             {
-                System.out.println(e);
                 e.printStackTrace();
             }
 //        	        	routesByShortName.put(ri.getTag("route_short_name"),ri);
