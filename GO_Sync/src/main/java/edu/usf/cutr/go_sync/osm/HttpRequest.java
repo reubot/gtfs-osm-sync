@@ -319,9 +319,8 @@ public class HttpRequest {
 
             ArrayList<Stop> toBeModified = new ArrayList<Stop>();
             toBeModified.addAll(par.getToBeModifiedStop());
-            for (int i=0; i<toBeModified.size(); i++) {
-                Stop ts = toBeModified.get(i);
-                Integer versionNumber = (Integer.parseInt(ts.getOsmVersion())-1);
+            for (Stop ts : toBeModified) {
+                Integer versionNumber = (Integer.parseInt(ts.getOsmVersion()) - 1);
                 Stop ns = getNodeByVersion(ts.getOsmId(), versionNumber.toString(), false);
                 ns.setOsmVersion(ts.getOsmVersion());
                 revertModify.add(ns);
@@ -329,8 +328,7 @@ public class HttpRequest {
 
             ArrayList<Stop> toBeUploaded = new ArrayList<Stop>();
             toBeUploaded.addAll(par.getToBeUploadedStop());
-            for (int i=0; i<toBeUploaded.size(); i++) {
-                Stop ts = toBeUploaded.get(i);
+            for (Stop ts : toBeUploaded) {
                 Stop ns = getNodeByVersion(ts.getOsmId(), ts.getOsmVersion(), true);
                 ns.setOsmVersion("-1");
                 revertUpload.add(ns);
@@ -438,9 +436,9 @@ public class HttpRequest {
         text += oprinter.osmChangeModify();
         stops = new ArrayList<Stop>();
         stops.addAll(modifyStop);
-        for(int i=0; i<stops.size(); i++){
-            String nodeid = stops.get(i).getOsmId();
-            text += oprinter.writeBusStop(changeSetID, nodeid, stops.get(i));
+        for (Stop stop : stops) {
+            String nodeid = stop.getOsmId();
+            text += oprinter.writeBusStop(changeSetID, nodeid, stop);
 //            System.out.println(stops.get(i).getOsmId()+","+stops.get(i).getStopID()+","+stops.get(i).getOsmVersion());
         }
         //all routes should be modified. Thus, k=0 after while loop
@@ -459,9 +457,9 @@ public class HttpRequest {
         stops = new ArrayList<Stop>();
         stops.addAll(deleteStop);
         text += oprinter.osmChangeDelete();
-        for(int i=0; i<stops.size(); i++){
-            String nodeid = stops.get(i).getOsmId();
-            String nodeVersion = stops.get(i).getOsmVersion();
+        for (Stop stop : stops) {
+            String nodeid = stop.getOsmId();
+            String nodeVersion = stop.getOsmVersion();
             text += oprinter.writeDeleteNode(nodeid, changeSetID, nodeVersion);
         }
         text += oprinter.osmChangeDeleteClose();

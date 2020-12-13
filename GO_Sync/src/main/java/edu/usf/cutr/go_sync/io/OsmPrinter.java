@@ -104,11 +104,9 @@ public class OsmPrinter {
         //add tag
         HashSet<String> keys = new HashSet<String>(s.keySet().size());
         keys.addAll(s.keySet());
-        Iterator it = keys.iterator();
-        while (it.hasNext()){
-            String k = (String) it.next();
+        for (String k : keys) {
             if (!s.getTag(k).equals("none")) {
-                text += "<tag k='"+OsmFormatter.getValidXmlText(k)+"' v='"+OsmFormatter.getValidXmlText(s.getTag(k))+"' />\n";
+                text += "<tag k='" + OsmFormatter.getValidXmlText(k) + "' v='" + OsmFormatter.getValidXmlText(s.getTag(k)) + "' />\n";
             }
         }
         text += "</node>\n";
