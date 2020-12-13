@@ -68,14 +68,14 @@ public class OsmPrinter {
     public String writeDeleteNode(String nodeID, String changeSetID, String version) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         return "<node id='"+nodeID+ "' " + changesetText +  " version='"+ version +"' />\n";
     }
 
     public String writeBusStop(String changeSetID, String lat, String lon) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         return "<node " + changesetText +  " lat='" + lat + "' lon='" + lon + "'>\n" +
                 "<tag k='highway' v='bus_stop'/>\n" +
                 "</node>";
@@ -84,7 +84,7 @@ public class OsmPrinter {
     public String writeBusStop(String changeSetID, String nodeID, Stop st) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         String text="";
         Stop s = new Stop(st);
         // if modify, we need version number
@@ -116,7 +116,7 @@ public class OsmPrinter {
     public String writeBusRoute(String changeSetID, String routeID, Route r) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         String text="";
         Route route = new Route(r);
         // if modify, we need version number

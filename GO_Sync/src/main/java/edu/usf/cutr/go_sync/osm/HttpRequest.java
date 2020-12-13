@@ -206,7 +206,7 @@ public class HttpRequest {
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
 //        String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 
-        String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( " +
+        String content = "[bbox:"+bottom+ ',' +left+ ',' +top+ ',' +right+"]; ( " +
                 "relation[public_transport=station];" +
                 "relation[public_transport=platform];" +
                 "way[public_transport=station];"+
@@ -255,8 +255,8 @@ public class HttpRequest {
     public ArrayList<AttributesImpl> getExistingBusRelations(String left, String bottom, String right, String top) throws InterruptedException{
 //        String urlSuffix = "/api/0.6/relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
-    	String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
-        String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( relation[\"route\"=\"ferry\"];" +
+    	String urlSuffix = "?relation[route=bus][bbox="+left+ ',' +bottom+ ',' +right+ ',' +top+ ']';
+        String content = "[bbox:"+bottom+ ',' +left+ ',' +top+ ',' +right+"]; ( relation[\"route\"=\"ferry\"];" +
                 "  relation[\"route\"=\"bus\"];" +
                 "); out meta;";
 //        String[] hosts = {"http://www.overpass-api.de/api/xapi_meta","http://overpass.openstreetmap.ru/cgi/xapi_meta"};
@@ -356,7 +356,7 @@ public class HttpRequest {
 
     private Stop getNodeByVersion(String osmid, String version, boolean isNew) throws InterruptedException{
         Stop st=null;
-        String urlSuffix = "node/"+osmid+"/"+version;
+        String urlSuffix = "node/"+osmid+ '/' +version;
         String[] hosts = {OSM_HOST};
         System.out.println("Retrieving node "+osmid+" with version "+version+"...");
         try {
@@ -376,7 +376,7 @@ public class HttpRequest {
                 st.setOsmId(attImplNode.getValue("id"));
             }
             else {
-                st.setOsmId("-"+attImplNode.getValue("id"));
+                st.setOsmId('-' +attImplNode.getValue("id"));
             }
         } catch(IOException e) {
             e.printStackTrace();
@@ -475,7 +475,7 @@ public class HttpRequest {
             String s = getRequestContents();
             responseMessage = sendRequest(hosts, urlSuffix, "PUT", getRequestContents());
             System.out.println(responseMessage);
-            cSetID = responseMessage.substring(0, responseMessage.lastIndexOf("\n"));
+            cSetID = responseMessage.substring(0, responseMessage.lastIndexOf('\n'));
             System.out.println("ChangeSet ID = "+cSetID);
         }
     }
@@ -492,7 +492,7 @@ public class HttpRequest {
             }
             else {
                 System.out.println("Changeset ID is not obtained yet!");
-                taskOutput.append("Changeset ID is not obtained yet!"+"\n");
+                taskOutput.append("Changeset ID is not obtained yet!\n");
             }
         }
     }
@@ -509,7 +509,7 @@ public class HttpRequest {
             }
             else {
                 System.out.println("Changeset ID is not obtained yet!");
-                taskOutput.append("Changeset ID is not obtained yet!"+"\n");
+                taskOutput.append("Changeset ID is not obtained yet!\n");
             }
         }
     }
@@ -543,7 +543,7 @@ public class HttpRequest {
             }
             else {
                 System.out.println("Changeset ID is not obtained yet!");
-                taskOutput.append("Changeset ID is not obtained yet!"+"\n");
+                taskOutput.append("Changeset ID is not obtained yet!\n");
             }
         }
     }
@@ -571,10 +571,10 @@ public class HttpRequest {
             }
             String url = hosts[hostIndex]+urlSuffix;
             try {
-                System.out.println("Connecting "+url+" using method "+method+" "+retry);
+                System.out.println("Connecting "+url+" using method "+method+ ' ' +retry);
 //                try {
                     Thread.sleep(SLEEP_TIME);
-                    taskOutput.append("Connecting "+url+" using method "+method+" "+retry+"\n");
+                    taskOutput.append("Connecting "+url+" using method "+method+ ' ' +retry+ '\n');
 //                } catch (InterruptedException e) {
 //                    throw new InterruptedException();
 //                }
@@ -589,7 +589,7 @@ public class HttpRequest {
                 if (method.equals("PUT") || method.equals("POST") || method.equals("DELETE")) {
                     //BASE64Encoder enc = new sun.misc.BASE64Encoder();
                     Base64.Encoder enc = java.util.Base64.getEncoder();
-                    String usernamePassword = Session.getUserName()+":"+Session.getPassword();
+                    String usernamePassword = Session.getUserName()+ ':' +Session.getPassword();
                     String encodedAuthorization = enc.encode(usernamePassword.getBytes()).toString();
                     conn.setRequestProperty("Authorization", "Basic "+ encodedAuthorization);
 
@@ -611,7 +611,7 @@ public class HttpRequest {
 
                 if (responseCode >= 500) {
                     System.out.println("response code >=500");
-                    taskOutput.append("response code >=500"+"\n");
+                    taskOutput.append("response code >=500\n");
                     retry++;
                     continue;
                 }
@@ -625,7 +625,7 @@ public class HttpRequest {
                     s = response.readLine();
                     while(s != null) {
                         responseText.append(s);
-                        responseText.append("\n");
+                        responseText.append('\n');
                         s = response.readLine();
                     }
                     System.out.println("End response");
@@ -636,7 +636,7 @@ public class HttpRequest {
                     s = response.readLine();
                     while(s != null) {
                         responseText.append(s);
-                        responseText.append("\n");
+                        responseText.append('\n');
                         s = response.readLine();
                     }
 
@@ -644,10 +644,10 @@ public class HttpRequest {
                     String errMess = conn.getHeaderField("Error");
                     if (errMess != null) {
                         System.err.println("Error: " + errMess);
-                        taskOutput.append("Error: "+ errMess +"\n");
+                        taskOutput.append("Error: "+ errMess + '\n');
                     } else if (responseText.length()>0) {
                         System.err.println("Error: " + responseText);
-                        taskOutput.append("Error: "+ errMess +"\n");
+                        taskOutput.append("Error: "+ errMess + '\n');
                     }
                     break;
                 }
@@ -655,13 +655,13 @@ public class HttpRequest {
             } catch (ConnectException e) {
                 e.printStackTrace();
                 System.out.println(e.toString());
-                taskOutput.append(e.toString()+"\n");
+                taskOutput.append(e.toString()+ '\n');
                 retry ++;
                 continue;
             } catch (SocketTimeoutException e) {
                 e.printStackTrace();
                 System.out.println(e.toString());
-                taskOutput.append(e.toString()+"\n");
+                taskOutput.append(e.toString()+ '\n');
                 retry ++;
                 continue;
             } catch (MalformedURLException e) {
