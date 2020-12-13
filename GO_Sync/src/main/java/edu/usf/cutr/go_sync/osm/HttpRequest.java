@@ -73,6 +73,7 @@ public class HttpRequest {
 
     private HashMap<String,HashSet<RelationMember>> existingStationMembers = new HashMap<String,HashSet<RelationMember>>();
     private ArrayList<HashSet<RelationMember>> existingRelationMembers = new ArrayList<HashSet<RelationMember>>();
+    private HashMap<String,ArrayList<String>> existingStationWayNodes = new HashMap<String,ArrayList<String>>();
 
     private HashSet<Stop> revertDelete = new HashSet<Stop>();
     private HashSet<Stop> revertModify = new HashSet<Stop>();
@@ -230,7 +231,7 @@ public class HttpRequest {
             existingStationTags.putAll(par.getTagsMap());
             existingStationTypes.putAll(par.getTypesMap());
             existingStationMembers.putAll(par.getMembers());
-
+            existingStationWayNodes.putAll(par.getWayNodes());
 //            existingNodes.addAll(existingStations);
 //            existingBusTags.addAll(existingStationTags);
 //            existingStopTypes.addAll(existingStationTypes);
