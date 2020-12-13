@@ -488,7 +488,7 @@ public class HttpRequest {
 
         String responseMessage = "";
         if (isSupportVersion) {
-            if (!cSetID.equals("")) {
+            if (!cSetID.isEmpty()) {
                 responseMessage = sendRequest(hosts, urlSuffix, "PUT", getRequestContents());
                 System.out.println(responseMessage);
             }
@@ -505,7 +505,7 @@ public class HttpRequest {
 
         String responseMessage = "";
         if (isSupportVersion) {
-            if (!cSetID.equals("")) {
+            if (!cSetID.isEmpty()) {
                 responseMessage = sendRequest(hosts, urlSuffix, "PUT", getRequestContents(cSetID, lat, lon));
                 System.out.println(responseMessage);
             }
@@ -533,7 +533,7 @@ public class HttpRequest {
 
         String responseMessage = "";
         if (isSupportVersion) {
-            if (!cSetID.equals("")) {
+            if (!cSetID.isEmpty()) {
                 String osmChangeText = getRequestContents(cSetID, newStops, modifyStops, deleteStops, routes);
                 new WriteFile(FILE_NAME_OUT_UPLOAD, osmChangeText);
                 try{
