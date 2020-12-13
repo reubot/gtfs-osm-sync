@@ -42,10 +42,8 @@ public class StationParser extends DefaultHandler {
     private ArrayList<AttributesImpl> xmlRelations;
     //    private ArrayList<String> xmlRelationID = new String[];
     private HashMap<String, EuclideanDoublePoint> xmlNodes = new HashMap<>();
-    private HashMap<String, OsmPrimitive> xmlNodesPrimative = new HashMap<>();
     private HashMap<String, HashSet<EuclideanDoublePoint>> xmlWays = new HashMap<>();
-    private HashSet<EuclideanDoublePoint> xmlWayMemberNodes;
-    private HashSet<OsmPrimitive> tempWayMemberNodes;
+
     private HashSet<EuclideanDoublePoint> tempWayMembers;
 
     private ArrayList<tag_defs.primative_type> xmlTypes;
@@ -57,8 +55,8 @@ public class StationParser extends DefaultHandler {
 
     private HashMap<String, HashSet<RelationMember>> xmlMembers;
     private HashMap<String, HashSet<OsmPrimitive>> xmlWayMembers;
-    AttributesImpl tempattImpl;
-    String id;
+    private AttributesImpl tempattImpl;
+    private String id;
 
     public StationParser() {
         xmlRelations = new ArrayList<AttributesImpl>();
@@ -85,6 +83,7 @@ public class StationParser extends DefaultHandler {
         if (qname.equals(tag_defs.XML_WAY)) {
             id = attImpl.getValue("id");
             tempattImpl = new AttributesImpl(attributes);
+            tempTag = new HashMap<String, String>();
             tempWayMembers = new HashSet<EuclideanDoublePoint>();
         }
 
@@ -132,16 +131,20 @@ public class StationParser extends DefaultHandler {
 //TODO handle way in the same manner as replations
         if (qName.equals(tag_defs.XML_WAY)) {
             xmlWays.put(id,tempWayMembers);
-            xmlTagsMap.put(id,tempTag);
 
-//            if (tempTag.containsKey("public_transport")) {
-//                EuclideanDoublePoint centroid = new EuclideanDoublePoint(new double[2]).centroidOf(tempWayMembers);
-////            AttributesImpl tempImpl =  xmlRelations.get(xmlRelations.size()-1);
-//                tempattImpl.addAttribute("",tag_defs.LAT,tag_defs.LAT,"CDATA",Double.toString(centroid.getPoint()[0]));
-//                tempattImpl.addAttribute("",tag_defs.LON,tag_defs.LON,"CDATA",Double.toString(centroid.getPoint()[1]));
-//                xmlStationsMap.put(id, tempattImpl);
-//                xmlTypesMap.put(id, tag_defs.primative_type.WAY);
-//            }
+            if (tempTag!=null)
+                if(tempTag.containsKey("public_transport"))
+                {
+                    EuclideanDoublePoint centroid = new EuclideanDoublePoint( new double[2]).centroidOf(tempWayMembers);
+                    tempattImpl.addAttribute("",tag_defs.LAT,tag_defs.LAT,"CDATA",Double.toString(centroid.getPoint()[0]));
+                    tempattImpl.addAttribute("",tag_defs.LON,tag_defs.LON,"CDATA",Double.toString(centroid.getPoint()[1]));
+                    xmlTypesMap.put(id, tag_defs.primative_type.WAY);
+                    xmlStationsMap.put(id,tempattImpl);
+                    xmlTagsMap.put(id,tempTag);
+                    xmlTags.add(tempTag);
+//
+                }
+
             id = null;
             tempWayMembers = null;
 

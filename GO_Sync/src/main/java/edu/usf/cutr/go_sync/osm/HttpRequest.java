@@ -209,8 +209,8 @@ public class HttpRequest {
         String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( " +
                 "relation[public_transport=station];" +
                 "relation[public_transport=platform];" +
-//                "way[public_transport=station];"+
-//                "way[public_transport=platform];"+
+                "way[public_transport=station];"+
+                "way[public_transport=platform];"+
 //                "way[amenity=bus_station];"+
 //                "way[amenity=ferry_terminal];"+
             "); (._;>;); out meta;";
