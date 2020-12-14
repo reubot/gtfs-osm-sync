@@ -89,6 +89,7 @@ public class CompareData extends OsmTask{
     private Hashtable<String,String> osmIdToGtfsId = new Hashtable<String,String>();
 
     private HashMap<String,tag_defs.primative_type> OSMNodesType = new HashMap<>();
+    private HashMap<String,ArrayList<String>> OSMWayNodes = new HashMap<>();
 
     private final double ERROR_TO_ZERO = 0.5;       // acceptable error while calculating distance ~= consider as 0
     private /*final*/ double DELTA = 0.004;   // ~400m in Lat and 400m in Lon       0.00001 ~= 1.108m in Lat and 0.983 in Lon
@@ -609,6 +610,7 @@ public class CompareData extends OsmTask{
 
     /**
      * FIXME: why is wrong gtfs_id included?
+     *
      */
     public void compareBusStopData() throws InterruptedException {
         //Compare the OSM stops with GTFS data
@@ -677,8 +679,13 @@ public class CompareData extends OsmTask{
 //                    Stop gtfsStop = GTFSstops.get(gtfsindex);
                     double distance = OsmDistance.distVincenty(node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON),
                             gtfsStop.getLat(), gtfsStop.getLon());
-                    if ((distance<RANGE) && !(noUpload.contains(gtfsStop)) ){//&& (!matched.contains(gtfsStop))){
+
+                    if ((distance<RANGE) && !(noUpload.contains(gtfsStop)) ){
+                        //&& (!matched.contains(gtfsStop))){
                         // if has same stop_id
+                        /**
+                         * OsmPrimitive.RC.MODIFY
+                         */
                         if ((osmStopID!= null) && (!osmStopID.equals("missing")) && (osmStopID.equals(gtfsStop.getStopID()))){
                             noUpload.add(gtfsStop);
                             osmIdToGtfsId.put(node.getValue("id"), gtfsStop.getStopID());  //EXISTING STOP WITH UPDATE
@@ -695,6 +702,8 @@ public class CompareData extends OsmTask{
                             es.addTags(osmtag);
                             es.setOsmId(node.getValue("id"));
                             es.setType(OSMNodesType.get(osmID));
+                            if (es.getType()== tag_defs.primative_type.WAY)
+                                es.addOsmNodes(OSMWayNodes.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             // for comparing tag
@@ -750,6 +759,10 @@ public class CompareData extends OsmTask{
 //                                // for comparing tag
 //                                Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
                                 if (diff.isEmpty()) {
+                                    /**
+                                     * OsmPrimitive.RC.NOTHING_NEW
+                                     * "Existing Stops"
+                                     */
                                     es.setReportText("Stop already exists in OSM. Nothing new from last upload.\n" +
                                             "\t   " + es.printOSMStop() +
                                             "\n ACTION: No upload!");
@@ -783,6 +796,8 @@ public class CompareData extends OsmTask{
                             es.addTags(osmtag);
                             es.setOsmId(node.getValue("id"));
                             es.setType(OSMNodesType.get(osmID));
+                            if (es.getType()== tag_defs.primative_type.WAY)
+                                es.addOsmNodes(OSMWayNodes.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             es.setOsmVersion(version);
@@ -998,6 +1013,7 @@ public class CompareData extends OsmTask{
                 OSMNodes.putAll(tempOSMstations);
                 OSMTags.putAll(osmRequest.getExistingStationTags());
                 OSMNodesType.putAll(osmRequest.getExistingStationTypes());
+                OSMWayNodes.putAll(osmRequest.getExistingStationWayNodes());
                 System.out.println("Existing Nodes = "+OSMNodes.size());
                 System.out.println("New Nodes = "+GTFSstops.size());
                 compareBusStopData();

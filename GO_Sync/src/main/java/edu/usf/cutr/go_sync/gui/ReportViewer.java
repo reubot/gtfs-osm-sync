@@ -2867,7 +2867,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             // Save to final Stops
             Stop st = saveAcceptedDataToFinalStops(selectedGtfs);
             if (selectedOSMStop!= null) {
-                st.setOsmId(selectedOSMStop.getOsmId());
+//                st.setOsmId(selectedOSMStop.getOsmId());
+                st.setOsmData(selectedOSMStop);
+
                 usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
                 //broken
 //                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
@@ -2884,7 +2886,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     && !selectedGtfsStop.getReportCategory().equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT) )
             {
 
-                selectedGtfsStop.setOsmId(selectedOSMStop.getOsmId());
+//                selectedGtfsStop.setOsmId(selectedOSMStop.getOsmId());
+                selectedGtfsStop.setOsmData(selectedOSMStop);
                 int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
                 selectedGtfsStop.setOsmVersion(Integer.toString(newOSMVersion + 1));
             }// stops to finish
@@ -2916,7 +2919,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 // set osmId and version number
                 if (selectedOsmStop != null) {
                     if (st.getOsmId() == null) {
-                        st.setOsmId(selectedOsmStop.getOsmId());
+//                        st.setOsmId (selectedOsmStop.getOsmId());
+                        st.setOsmData(selectedOSMStop);
+
                     }
 //                st.setOsmVersion((selectedOsmStop.getOsmVersion()));
                     if (st.getOsmVersion() == null) {
