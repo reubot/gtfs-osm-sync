@@ -694,4 +694,6 @@ public class HttpRequest {
 
     public HashMap<String, ArrayList<String>> getExistingStationWayNodes () {return existingStationWayNodes;}
 
+    public HashMap<String, HashSet<RelationMember>> getExistingStationMembers () {return existingStationMembers;}
+
 }

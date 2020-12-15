@@ -127,6 +127,7 @@ public class OsmPrinter {
                 text += "</way>\n";
                 break;
             case RELATION:
+                text += writeMembers(st.getOsmMembers());
                 text += "</relation>\n";
                 break;
             case NODE:
@@ -136,6 +137,20 @@ public class OsmPrinter {
         }
 
         return text;
+    }
+    public String writeMembers(HashSet<RelationMember> members){
+        StringBuilder text= new StringBuilder();
+        for (RelationMember rm : members) {
+            text.append("<member type='")
+                .append(rm.getType())
+                .append("' ref='")
+                .append(rm.getRef())
+                .append("' role='");
+            if (rm.getRole() != null)
+                 text.append(OsmFormatter.getValidXmlText(rm.getRole()));
+            text.append("' />\n");
+        }
+        return text.toString();
     }
 
     public String writeBusRoute(String changeSetID, String routeID, Route r) {

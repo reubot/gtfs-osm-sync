@@ -35,6 +35,7 @@ public class Stop extends OsmPrimitive implements Comparable{
     private final String GTFS_NAME_KEY		= tag_defs.GTFS_NAME_KEY;
     private String lat, lon;
     private HashSet<Route> routes;
+    private HashSet<RelationMember> osmMembers = new HashSet<>();
     private ArrayList<String> osmWayNodes = new ArrayList<String>();
     public Stop(String stopID, String operatorName, String stopName, String lat, String lon) {
         osmTags = new Hashtable();
@@ -103,6 +104,8 @@ public class Stop extends OsmPrimitive implements Comparable{
         this.setOsmId(s.getOsmId());
         this.setType(s.getType());
         if(s.getOsmNodes()!=null) this.addOsmNodes(s.getOsmNodes());
+        if(s.getOsmMembers()!=null) this.osmMembers.addAll(s.getOsmMembers());
+
     }
 
 
@@ -219,6 +222,14 @@ public class Stop extends OsmPrimitive implements Comparable{
     }
     public ArrayList<String> getOsmNodes(){
         return osmWayNodes;
+    }
+
+    public HashSet<RelationMember> getOsmMembers(){
+        return osmMembers;
+    }
+    public void addOsmMembers(HashSet<RelationMember> oMembers) {
+        osmMembers.addAll(oMembers);
+
     }
 
 }

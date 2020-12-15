@@ -67,6 +67,7 @@ public class CompareData extends OsmTask{
 //    private ArrayList<Hashtable<String, String>> OSMRelationTags = new ArrayList<Hashtable<String, String>>();
     private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
     private ArrayList<HashSet<RelationMember>> OSMRelationMembers = new ArrayList<HashSet<RelationMember>>();
+    private HashMap<String, HashSet<RelationMember>> OSMStationMembers = new HashMap<String, HashSet<RelationMember>>();
     // key is gtfs, value is container of potential osm matches, sorted by distance from gtfs stop
     private ConcurrentHashMap<Stop, TreeSet<Stop>> report =
         new ConcurrentHashMap<>();
@@ -704,6 +705,8 @@ public class CompareData extends OsmTask{
                             es.setType(OSMNodesType.get(osmID));
                             if (es.getType()== tag_defs.primative_type.WAY)
                                 es.addOsmNodes(OSMWayNodes.get(osmID));
+                            if (es.getType()== tag_defs.primative_type.RELATION)
+                                es.addOsmMembers(OSMStationMembers.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             // for comparing tag
@@ -798,6 +801,8 @@ public class CompareData extends OsmTask{
                             es.setType(OSMNodesType.get(osmID));
                             if (es.getType()== tag_defs.primative_type.WAY)
                                 es.addOsmNodes(OSMWayNodes.get(osmID));
+                            if (es.getType()== tag_defs.primative_type.RELATION)
+                                es.addOsmMembers(OSMStationMembers.get(osmID));
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             es.setOsmVersion(version);
@@ -1014,6 +1019,7 @@ public class CompareData extends OsmTask{
                 OSMTags.putAll(osmRequest.getExistingStationTags());
                 OSMNodesType.putAll(osmRequest.getExistingStationTypes());
                 OSMWayNodes.putAll(osmRequest.getExistingStationWayNodes());
+                OSMStationMembers.putAll(osmRequest.getExistingStationMembers());
                 System.out.println("Existing Nodes = "+OSMNodes.size());
                 System.out.println("New Nodes = "+GTFSstops.size());
                 compareBusStopData();
