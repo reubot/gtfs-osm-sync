@@ -87,16 +87,27 @@ public class OsmPrinter {
             changesetText = "changeset='" + changeSetID+ '\'';
         String text="";
         Stop s = new Stop(st);
+
+        switch (st.getType()) {
+            case NODE:
+                text += "<node " + changesetText + " id='" + nodeID
+                        + "' lat='" + st.getLat() + "' lon='" + st.getLon();
+                break;
+            case WAY:
+                text += "<way " + changesetText + " id='" + nodeID;
+                break;
+            case RELATION:
+                text += "<relation " + changesetText + " id='" + nodeID;
+        }
+
         // if modify, we need version number
         if(st.getOsmVersion()!=null) {
-            text += "<node " + changesetText + " id='" + nodeID
-                    + "' lat='" + st.getLat() + "' lon='" + st.getLon()
-                    + "' version='"+st.getOsmVersion() + "'>\n";
+            text += "' version='"+st.getOsmVersion();
+            text += "'>\n";
         }
         // mainly for create new node
         else {
-            text += "<node " + changesetText + " id='" + nodeID
-                    + "' lat='" + st.getLat() + "' lon='" + st.getLon() + "'>\n";
+            text += "'>\n";
             if(st.getTag(APPLICATION_CREATOR_KEY)!=null && !st.getTag(APPLICATION_CREATOR_KEY).equals("none")) {
                 text += "<tag k='"+APPLICATION_CREATOR_KEY+"' v='"+APPLICATION_CREATOR_NAME+"' />\n";
             }
@@ -109,7 +120,21 @@ public class OsmPrinter {
                 text += "<tag k='" + OsmFormatter.getValidXmlText(k) + "' v='" + OsmFormatter.getValidXmlText(s.getTag(k)) + "' />\n";
             }
         }
-        text += "</node>\n";
+        switch (st.getType()) {
+            case WAY:
+                for (String nd:st.getOsmNodes())
+                    text += "<nd ref='" + nd + "' />\n";
+                text += "</way>\n";
+                break;
+            case RELATION:
+                text += "</relation>\n";
+                break;
+            case NODE:
+            default:
+                text += "</node>\n";
+
+        }
+
         return text;
     }
 
