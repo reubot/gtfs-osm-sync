@@ -135,7 +135,10 @@ public class StationParser extends DefaultHandler {
             xmlWays.put(id,tempWayMembers);
             xmlWayNodes.put(id,tempWayNodes);
             if (tempTag!=null)
-                if(tempTag.containsKey("public_transport"))
+                if(tempTag.containsKey("public_transport") ||
+                        tempTag.containsKey("station") ||
+                        tempTag.containsValue("bus_station") ||
+                        tempTag.containsValue("ferry_terminal") )
                 {
                     EuclideanDoublePoint centroid = new EuclideanDoublePoint( new double[2]).centroidOf(tempWayMembers);
                     tempattImpl.addAttribute("",tag_defs.LAT,tag_defs.LAT,"CDATA",Double.toString(centroid.getPoint()[0]));

@@ -607,8 +607,10 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             }
             if(selectedOsmStop!=null) osmValue = selectedOsmStop.getTag(k);
             //don't wipe extra tags for UPLOAD_CONFLICT, use GTFS values for missing tags for MODIFY;
-            if (!(osmValue == null || osmValue.isEmpty()) &&
+            if ((!(osmValue == null || osmValue.isEmpty() ) &&
                     (gtfsValue == null || gtfsValue.isEmpty()))
+                    //don't override stop_area
+                    || (osmValue != null && (k.equals("public_transport")) && osmValue.equals("stop_area")))
                     {
                         newValue = osmValue;
                         osmCB = true;
