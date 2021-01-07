@@ -38,6 +38,7 @@ public class StationParser extends DefaultHandler {
 //TODO use OsmPrimative for nodes , only use EuclideanDoublePoint for calculating centroid
     private HashMap<String, String> tempTag;
     private HashSet<RelationMember> tempMembers;
+    private ArrayList<String> tempWayNodes;
     private ArrayList<String> tempMembersID;
     private ArrayList<AttributesImpl> xmlRelations;
     //    private ArrayList<String> xmlRelationID = new String[];
@@ -53,15 +54,14 @@ public class StationParser extends DefaultHandler {
     private HashMap<String, HashMap<String, String>> xmlTagsMap = new HashMap<>();
     private HashMap<String, tag_defs.primative_type> xmlTypesMap = new HashMap<>();
 
-    private HashMap<String, HashSet<RelationMember>> xmlMembers;
-    private HashMap<String, HashSet<OsmPrimitive>> xmlWayMembers;
+    private HashMap<String, HashSet<RelationMember>> xmlMembers = new HashMap<String, HashSet<RelationMember>>();
+    private HashMap<String, ArrayList<String>> xmlWayNodes = new HashMap<String, ArrayList<String>>();
     private AttributesImpl tempattImpl;
     private String id;
 
     public StationParser() {
         xmlRelations = new ArrayList<AttributesImpl>();
         xmlTags = new ArrayList<HashMap<String, String>>();
-        xmlMembers = new HashMap<String, HashSet<RelationMember>>();
         xmlTypes = new ArrayList<tag_defs.primative_type>();
     }
 
@@ -85,10 +85,12 @@ public class StationParser extends DefaultHandler {
             tempattImpl = new AttributesImpl(attributes);
             tempTag = new HashMap<String, String>();
             tempWayMembers = new HashSet<EuclideanDoublePoint>();
+            tempWayNodes = new ArrayList<>();
         }
 
         if (qname.equals("nd")) {
             String ndId = attImpl.getValue("ref");
+            tempWayNodes.add(ndId);
             if (xmlNodes.containsKey(ndId))
                 tempWayMembers.add(xmlNodes.get(ndId));
         }
@@ -131,9 +133,12 @@ public class StationParser extends DefaultHandler {
 //TODO handle way in the same manner as replations
         if (qName.equals(tag_defs.XML_WAY)) {
             xmlWays.put(id,tempWayMembers);
-
+            xmlWayNodes.put(id,tempWayNodes);
             if (tempTag!=null)
-                if(tempTag.containsKey("public_transport"))
+                if(tempTag.containsKey("public_transport") ||
+                        tempTag.containsKey("station") ||
+                        tempTag.containsValue("bus_station") ||
+                        tempTag.containsValue("ferry_terminal") )
                 {
                     EuclideanDoublePoint centroid = new EuclideanDoublePoint( new double[2]).centroidOf(tempWayMembers);
                     tempattImpl.addAttribute("",tag_defs.LAT,tag_defs.LAT,"CDATA",Double.toString(centroid.getPoint()[0]));
@@ -183,6 +188,8 @@ public class StationParser extends DefaultHandler {
     public ArrayList<AttributesImpl> getRelations(){
         return xmlRelations;
     }
+
+    public HashMap<String, ArrayList<String>> getWayNodes() {return xmlWayNodes;}
 
     public ArrayList<HashMap<String, String>> getTags(){
         return xmlTags;

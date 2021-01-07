@@ -55,7 +55,7 @@ public class HttpRequest {
     private static final int SLEEP_TIME = 500;
     private static final String API_VERSION ="0.6";
     private static final String OSM_HOST = "https://openstreetmap.org/api/0.6/";
-    private static final String[] overpass_hosts = {"http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
+    private static final String[] overpass_hosts = {"https://overpass.nchc.org.tw/api/interpreter","http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
 
 
 
@@ -73,6 +73,7 @@ public class HttpRequest {
 
     private HashMap<String,HashSet<RelationMember>> existingStationMembers = new HashMap<String,HashSet<RelationMember>>();
     private ArrayList<HashSet<RelationMember>> existingRelationMembers = new ArrayList<HashSet<RelationMember>>();
+    private HashMap<String,ArrayList<String>> existingStationWayNodes = new HashMap<String,ArrayList<String>>();
 
     private HashSet<Stop> revertDelete = new HashSet<Stop>();
     private HashSet<Stop> revertModify = new HashSet<Stop>();
@@ -206,13 +207,15 @@ public class HttpRequest {
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
 //        String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 
-        String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( " +
+        String content = "[bbox:"+bottom+ ',' +left+ ',' +top+ ',' +right+"]; ( " +
                 "relation[public_transport=station];" +
                 "relation[public_transport=platform];" +
+                "relation[public_transport];" +
+                "way[station];" +
                 "way[public_transport=station];"+
                 "way[public_transport=platform];"+
-//                "way[amenity=bus_station];"+
-//                "way[amenity=ferry_terminal];"+
+                "way[amenity=bus_station];"+
+                "way[amenity=ferry_terminal];"+
             "); (._;>;); out meta;";
 //        String[] hosts = {"http://www.overpass-api.de/api/xapi_meta","http://overpass.openstreetmap.ru/cgi/xapi_meta"};
 
@@ -230,7 +233,7 @@ public class HttpRequest {
             existingStationTags.putAll(par.getTagsMap());
             existingStationTypes.putAll(par.getTypesMap());
             existingStationMembers.putAll(par.getMembers());
-
+            existingStationWayNodes.putAll(par.getWayNodes());
 //            existingNodes.addAll(existingStations);
 //            existingBusTags.addAll(existingStationTags);
 //            existingStopTypes.addAll(existingStationTypes);
@@ -255,8 +258,8 @@ public class HttpRequest {
     public ArrayList<AttributesImpl> getExistingBusRelations(String left, String bottom, String right, String top) throws InterruptedException{
 //        String urlSuffix = "/api/0.6/relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
-    	String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
-        String content = "[bbox:"+bottom+","+left+","+top+","+right+"]; ( relation[\"route\"=\"ferry\"];" +
+    	String urlSuffix = "?relation[route=bus][bbox="+left+ ',' +bottom+ ',' +right+ ',' +top+ ']';
+        String content = "[bbox:"+bottom+ ',' +left+ ',' +top+ ',' +right+"]; ( relation[\"route\"=\"ferry\"];" +
                 "  relation[\"route\"=\"bus\"];" +
                 "); out meta;";
 //        String[] hosts = {"http://www.overpass-api.de/api/xapi_meta","http://overpass.openstreetmap.ru/cgi/xapi_meta"};
@@ -319,9 +322,8 @@ public class HttpRequest {
 
             ArrayList<Stop> toBeModified = new ArrayList<Stop>();
             toBeModified.addAll(par.getToBeModifiedStop());
-            for (int i=0; i<toBeModified.size(); i++) {
-                Stop ts = toBeModified.get(i);
-                Integer versionNumber = (Integer.parseInt(ts.getOsmVersion())-1);
+            for (Stop ts : toBeModified) {
+                Integer versionNumber = (Integer.parseInt(ts.getOsmVersion()) - 1);
                 Stop ns = getNodeByVersion(ts.getOsmId(), versionNumber.toString(), false);
                 ns.setOsmVersion(ts.getOsmVersion());
                 revertModify.add(ns);
@@ -329,8 +331,7 @@ public class HttpRequest {
 
             ArrayList<Stop> toBeUploaded = new ArrayList<Stop>();
             toBeUploaded.addAll(par.getToBeUploadedStop());
-            for (int i=0; i<toBeUploaded.size(); i++) {
-                Stop ts = toBeUploaded.get(i);
+            for (Stop ts : toBeUploaded) {
                 Stop ns = getNodeByVersion(ts.getOsmId(), ts.getOsmVersion(), true);
                 ns.setOsmVersion("-1");
                 revertUpload.add(ns);
@@ -358,7 +359,7 @@ public class HttpRequest {
 
     private Stop getNodeByVersion(String osmid, String version, boolean isNew) throws InterruptedException{
         Stop st=null;
-        String urlSuffix = "node/"+osmid+"/"+version;
+        String urlSuffix = "node/"+osmid+ '/' +version;
         String[] hosts = {OSM_HOST};
         System.out.println("Retrieving node "+osmid+" with version "+version+"...");
         try {
@@ -378,7 +379,7 @@ public class HttpRequest {
                 st.setOsmId(attImplNode.getValue("id"));
             }
             else {
-                st.setOsmId("-"+attImplNode.getValue("id"));
+                st.setOsmId('-' +attImplNode.getValue("id"));
             }
         } catch(IOException e) {
             e.printStackTrace();
@@ -438,9 +439,9 @@ public class HttpRequest {
         text += oprinter.osmChangeModify();
         stops = new ArrayList<Stop>();
         stops.addAll(modifyStop);
-        for(int i=0; i<stops.size(); i++){
-            String nodeid = stops.get(i).getOsmId();
-            text += oprinter.writeBusStop(changeSetID, nodeid, stops.get(i));
+        for (Stop stop : stops) {
+            String nodeid = stop.getOsmId();
+            text += oprinter.writeBusStop(changeSetID, nodeid, stop);
 //            System.out.println(stops.get(i).getOsmId()+","+stops.get(i).getStopID()+","+stops.get(i).getOsmVersion());
         }
         //all routes should be modified. Thus, k=0 after while loop
@@ -459,9 +460,9 @@ public class HttpRequest {
         stops = new ArrayList<Stop>();
         stops.addAll(deleteStop);
         text += oprinter.osmChangeDelete();
-        for(int i=0; i<stops.size(); i++){
-            String nodeid = stops.get(i).getOsmId();
-            String nodeVersion = stops.get(i).getOsmVersion();
+        for (Stop stop : stops) {
+            String nodeid = stop.getOsmId();
+            String nodeVersion = stop.getOsmVersion();
             text += oprinter.writeDeleteNode(nodeid, changeSetID, nodeVersion);
         }
         text += oprinter.osmChangeDeleteClose();
@@ -477,7 +478,7 @@ public class HttpRequest {
             String s = getRequestContents();
             responseMessage = sendRequest(hosts, urlSuffix, "PUT", getRequestContents());
             System.out.println(responseMessage);
-            cSetID = responseMessage.substring(0, responseMessage.lastIndexOf("\n"));
+            cSetID = responseMessage.substring(0, responseMessage.lastIndexOf('\n'));
             System.out.println("ChangeSet ID = "+cSetID);
         }
     }
@@ -488,13 +489,13 @@ public class HttpRequest {
 
         String responseMessage = "";
         if (isSupportVersion) {
-            if (!cSetID.equals("")) {
+            if (!cSetID.isEmpty()) {
                 responseMessage = sendRequest(hosts, urlSuffix, "PUT", getRequestContents());
                 System.out.println(responseMessage);
             }
             else {
                 System.out.println("Changeset ID is not obtained yet!");
-                taskOutput.append("Changeset ID is not obtained yet!"+"\n");
+                taskOutput.append("Changeset ID is not obtained yet!\n");
             }
         }
     }
@@ -505,13 +506,13 @@ public class HttpRequest {
 
         String responseMessage = "";
         if (isSupportVersion) {
-            if (!cSetID.equals("")) {
+            if (!cSetID.isEmpty()) {
                 responseMessage = sendRequest(hosts, urlSuffix, "PUT", getRequestContents(cSetID, lat, lon));
                 System.out.println(responseMessage);
             }
             else {
                 System.out.println("Changeset ID is not obtained yet!");
-                taskOutput.append("Changeset ID is not obtained yet!"+"\n");
+                taskOutput.append("Changeset ID is not obtained yet!\n");
             }
         }
     }
@@ -533,7 +534,7 @@ public class HttpRequest {
 
         String responseMessage = "";
         if (isSupportVersion) {
-            if (!cSetID.equals("")) {
+            if (!cSetID.isEmpty()) {
                 String osmChangeText = getRequestContents(cSetID, newStops, modifyStops, deleteStops, routes);
                 new WriteFile(FILE_NAME_OUT_UPLOAD, osmChangeText);
                 try{
@@ -545,7 +546,7 @@ public class HttpRequest {
             }
             else {
                 System.out.println("Changeset ID is not obtained yet!");
-                taskOutput.append("Changeset ID is not obtained yet!"+"\n");
+                taskOutput.append("Changeset ID is not obtained yet!\n");
             }
         }
     }
@@ -573,10 +574,10 @@ public class HttpRequest {
             }
             String url = hosts[hostIndex]+urlSuffix;
             try {
-                System.out.println("Connecting "+url+" using method "+method+" "+retry);
+                System.out.println("Connecting "+url+" using method "+method+ ' ' +retry);
 //                try {
                     Thread.sleep(SLEEP_TIME);
-                    taskOutput.append("Connecting "+url+" using method "+method+" "+retry+"\n");
+                    taskOutput.append("Connecting "+url+" using method "+method+ ' ' +retry+ '\n');
 //                } catch (InterruptedException e) {
 //                    throw new InterruptedException();
 //                }
@@ -591,7 +592,7 @@ public class HttpRequest {
                 if (method.equals("PUT") || method.equals("POST") || method.equals("DELETE")) {
                     //BASE64Encoder enc = new sun.misc.BASE64Encoder();
                     Base64.Encoder enc = java.util.Base64.getEncoder();
-                    String usernamePassword = Session.getUserName()+":"+Session.getPassword();
+                    String usernamePassword = Session.getUserName()+ ':' +Session.getPassword();
                     String encodedAuthorization = enc.encode(usernamePassword.getBytes()).toString();
                     conn.setRequestProperty("Authorization", "Basic "+ encodedAuthorization);
 
@@ -613,7 +614,7 @@ public class HttpRequest {
 
                 if (responseCode >= 500) {
                     System.out.println("response code >=500");
-                    taskOutput.append("response code >=500"+"\n");
+                    taskOutput.append("response code >=500\n");
                     retry++;
                     continue;
                 }
@@ -627,7 +628,7 @@ public class HttpRequest {
                     s = response.readLine();
                     while(s != null) {
                         responseText.append(s);
-                        responseText.append("\n");
+                        responseText.append('\n');
                         s = response.readLine();
                     }
                     System.out.println("End response");
@@ -638,7 +639,7 @@ public class HttpRequest {
                     s = response.readLine();
                     while(s != null) {
                         responseText.append(s);
-                        responseText.append("\n");
+                        responseText.append('\n');
                         s = response.readLine();
                     }
 
@@ -646,10 +647,10 @@ public class HttpRequest {
                     String errMess = conn.getHeaderField("Error");
                     if (errMess != null) {
                         System.err.println("Error: " + errMess);
-                        taskOutput.append("Error: "+ errMess +"\n");
+                        taskOutput.append("Error: "+ errMess + '\n');
                     } else if (responseText.length()>0) {
                         System.err.println("Error: " + responseText);
-                        taskOutput.append("Error: "+ errMess +"\n");
+                        taskOutput.append("Error: "+ errMess + '\n');
                     }
                     break;
                 }
@@ -657,13 +658,13 @@ public class HttpRequest {
             } catch (ConnectException e) {
                 e.printStackTrace();
                 System.out.println(e.toString());
-                taskOutput.append(e.toString()+"\n");
+                taskOutput.append(e.toString()+ '\n');
                 retry ++;
                 continue;
             } catch (SocketTimeoutException e) {
                 e.printStackTrace();
                 System.out.println(e.toString());
-                taskOutput.append(e.toString()+"\n");
+                taskOutput.append(e.toString()+ '\n');
                 retry ++;
                 continue;
             } catch (MalformedURLException e) {
@@ -692,5 +693,9 @@ public class HttpRequest {
     public HashMap<String, tag_defs.primative_type> getExistingStationTypes() {
         return existingStationTypes;
     }
+
+    public HashMap<String, ArrayList<String>> getExistingStationWayNodes () {return existingStationWayNodes;}
+
+    public HashMap<String, HashSet<RelationMember>> getExistingStationMembers () {return existingStationMembers;}
 
 }

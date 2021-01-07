@@ -607,8 +607,10 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             }
             if(selectedOsmStop!=null) osmValue = selectedOsmStop.getTag(k);
             //don't wipe extra tags for UPLOAD_CONFLICT, use GTFS values for missing tags for MODIFY;
-            if (!(osmValue == null || osmValue.isEmpty()) &&
+            if ((!(osmValue == null || osmValue.isEmpty() ) &&
                     (gtfsValue == null || gtfsValue.isEmpty()))
+                    //don't override stop_area
+                    || (osmValue != null && (k.equals("public_transport")) && osmValue.equals("stop_area")))
                     {
                         newValue = osmValue;
                         osmCB = true;
@@ -2867,7 +2869,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             // Save to final Stops
             Stop st = saveAcceptedDataToFinalStops(selectedGtfs);
             if (selectedOSMStop!= null) {
-                st.setOsmId(selectedOSMStop.getOsmId());
+//                st.setOsmId(selectedOSMStop.getOsmId());
+                st.setOsmData(selectedOSMStop);
+
                 usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
                 //broken
 //                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
@@ -2884,7 +2888,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     && !selectedGtfsStop.getReportCategory().equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT) )
             {
 
-                selectedGtfsStop.setOsmId(selectedOSMStop.getOsmId());
+//                selectedGtfsStop.setOsmId(selectedOSMStop.getOsmId());
+                selectedGtfsStop.setOsmData(selectedOSMStop);
                 int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
                 selectedGtfsStop.setOsmVersion(Integer.toString(newOSMVersion + 1));
             }// stops to finish
@@ -2916,7 +2921,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 // set osmId and version number
                 if (selectedOsmStop != null) {
                     if (st.getOsmId() == null) {
-                        st.setOsmId(selectedOsmStop.getOsmId());
+//                        st.setOsmId (selectedOsmStop.getOsmId());
+                        st.setOsmData(selectedOSMStop);
+
                     }
 //                st.setOsmVersion((selectedOsmStop.getOsmVersion()));
                     if (st.getOsmVersion() == null) {

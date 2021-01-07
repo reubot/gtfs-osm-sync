@@ -68,14 +68,14 @@ public class OsmPrinter {
     public String writeDeleteNode(String nodeID, String changeSetID, String version) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         return "<node id='"+nodeID+ "' " + changesetText +  " version='"+ version +"' />\n";
     }
 
     public String writeBusStop(String changeSetID, String lat, String lon) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         return "<node " + changesetText +  " lat='" + lat + "' lon='" + lon + "'>\n" +
                 "<tag k='highway' v='bus_stop'/>\n" +
                 "</node>";
@@ -84,19 +84,30 @@ public class OsmPrinter {
     public String writeBusStop(String changeSetID, String nodeID, Stop st) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         String text="";
         Stop s = new Stop(st);
+
+        switch (st.getType()) {
+            case NODE:
+                text += "<node " + changesetText + " id='" + nodeID
+                        + "' lat='" + st.getLat() + "' lon='" + st.getLon();
+                break;
+            case WAY:
+                text += "<way " + changesetText + " id='" + nodeID;
+                break;
+            case RELATION:
+                text += "<relation " + changesetText + " id='" + nodeID;
+        }
+
         // if modify, we need version number
         if(st.getOsmVersion()!=null) {
-            text += "<node " + changesetText + " id='" + nodeID
-                    + "' lat='" + st.getLat() + "' lon='" + st.getLon()
-                    + "' version='"+st.getOsmVersion() + "'>\n";
+            text += "' version='"+st.getOsmVersion();
+            text += "'>\n";
         }
         // mainly for create new node
         else {
-            text += "<node " + changesetText + " id='" + nodeID
-                    + "' lat='" + st.getLat() + "' lon='" + st.getLon() + "'>\n";
+            text += "'>\n";
             if(st.getTag(APPLICATION_CREATOR_KEY)!=null && !st.getTag(APPLICATION_CREATOR_KEY).equals("none")) {
                 text += "<tag k='"+APPLICATION_CREATOR_KEY+"' v='"+APPLICATION_CREATOR_NAME+"' />\n";
             }
@@ -104,21 +115,48 @@ public class OsmPrinter {
         //add tag
         HashSet<String> keys = new HashSet<String>(s.keySet().size());
         keys.addAll(s.keySet());
-        Iterator it = keys.iterator();
-        while (it.hasNext()){
-            String k = (String) it.next();
+        for (String k : keys) {
             if (!s.getTag(k).equals("none")) {
-                text += "<tag k='"+OsmFormatter.getValidXmlText(k)+"' v='"+OsmFormatter.getValidXmlText(s.getTag(k))+"' />\n";
+                text += "<tag k='" + OsmFormatter.getValidXmlText(k) + "' v='" + OsmFormatter.getValidXmlText(s.getTag(k)) + "' />\n";
             }
         }
-        text += "</node>\n";
+        switch (st.getType()) {
+            case WAY:
+                for (String nd:st.getOsmNodes())
+                    text += "<nd ref='" + nd + "' />\n";
+                text += "</way>\n";
+                break;
+            case RELATION:
+                text += writeMembers(st.getOsmMembers());
+                text += "</relation>\n";
+                break;
+            case NODE:
+            default:
+                text += "</node>\n";
+
+        }
+
         return text;
+    }
+    public String writeMembers(HashSet<RelationMember> members){
+        StringBuilder text= new StringBuilder();
+        for (RelationMember rm : members) {
+            text.append("<member type='")
+                .append(rm.getType())
+                .append("' ref='")
+                .append(rm.getRef())
+                .append("' role='");
+            if (rm.getRole() != null)
+                 text.append(OsmFormatter.getValidXmlText(rm.getRole()));
+            text.append("' />\n");
+        }
+        return text.toString();
     }
 
     public String writeBusRoute(String changeSetID, String routeID, Route r) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
-            changesetText = "changeset='" + changeSetID+ "'";
+            changesetText = "changeset='" + changeSetID+ '\'';
         String text="";
         Route route = new Route(r);
         // if modify, we need version number

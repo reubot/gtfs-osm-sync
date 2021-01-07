@@ -17,6 +17,7 @@ Copyright 2010 University of South Florida
 
 package edu.usf.cutr.go_sync.object;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -34,6 +35,8 @@ public class Stop extends OsmPrimitive implements Comparable{
     private final String GTFS_NAME_KEY		= tag_defs.GTFS_NAME_KEY;
     private String lat, lon;
     private HashSet<Route> routes;
+    private HashSet<RelationMember> osmMembers = new HashSet<>();
+    private ArrayList<String> osmWayNodes = new ArrayList<String>();
     public Stop(String stopID, String operatorName, String stopName, String lat, String lon) {
         osmTags = new Hashtable();
         if (operatorName == null || operatorName.equals("")) operatorName="none";
@@ -87,9 +90,24 @@ public class Stop extends OsmPrimitive implements Comparable{
         this.setLastEditedOsmDate(s.getLastEditedOsmDate());
         this.setLastEditedOsmUser(s.getLastEditedOsmUser());
         this.setType(s.getType());
+        this.setOsmData(s);
+        //if(s.getOsmNodes()!=null) this.addOsmNodes(s.getOsmNodes());
         routes = new HashSet<Route>();
         routes.addAll(s.getRoutes());
     }
+
+    /**
+     * Copies id, type and members/nodes from s
+     * @param s Stop to copy from
+     */
+    public void setOsmData(Stop s){
+        this.setOsmId(s.getOsmId());
+        this.setType(s.getType());
+        if(s.getOsmNodes()!=null) this.addOsmNodes(s.getOsmNodes());
+        if(s.getOsmMembers()!=null) this.osmMembers.addAll(s.getOsmMembers());
+
+    }
+
 
     public void addRoutes(HashSet<Route> r){
         routes.addAll(r);
@@ -198,4 +216,20 @@ public class Stop extends OsmPrimitive implements Comparable{
     public String toString(){
         return this.getStopID();
     }
+
+    public void addOsmNodes(ArrayList<String> oNodes){
+        osmWayNodes.addAll(oNodes);
+    }
+    public ArrayList<String> getOsmNodes(){
+        return osmWayNodes;
+    }
+
+    public HashSet<RelationMember> getOsmMembers(){
+        return osmMembers;
+    }
+    public void addOsmMembers(HashSet<RelationMember> oMembers) {
+        osmMembers.addAll(oMembers);
+
+    }
+
 }
