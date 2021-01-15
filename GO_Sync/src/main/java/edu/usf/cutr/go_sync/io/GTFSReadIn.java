@@ -117,6 +117,9 @@ public class GTFSReadIn {
                             case tag_defs.GTFS_WHEELCHAIR_KEY:
                                 keysIndex.put(tag_defs.OSM_WHEELCHAIR_KEY, i);
                                 break;
+                            case tag_defs.GTFS_PLATFORM_KEY:
+                                keysIndex.put(tag_defs.OSM_PLATFORM_KEY, i);
+                                break;
                             default:
                                 String t = "gtfs_" + keys[i];
                                 keysIndex.put(t, i);
