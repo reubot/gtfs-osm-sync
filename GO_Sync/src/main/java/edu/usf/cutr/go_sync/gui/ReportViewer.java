@@ -289,9 +289,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         finalRouteCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
 
 //System.out.println(r.size() + "\t" + u.size() + "\t" + m.size() + "\t" + d.size() + "\t");
-        ArrayList<Stop> reportKeys = new ArrayList<Stop>();
         //convert to arrayList for ordering
-        reportKeys.addAll(report.keySet());
+        // TODO: use comparator / java.util.Collections.sort()
+        ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
         //ordering by hashcode
         for (int i=0; i<reportKeys.size()-1; i++) {
             int k=i;
@@ -304,6 +304,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             reportKeys.set(i, reportKeys.get(k));
             reportKeys.set(k, temp);
         }
+        System.out.println("reportKeys sort in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
 
         //get the total elements in each list first
         gtfsAll = new Stop[reportKeys.size()];
@@ -358,6 +359,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             String stopSearchData = reportKeys.get(i).getStopName() + ';' +reportKeys.get(i).getStopID();
             searchKeyToStop.put(stopSearchData, reportKeys.get(i));
         }
+        System.out.println("ReportViewer gtfs lists generated in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
 
         // set the list to All initially
         gtfsStops = gtfsAll;
@@ -387,6 +389,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             finalStops.put(st.getStopID(), st);
             finalCheckboxes.put(st.getStopID(), arr);
         }
+        System.out.println("Final stops with Gtfs Value as Default generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
 
         // set Final stops with Osm Value as Default
         for (int i=0; i<reportKeys.size(); i++) {
@@ -419,8 +422,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 Stop agencyStop = agencyStops.get(newStop.getStopID());
                 Hashtable<String, String> agencyTags = agencyStop.getTags();
                 Hashtable<String, String> osmTags = osmStop.getTags();
-                ArrayList<String> osmTagKeys = new ArrayList<String>();
-                osmTagKeys.addAll(osmStop.keySet());
+                ArrayList<String> osmTagKeys = new ArrayList<String>(osmStop.keySet());
                 osmTagKeys.remove(tag_defs.GTFS_OPERATOR_KEY);
 //                osmTagKeys.remove("highway");
                 osmTagKeys.remove("source");
@@ -438,6 +440,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     osmDefaultOnlyChangedFinalStops.put(stopWithSelectedTags.getStopID(), stopWithSelectedTags);
             }
         }
+        System.out.println("Final stops with Osm Value as Default generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
 
         // Routes
         routeTableModel = new TagReportTableModel(0);
@@ -455,10 +458,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         finalRoutesAccepted = new Hashtable<String, Route>();
 
         //ordering by hashcode
-        ArrayList<String> routeKeys = new ArrayList<String>();
 
         //convert to arrayList for ordering
-        routeKeys.addAll(agencyRoutes.keySet());
+        ArrayList<String> routeKeys = new ArrayList<String>(agencyRoutes.keySet());
         java.util.Collections.sort(routeKeys);
  /*       //ordering by hashcode
         for (int i=0; i<routeKeys.size()-1; i++) {
@@ -510,6 +512,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         // set the list to All initially
         gtfsRoutes = gtfsRouteAll;
+
+        System.out.println("add data to correct lists generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
+
 /*
         // set Final Routes
         for (int i=0; i<routeKeys.size(); i++) {
@@ -530,6 +535,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         }
 */
         initComponents();
+        System.out.println("initComponents generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
 
         // get main map
         mainMap = mapJXMapKit.getMainMap();
@@ -580,8 +586,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         dataTable.setModel(stopTableModel);
 
         // the same as tagKeys. For the purpose of using for loop
-        ArrayList<String> tkeys = new ArrayList<String>();
-        tkeys.addAll(tagKeys);
+        ArrayList<String> tkeys = new ArrayList<String>(tagKeys);
 
         // add data to table
         // first, add lat and lon
@@ -771,8 +776,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         if(!tempStopsGeo.isEmpty()) {
             mainMap.setZoom(1);
-            ArrayList<GeoPosition> tempGeo = new ArrayList<GeoPosition>();
-            tempGeo.addAll(tempStopsGeo);
+            ArrayList<GeoPosition> tempGeo = new ArrayList<GeoPosition>(tempStopsGeo);
 
             if(tempStopsGeo.size()>2 || (tempStopsGeo.size()==2 && OsmDistance.distVincenty(Double.toString(tempGeo.get(0).getLatitude()), Double.toString(tempGeo.get(0).getLongitude()),
                                                     Double.toString(tempGeo.get(1).getLatitude()), Double.toString(tempGeo.get(1).getLongitude()))>100)) mainMap.calculateZoomFrom(tempStopsGeo);
@@ -1037,8 +1041,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         routeTable.setModel(routeTableModel);
 
         // the same as tagKeys. For the purpose of using for loop
-        ArrayList<String> tkeys = new ArrayList<String>();
-        tkeys.addAll(tagKeys);
+        ArrayList<String> tkeys = new ArrayList<String>(tagKeys);
 
         // add data to table
         // first, add lat and lon
@@ -1099,8 +1102,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         else return;
 
         // Member Table
-        ArrayList<RelationMember> newMembers = new ArrayList<RelationMember>();
-        newMembers.addAll(selectedNewRoute.getOsmMembers());
+        ArrayList<RelationMember> newMembers = new ArrayList<RelationMember>(selectedNewRoute.getOsmMembers());
 
         ArrayList<RelationMember> gtfsMembers = new ArrayList<RelationMember>();
         if(aRoute!=null) gtfsMembers.addAll(aRoute.getOsmMembers());
@@ -3023,8 +3025,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
     private void exportGtfsValueWithOsmTagsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportGtfsValueWithOsmTagsMenuItemActionPerformed
         ArrayList<String> keys = new ArrayList<String>(agencyStops.keySet());
-        Hashtable<String, Stop> gtfsDefaultFinalStops = new Hashtable<String, Stop>();
-        gtfsDefaultFinalStops.putAll(agencyStops);
+        Hashtable<String, Stop> gtfsDefaultFinalStops = new Hashtable<String, Stop>(agencyStops);
         for(int i=0; i<keys.size(); i++){
             String sid = keys.get(i);
             Stop s = gtfsDefaultFinalStops.get(sid);
