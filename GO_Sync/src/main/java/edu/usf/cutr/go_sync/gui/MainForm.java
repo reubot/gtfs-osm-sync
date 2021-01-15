@@ -539,7 +539,7 @@ public class MainForm extends javax.swing.JFrame implements PropertyChangeListen
 
         //optional field
         _operatorNtdId = operatorNTDIDField.getText();
-        if (gtfsIdDigitField.getText() != null && !gtfsIdDigitField.getText().equals("")) {
+        if (gtfsIdDigitField.getText() != null && !gtfsIdDigitField.getText().isEmpty()) {
             try {
                 _gtfsIdDigit = Integer.parseInt(gtfsIdDigitField.getText());
             } catch (Exception e) {
@@ -647,7 +647,7 @@ public class MainForm extends javax.swing.JFrame implements PropertyChangeListen
                     HttpURLConnection zipHttpCon = ((HttpURLConnection)zipURL.openConnection());
                     int response_code = zipHttpCon.getResponseCode();
                     if (response_code != 200 ) {
-                        taskOutput.append("HTTP server returned " +response_code + " " + zipHttpCon.getResponseMessage());
+                        taskOutput.append("HTTP server returned " +response_code + ' ' + zipHttpCon.getResponseMessage());
                         System.err.println("HTTP server returned " +response_code);
                         return false;
                     }

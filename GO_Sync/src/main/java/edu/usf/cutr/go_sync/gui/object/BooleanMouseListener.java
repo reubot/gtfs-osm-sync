@@ -47,7 +47,7 @@ public class BooleanMouseListener implements MouseListener{
 
         // add appropriate data to New Values
         String dataValue = (String)dataTable.getValueAt(row, column-1);
-        if((dataValue!=null) && !(dataValue.equals(""))){
+        if((dataValue!=null) && !(dataValue.isEmpty())){
             Boolean otherCheckBox;
             String otherData, insertData=dataValue;
             int otherCheckColumn;
@@ -61,16 +61,16 @@ public class BooleanMouseListener implements MouseListener{
                 otherDataColumn = otherCheckColumn - 1;
                 otherCheckBox = (Boolean)dataTable.getValueAt(row, otherCheckColumn);
                 otherData = (String)dataTable.getValueAt(row, otherDataColumn);
-                if(otherData!=null && !(otherData.equals("")))
-                    insertData = dataValue+";"+otherData;
+                if(otherData!=null && !(otherData.isEmpty()))
+                    insertData = dataValue+ ';' +otherData;
             } else { // column == StopTableInfo.OSM_CHECK_COL
                 otherCheckColumn = StopTableInfo.GTFS_CHECK_COL;
                 otherDataColumn = otherCheckColumn - 1;
                 otherCheckBox = (Boolean)dataTable.getValueAt(row, otherCheckColumn);
                 otherData = (String)dataTable.getValueAt(row, otherDataColumn);
                 if(otherCheckBox) {
-                    if (otherData!=null && !(otherData.equals("")))
-                        insertData = otherData+";"+dataValue;
+                    if (otherData!=null && !(otherData.isEmpty()))
+                        insertData = otherData+ ';' +dataValue;
                     else {
                         insertData = dataValue;
                         otherCheckBox = false;
@@ -102,7 +102,7 @@ public class BooleanMouseListener implements MouseListener{
                 if(otherCheckBox)
                     dataTable.setValueAt(otherData, row, StopTableInfo.NEW_VALUE_DATA_COL);
                 else {
-                    if(otherData!=null && !(otherData.equals(""))) {
+                    if(otherData!=null && !(otherData.isEmpty())) {
                         dataTable.setValueAt(new Boolean(true), row, otherCheckColumn);
                         dataTable.setValueAt(otherData, row, StopTableInfo.NEW_VALUE_DATA_COL);
                     } else {

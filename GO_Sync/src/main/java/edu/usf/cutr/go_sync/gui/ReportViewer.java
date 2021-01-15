@@ -355,7 +355,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             totalNumberOfStopsToFinish = stopsToFinish.size();
 
             // for search functionality
-            String stopSearchData = reportKeys.get(i).getStopName() + ";" +reportKeys.get(i).getStopID();
+            String stopSearchData = reportKeys.get(i).getStopName() + ';' +reportKeys.get(i).getStopID();
             searchKeyToStop.put(stopSearchData, reportKeys.get(i));
         }
 
@@ -429,7 +429,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     String osmTagKey = osmTagKeys.get(j);
                     String agencyTagValue = agencyTags.get(osmTagKey);
                     String osmTagValue = osmTags.get(osmTagKey);
-                    if((osmTagValue!=null || !osmTagValue.equals("")) && ((agencyTagValue==null) || (agencyTagValue.equals("")) || !osmTagValue.equals(agencyTagValue))) {
+                    if((osmTagValue!=null || !osmTagValue.isEmpty()) && ((agencyTagValue==null) || (agencyTagValue.isEmpty()) || !osmTagValue.equals(agencyTagValue))) {
                         stopWithSelectedTags.addTag(osmTagKey, osmTagValue);
                         isDiff = true;
                     }
@@ -691,9 +691,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         String lastEditedUser = "N/A";
         String lastEditedDate = "N/A";
         if(selectedOsmStop!=null) {
-            if(selectedOsmStop.getLastEditedOsmUser()!=null && !selectedOsmStop.getLastEditedOsmUser().equals(""))
+            if(selectedOsmStop.getLastEditedOsmUser()!=null && !selectedOsmStop.getLastEditedOsmUser().isEmpty())
                 lastEditedUser = selectedOsmStop.getLastEditedOsmUser();
-            if(selectedOsmStop.getLastEditedOsmDate()!=null && !selectedOsmStop.getLastEditedOsmDate().equals(""))
+            if(selectedOsmStop.getLastEditedOsmDate()!=null && !selectedOsmStop.getLastEditedOsmDate().isEmpty())
                 lastEditedDate = selectedOsmStop.getLastEditedOsmDate();
         }
 
@@ -843,7 +843,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 Stop selected = findStop(e.getPoint());
                 if(selected!=null){
                     System.out.println(selected+" " + selected.getReportCategory() + " MouseListener.mouseClicked");
-                    System.out.println(selected.getLat()+","+selected.getLon());
+                    System.out.println(selected.getLat()+ ',' +selected.getLon());
 
                     // when the user is in multiple possible match category
                     // if user selects one of the items in osm list then only update osm list, no need to zoom in
@@ -1119,7 +1119,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         for(int i=0; i<gtfsMembers.size(); i++){
             RelationMember t = gtfsMembers.get(i);
             String v = t.getGtfsId();
-            if (v!=null && !v.equals("none") && !v.equals("")) hashGtfs.put(t, v);
+            if (v!=null && !v.equals("none") && !v.isEmpty()) hashGtfs.put(t, v);
 //            else hashGtfs.put(t, t.getType() + " (" + t.getRef()+")");
         }
 
@@ -1127,7 +1127,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         for(int i=0; i<osmMembers.size(); i++){
             RelationMember t = osmMembers.get(i);
             String v = t.getGtfsId();
-            if (v!=null && !v.equals("none") && !v.equals("")) hashOsm.put(t, v);
+            if (v!=null && !v.equals("none") && !v.isEmpty()) hashOsm.put(t, v);
 //            else hashOsm.put(t, t.getType() + " (" + t.getRef()+")");
         }
 
@@ -1143,7 +1143,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 if(hashGtfs.get(t)!=null) memberGtfsIndex++;
                 if(hashOsm.get(t)!=null) memberOsmIndex++;
 
-                if (v!=null && !v.equals("none") && !v.equals("")) {
+                if (v!=null && !v.equals("none") && !v.isEmpty()) {
                     memberTableModel.setRowValueAt(new Object[] {hashGtfs.get(t), hashOsm.get(t), v}, memberNewIndex);
                     memberNewIndex++;
                 }
@@ -1248,7 +1248,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 progressBar.setVisible(true);
                 int progress = (Integer) evt.getNewValue();
                 progressBar.setValue(progress);
-                generalInformationStopTextArea.append(taskUpload.getMessage()+"\n");
+                generalInformationStopTextArea.append(taskUpload.getMessage()+ '\n');
                 /*
                 if(taskUpload.getMessage().contains("several minutes")){
                     progressBar.setIndeterminate(true);
@@ -1372,7 +1372,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             "x","y","z") {
             public String getTileUrl(int x, int y, int zoom) {
                 zoom = osmMaxZoom-zoom;
-                String url = this.baseURL +"/"+zoom+"/"+x+"/"+y+".png";
+                String url = this.baseURL + '/' +zoom+ '/' +x+ '/' +y+".png";
                 return url;
             }
         };
@@ -2523,7 +2523,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
 //        arrayStops = stopList.toArray(arrayStops);
     	arrayStops =  Arrays.copyOf(stopList.toArray(arrayStops), stopList.size());
-        System.out.println("\t" + stopList.size() + "\t" + arrayStops.length);
+        System.out.println("\t" + stopList.size() + '\t' + arrayStops.length);
         return arrayStops;
 
 
@@ -2533,7 +2533,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     {
 
         System.out.println("upload\tmodify\tdelete\tfinalStops");
-    	System.out.println(upload.size() + "\t" + modify.size() + "\t" +delete.size() + "\t" +finalStops.size());
+    	System.out.println(upload.size() + "\t" + modify.size() + '\t' +delete.size() + '\t' +finalStops.size());
 
 
 //    	GtfsArrayList.remove(o)
@@ -2547,7 +2547,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
 
 
-    	System.out.println(gtfsUploadConflict.length+"\t" + gtfsUploadNoConflict.length+"\t" + gtfsModify.length+"\t" + gtfsUploadConflict.length+"\t" + gtfsAll.length+"\t" );
+    	System.out.println(gtfsUploadConflict.length+"\t" + gtfsUploadNoConflict.length+ '\t' + gtfsModify.length+ '\t' + gtfsUploadConflict.length+ '\t' + gtfsAll.length+ '\t');
     	System.out.println(GtfsAllLinkedList.size()+"\t");
 
 //    	GtfsAlGtfsAll
@@ -2661,7 +2661,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         //FIXME broken when some already do not uploads?
         System.out.println("\t"+GtfsAllLinkedList.size());
         System.out.println("upload\tmodify\tdelete\tfinalStops");
-    	System.out.println(upload.size() + "\t" + modify.size() + "\t" +delete.size() + "\t" +finalStops.size());
+    	System.out.println(upload.size() + "\t" + modify.size() + '\t' +delete.size() + '\t' +finalStops.size());
 
 
     }
@@ -2712,7 +2712,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             else
             updateStopCategory(gtfsModify, index);
         }
-        System.err.println(index + "\t gtfsStopsComboBox.getItemCount():\t" + gtfsStopsComboBox.getItemCount() + "x"); //FIXME combo box count is broken before uopdate
+        System.err.println(index + "\t gtfsStopsComboBox.getItemCount():\t" + gtfsStopsComboBox.getItemCount() + 'x'); //FIXME combo box count is broken before uopdate
 
 
         finalStops.remove(sid);
@@ -2899,7 +2899,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 stopsToFinish.remove(selectedGtfsStop.toString());
                 int visited = totalNumberOfStopsToFinish - stopsToFinish.size();
                 finishProgressBar.setString(Integer.toString(visited)
-                                                +"/"+totalNumberOfStopsToFinish+" stops");
+                                                + '/' +totalNumberOfStopsToFinish+" stops");
                 if(!stopsToFinish.isEmpty())
                 {
                     int progressValue = finishProgressBar.getValue();
