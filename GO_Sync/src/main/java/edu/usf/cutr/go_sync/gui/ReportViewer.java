@@ -33,15 +33,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -226,8 +218,6 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
 
 
-
-
     /**
      * @param aData GTFSstops
      * @param r report
@@ -293,6 +283,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // TODO: use comparator / java.util.Collections.sort()
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
         //ordering by hashcode
+        /*
         for (int i=0; i<reportKeys.size()-1; i++) {
             int k=i;
             for (int j=i+1; j<reportKeys.size(); j++) {
@@ -304,6 +295,16 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             reportKeys.set(i, reportKeys.get(k));
             reportKeys.set(k, temp);
         }
+        */
+        reportKeys.sort(new Comparator<Stop>()
+        {
+            @Override
+            public int compare(Stop k, Stop j) {
+                if ((k).getStopID().hashCode() > (j).getStopID().hashCode())
+                    return 1;
+                return -1;
+//             (k.getStopID().hashCode() - (j).getStopID().hashCode());
+        }});
         System.out.println("reportKeys sort in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
 
         //get the total elements in each list first
