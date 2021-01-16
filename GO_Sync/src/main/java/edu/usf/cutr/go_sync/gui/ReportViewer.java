@@ -255,9 +255,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         taskOutput = to;
         osmRequest = new HttpRequest(to);
 //        agencyTable = new Hashtable<Stop, Hashtable>();
-        for(int i=0; i<aData.size(); i++){
+        for (Stop aDatum : aData) {
 //            agencyTable.put(aData.get(i), aData.get(i).getTags());
-            agencyStops.put(aData.get(i).toString(), aData.get(i));
+            agencyStops.put(aDatum.toString(), aDatum);
         }
 
         report = new Hashtable<Stop, ArrayList<Stop>>();
@@ -336,29 +336,29 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         gtfsModify = new Stop[mi];
         gtfsNoUpload = new Stop[nui];
         uci=0; unci=0; mi=0; nui=0;
-        for (int i=0; i<reportKeys.size(); i++) {
-            OsmPrimitive.RC category = reportKeys.get(i).getReportCategory();
+        for (Stop reportKey : reportKeys) {
+            OsmPrimitive.RC category = reportKey.getReportCategory();
             if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)) {
-                gtfsUploadConflict[uci] = reportKeys.get(i);
+                gtfsUploadConflict[uci] = reportKey;
                 uci++;
-                stopsToFinish.add(reportKeys.get(i).toString());
+                stopsToFinish.add(reportKey.toString());
             } else if (category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
-                gtfsUploadNoConflict[unci] = reportKeys.get(i);
+                gtfsUploadNoConflict[unci] = reportKey;
                 unci++;
             } else if (category.equals(OsmPrimitive.RC.MODIFY)) {
-                gtfsModify[mi] = reportKeys.get(i);
+                gtfsModify[mi] = reportKey;
                 mi++;
-                stopsToFinish.add(reportKeys.get(i).toString());
+                stopsToFinish.add(reportKey.toString());
             } else if (category.equals(OsmPrimitive.RC.NOTHING_NEW)) {
-                gtfsNoUpload[nui] = reportKeys.get(i);
+                gtfsNoUpload[nui] = reportKey;
                 nui++;
             }
 
             totalNumberOfStopsToFinish = stopsToFinish.size();
 
             // for search functionality
-            String stopSearchData = reportKeys.get(i).getStopName() + ';' +reportKeys.get(i).getStopID();
-            searchKeyToStop.put(stopSearchData, reportKeys.get(i));
+            String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
+            searchKeyToStop.put(stopSearchData, reportKey);
         }
         System.out.println("ReportViewer gtfs lists generated in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
 
@@ -428,11 +428,10 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //                osmTagKeys.remove("highway");
                 osmTagKeys.remove("source");
                 boolean isDiff = false;
-                for (int j=0; j<osmTagKeys.size(); j++){
-                    String osmTagKey = osmTagKeys.get(j);
+                for (String osmTagKey : osmTagKeys) {
                     String agencyTagValue = agencyTags.get(osmTagKey);
                     String osmTagValue = osmTags.get(osmTagKey);
-                    if((osmTagValue!=null || !osmTagValue.isEmpty()) && ((agencyTagValue==null) || (agencyTagValue.isEmpty()) || !osmTagValue.equals(agencyTagValue))) {
+                    if ((osmTagValue != null || !osmTagValue.isEmpty()) && ((agencyTagValue == null) || (agencyTagValue.isEmpty()) || !osmTagValue.equals(agencyTagValue))) {
                         stopWithSelectedTags.addTag(osmTagKey, osmTagValue);
                         isDiff = true;
                     }
@@ -496,8 +495,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         gtfsRouteModify = new Route[mi];
         gtfsRouteNoUpload = new Route[nui];
         unci=0; mi=0; nui=0;
-        for (int i=0; i<routeKeys.size(); i++) {
-            Route tempr = finalRoutes.get(routeKeys.get(i));
+        for (String routeKey : routeKeys) {
+            Route tempr = finalRoutes.get(routeKey);
             OsmPrimitive.status status = tempr.getStatus();
             if (status.equals(OsmPrimitive.status.NEW)) {
                 gtfsRouteUploadNoConflict[unci] = tempr;
@@ -793,8 +792,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         //to Calculate Zoom
         allStopsGeo = new HashSet<GeoPosition>();
 
-        for(int i=0; i<newStops.size(); i++){
-            Stop st = newStops.get(i);
+        for (Stop st : newStops) {
             waypoints.add(new DefaultWaypoint(Double.parseDouble(st.getLat()), Double.parseDouble(st.getLon())));
             GeoPosition pos = new GeoPosition(Double.parseDouble(st.getLat()), Double.parseDouble(st.getLon()));
             allStopsGeo.add(pos);
@@ -1119,35 +1117,32 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // hashGtfs stores all the relation members with the key of the gtfs id.
         // if any relation member does not have gtfs id, the type would be taken as the key
         Hashtable<RelationMember, String> hashGtfs = new Hashtable<RelationMember, String>();
-        for(int i=0; i<gtfsMembers.size(); i++){
-            RelationMember t = gtfsMembers.get(i);
+        for (RelationMember t : gtfsMembers) {
             String v = t.getGtfsId();
-            if (v!=null && !v.equals("none") && !v.isEmpty()) hashGtfs.put(t, v);
+            if (v != null && !v.equals("none") && !v.isEmpty()) hashGtfs.put(t, v);
 //            else hashGtfs.put(t, t.getType() + " (" + t.getRef()+")");
         }
 
         Hashtable<RelationMember, String> hashOsm = new Hashtable<RelationMember, String>();
-        for(int i=0; i<osmMembers.size(); i++){
-            RelationMember t = osmMembers.get(i);
+        for (RelationMember t : osmMembers) {
             String v = t.getGtfsId();
-            if (v!=null && !v.equals("none") && !v.isEmpty()) hashOsm.put(t, v);
+            if (v != null && !v.equals("none") && !v.isEmpty()) hashOsm.put(t, v);
 //            else hashOsm.put(t, t.getType() + " (" + t.getRef()+")");
         }
 
         int memberNewIndex = 0;
         int memberGtfsIndex = 0, memberOsmIndex = 0;
-        for(int i=0; i<newMembers.size(); i++){
-            RelationMember t = newMembers.get(i);
+        for (RelationMember t : newMembers) {
             String status = t.getStatus();
-            if(status.equals(criteria) || criteria.equals("all")) {
+            if (status.equals(criteria) || criteria.equals("all")) {
                 String v = t.getGtfsId();
 //                if (v==null || v.equals("none") || v.equals("")) v = t.getType() + " (" + t.getRef() +")";
 
-                if(hashGtfs.get(t)!=null) memberGtfsIndex++;
-                if(hashOsm.get(t)!=null) memberOsmIndex++;
+                if (hashGtfs.get(t) != null) memberGtfsIndex++;
+                if (hashOsm.get(t) != null) memberOsmIndex++;
 
-                if (v!=null && !v.equals("none") && !v.isEmpty()) {
-                    memberTableModel.setRowValueAt(new Object[] {hashGtfs.get(t), hashOsm.get(t), v}, memberNewIndex);
+                if (v != null && !v.equals("none") && !v.isEmpty()) {
+                    memberTableModel.setRowValueAt(new Object[]{hashGtfs.get(t), hashOsm.get(t), v}, memberNewIndex);
                     memberNewIndex++;
                 }
             }
@@ -1276,29 +1271,27 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         ArrayList<String> stopIds = new ArrayList<String>(stops.keySet());
 
-        for(int i=0; i<stopIds.size(); i++){
-            Stop s = stops.get(stopIds.get(i));
+        for (String stopId : stopIds) {
+            Stop s = stops.get(stopId);
             OsmPrimitive.RC category = s.getReportCategory();
-            if(category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)){
+            if (category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
                 upload.add(s);
-            }
-            else if(category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) && acceptedOnlyCheckbox.isSelected()){
+            } else if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) && acceptedOnlyCheckbox.isSelected()) {
                 modify.add(s);
 
-            }
-            else if(category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)){
+            } else if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)) {
                 // upload the new stop
                 upload.add(s);
                 // add FIXME to its potential matches
                 Object o = report.get(s);
-                if(o instanceof ArrayList){
-                    HashSet<Stop> equiv = new HashSet<Stop>((ArrayList<Stop>)o);
+                if (o instanceof ArrayList) {
+                    HashSet<Stop> equiv = new HashSet<Stop>((ArrayList<Stop>) o);
                     modify.addAll(equiv);
                 }
-            } else if(category.equals(OsmPrimitive.RC.MODIFY)){
+            } else if (category.equals(OsmPrimitive.RC.MODIFY)) {
                 // if s is already in modify set, meaning GO-Sync added FIXME tag for the UPLOAD_CONFLICT category
                 // then, remove the stop and add FIXME tag to the current s
-                if(modify.contains(s)) {
+                if (modify.contains(s)) {
                     modify.remove(s);
                     s.addTag("FIXME", "This stop could be redundant");
                 }
@@ -3027,8 +3020,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     private void exportGtfsValueWithOsmTagsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportGtfsValueWithOsmTagsMenuItemActionPerformed
         ArrayList<String> keys = new ArrayList<String>(agencyStops.keySet());
         Hashtable<String, Stop> gtfsDefaultFinalStops = new Hashtable<String, Stop>(agencyStops);
-        for(int i=0; i<keys.size(); i++){
-            String sid = keys.get(i);
+        for (String sid : keys) {
             Stop s = gtfsDefaultFinalStops.get(sid);
             s.addTags(finalStops.get(sid).getTags());
         }
@@ -3080,9 +3072,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     private void searchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchButtonActionPerformed
         String userInput = searchTextField.getText();
         ArrayList<String> keys = new ArrayList<String>(searchKeyToStop.keySet());
-        for (int i=0; i<keys.size(); i++){
-            if(keys.get(i).toUpperCase().contains(userInput.toUpperCase())){
-                updateDataWhenStopSelected(searchKeyToStop.get(keys.get(i)));
+        for (String key : keys) {
+            if (key.toUpperCase().contains(userInput.toUpperCase())) {
+                updateDataWhenStopSelected(searchKeyToStop.get(key));
                 return;
             }
         }
