@@ -2849,97 +2849,78 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         Stop selectedOSMStop  = (Stop)osmStopsComboBox.getSelectedItem();
 
         String tableStopButtonText = tableStopButton.getText();
-        if (tableStopButtonText.contains("Save Change") || !finalStopsAccepted.contains(selectedGtfs))
-        {
+        if (tableStopButtonText.contains("Save Change")) {
 
             // Save Checkboxes values
             // no need to add 2 since lat and lon are already there (counted)
-            ArrayList<Boolean> saveValues = new ArrayList<Boolean>(stopTableModel.getRowCount()*2);
-            for(int i=0; i<stopTableModel.getRowCount(); i++){
-                saveValues.add((Boolean)stopTableModel.getValueAt(i, StopTableInfo.GTFS_CHECK_COL)); //gtfs
-                saveValues.add((Boolean)stopTableModel.getValueAt(i, StopTableInfo.OSM_CHECK_COL)); //osm
+            ArrayList<Boolean> saveValues = new ArrayList<Boolean>(stopTableModel.getRowCount() * 2);
+            for (int i = 0; i < stopTableModel.getRowCount(); i++) {
+                saveValues.add((Boolean) stopTableModel.getValueAt(i, StopTableInfo.GTFS_CHECK_COL)); //gtfs
+                saveValues.add((Boolean) stopTableModel.getValueAt(i, StopTableInfo.OSM_CHECK_COL)); //osm
             }
             finalCheckboxes.put(selectedGtfs, saveValues);
+        }
+        if(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Save Change")) {
 
             // Save to final Stops
             Stop st = saveAcceptedDataToFinalStops(selectedGtfs);
-            if (selectedOSMStop!= null) {
+            if (selectedOSMStop!= null)
 //                st.setOsmId(selectedOSMStop.getOsmId());
                 st.setOsmData(selectedOSMStop);
-
-                usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
-                //broken
-//                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
-//                st.setOsmVersion(Integer.toString(newOSMVersion + 1));
+            if (st.getOsmVersion() == null) {
+                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion())+1;
+                st.setOsmVersion(Integer.toString(newOSMVersion));
             }
+            st.setReportCategory(OsmPrimitive.RC.MODIFY);
+            usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
+            finalStopsAccepted.put(selectedGtfs,st);
+
+            //broken
+//                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
+//                st.setOsmVersion(Integer.toString(newOSMVersion + 1));'
+
+            if(tableStopButtonText.equals("Accept & Save Change"))
+                JOptionPane.showMessageDialog(this,"Stop is accepted and changes have been made!");
+            else if (tableStopButtonText.equals("Save Change"))
+                JOptionPane.showMessageDialog(this,"Changes have been made!");
+            else
+            JOptionPane.showMessageDialog(this,"Stop is accepted!");
+        }
             generateStopsToUploadFlag=false;
             //finalStopsAccepted.put(selectedGtfs,selectedGtfsStop);
 
-            if(!(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Add") )) JOptionPane.showMessageDialog(this,"Changes have been made!");
-        }
-        if(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Add"))
+
+
+        if(tableStopButtonText.contains("Add"))
         {
-            if (       !selectedGtfsStop.getReportCategory().equals(OsmPrimitive.RC.MODIFY)
-                    && !selectedGtfsStop.getReportCategory().equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT) )
-            {
+            Stop st = saveAcceptedDataToFinalStops(selectedGtfs);
+            finalStopsAccepted.put(selectedGtfs,st);
+                    JOptionPane.showMessageDialog(this,"Stop is added!");
+            }
 
-//                selectedGtfsStop.setOsmId(selectedOSMStop.getOsmId());
-                selectedGtfsStop.setOsmData(selectedOSMStop);
-                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
-                selectedGtfsStop.setOsmVersion(Integer.toString(newOSMVersion + 1));
-            }// stops to finish
-            if(stopsToFinish.contains(selectedGtfsStop.toString()))
-            {
+        if(stopsToFinish.contains(selectedGtfsStop.toString()))
+        {
 
-                stopsToFinish.remove(selectedGtfsStop.toString());
-                int visited = totalNumberOfStopsToFinish - stopsToFinish.size();
-                finishProgressBar.setString(Integer.toString(visited)
-                                                + '/' +totalNumberOfStopsToFinish+" stops");
-                if(!stopsToFinish.isEmpty())
+            stopsToFinish.remove(selectedGtfsStop.toString());
+            int visited = totalNumberOfStopsToFinish - stopsToFinish.size();
+            finishProgressBar.setString(Integer.toString(visited)
+                    + '/' +totalNumberOfStopsToFinish+" stops");
+            if(!stopsToFinish.isEmpty())
+            {
+                int progressValue = finishProgressBar.getValue();
+                if((100/totalNumberOfStopsToFinish)<=0)
                 {
-                    int progressValue = finishProgressBar.getValue();
-                    if((100/totalNumberOfStopsToFinish)<=0)
-                    {
-                        progressValue = (visited*100)/totalNumberOfStopsToFinish;
-                    } else {
-                        progressValue += 100/totalNumberOfStopsToFinish;
-                    }
-                    finishProgressBar.setValue(progressValue);
+                    progressValue = (visited*100)/totalNumberOfStopsToFinish;
                 } else {
-                    finishProgressBar.setValue(100);
+                    progressValue += 100/totalNumberOfStopsToFinish;
                 }
+                finishProgressBar.setValue(progressValue);
+            } else {
+                finishProgressBar.setValue(100);
             }
-
-            if(!tableStopButtonText.contains("Save Change") || !finalStopsAccepted.contains(selectedGtfs)) {
-                Stop st = saveAcceptedDataToFinalStops(selectedGtfs);
-                Stop selectedOsmStop = (Stop) osmStopsComboBox.getSelectedItem();
-                // set osmId and version number
-                if (selectedOsmStop != null) {
-                    if (st.getOsmId() == null) {
-//                        st.setOsmId (selectedOsmStop.getOsmId());
-                        st.setOsmData(selectedOSMStop);
-
-                    }
-//                st.setOsmVersion((selectedOsmStop.getOsmVersion()));
-                    if (st.getOsmVersion() == null) {
-//                    int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion());
-                        st.setOsmVersion(selectedOsmStop.getOsmVersion());
-                    }
-                    st.setReportCategory(OsmPrimitive.RC.MODIFY);
-                    usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
-                }
-                finalStopsAccepted.put(selectedGtfs,st);
-
-                // Do not want to upload selectedOsmStop
-                if(tableStopButtonText.equals("Accept & Save Change"))
-                    JOptionPane.showMessageDialog(this,"Stop is accepted and changes have been made!");
-                else
-                    JOptionPane.showMessageDialog(this,"Stop is accepted!");
-            }
-
-
-
         }
+
+
         // 14thchanges the OSM COMbo box but not the gtfs one
         // 16-10 only seems to work if tags not changed!?
         if (gtfsStopsComboBox.getSelectedIndex() + 1< gtfsStopsComboBox.getItemCount())
