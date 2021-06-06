@@ -309,8 +309,11 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         //get the total elements in each list first
         gtfsAll = new Stop[reportKeys.size()];
+        ArrayList<Stop> gtfsAllList = new ArrayList<Stop>(reportKeys.size());
         int uci=0, unci=0, mi=0, nui=0;
+
         for (int i=0; i<reportKeys.size(); i++) {
+            gtfsAllList.add(reportKeys.get(i));
             gtfsAll[i] = reportKeys.get(i);
             OsmPrimitive.RC category = gtfsAll[i].getReportCategory();
             if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)) {
@@ -366,23 +369,22 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         gtfsStops = gtfsAll;
 
         // set Final stops with Gtfs Value as Default
-        for (int i=0; i<reportKeys.size(); i++) {
-            Stop st = new Stop(reportKeys.get(i));
+        for (Stop reportKey : reportKeys) {
+            Stop st = new Stop(reportKey);
             OsmPrimitive.RC category = st.getReportCategory();
 
             // initialize boolean array to true for gtfs and false for osm
             // the size should be 2x of the number of tags+2(for lat,lon) since we need checkboxes for both osm and gtfs values
             // format: gtfs,osm,gtfs,osm,gtfs,osm,etc.
-            int numberOfBool = (st.getTags().size()+2)*2;
+            int numberOfBool = (st.getTags().size() + 2) * 2;
             ArrayList<Boolean> arr = new ArrayList<Boolean>(numberOfBool);
             // FIXME: very difficult to read, and does not handle gtfs nulls
-            for(int j=0; j<numberOfBool; j++){
-                if(category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) || category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
-                    if(j%2==0) arr.add(true);
+            for (int j = 0; j < numberOfBool; j++) {
+                if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) || category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
+                    if (j % 2 == 0) arr.add(true);
                     else arr.add(false);
-                }
-                else {
-                    if(j%2==1) arr.add(true);
+                } else {
+                    if (j % 2 == 1) arr.add(true);
                     else arr.add(false);
                 }
             }
@@ -393,20 +395,19 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         System.out.println("Final stops with Gtfs Value as Default generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
 
         // set Final stops with Osm Value as Default
-        for (int i=0; i<reportKeys.size(); i++) {
-            Stop newStop = reportKeys.get(i);
+        for (Stop newStop : reportKeys) {
             Stop osmStop = null;
 
             int numEquiv = 0;
-            ArrayList<Stop> arr = report.get(reportKeys.get(i));
+            ArrayList<Stop> arr = report.get(newStop);
             if (arr != null) {
-                if(arr.size()>1) numEquiv = 2;
-                else if(arr.size()==1) numEquiv = 1;
+                if (arr.size() > 1) numEquiv = 2;
+                else if (arr.size() == 1) numEquiv = 1;
             }
-            if(numEquiv==1) {
+            if (numEquiv == 1) {
                 osmStop = new Stop(arr.get(0));
             } else {
-                osmStop = new Stop(reportKeys.get(i));
+                osmStop = new Stop(newStop);
             }
             osmDefaultFinalStops.put(osmStop.getStopID(), osmStop);
 
@@ -417,7 +418,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             } else if (category.equals(ReportCategory.UPLOAD_NO_CONFLICT)) {
                 gtfsUploadNoConflict[unci] = reportKeys.get(i);
                 unci++;*/
-            if ((category.equals(OsmPrimitive.RC.MODIFY) || category.equals(OsmPrimitive.RC.NOTHING_NEW)) && numEquiv==1) {
+            if ((category.equals(OsmPrimitive.RC.MODIFY) || category.equals(OsmPrimitive.RC.NOTHING_NEW)) && numEquiv == 1) {
                 //String stopID, String operatorName, String stopName, String lat, String lon
                 Stop stopWithSelectedTags = new Stop(newStop.getStopID(), newStop.getOperatorName(), osmStop.getStopName(), osmStop.getLat(), osmStop.getLon());
                 Stop agencyStop = agencyStops.get(newStop.getStopID());
@@ -436,7 +437,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                         isDiff = true;
                     }
                 }
-                if(category.equals(OsmPrimitive.RC.MODIFY) || isDiff)
+                if (category.equals(OsmPrimitive.RC.MODIFY) || isDiff)
                     osmDefaultOnlyChangedFinalStops.put(stopWithSelectedTags.getStopID(), stopWithSelectedTags);
             }
         }
@@ -828,16 +829,14 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         mainMap.addMouseListener(new MouseListener() {
             private Stop findStop(Point mousePt){
                 JXMapViewer mainMap = mapJXMapKit.getMainMap();
-                Iterator it = allStopsGeo.iterator();
-                while(it.hasNext()){
-                    GeoPosition st_gp = (GeoPosition)it.next();
+                for (GeoPosition st_gp : allStopsGeo) {
                     //convert to pixel
                     Point2D st_gp_pt2D = mainMap.getTileFactory().geoToPixel(st_gp, mainMap.getZoom());
                     //convert to screen
                     Rectangle rect = mainMap.getViewportBounds();
-                    Point st_gp_pt_screen = new Point((int)st_gp_pt2D.getX()-rect.x, (int)st_gp_pt2D.getY()-rect.y);
+                    Point st_gp_pt_screen = new Point((int) st_gp_pt2D.getX() - rect.x, (int) st_gp_pt2D.getY() - rect.y);
                     //check if near the mouse
-                    if(st_gp_pt_screen.distance(mousePt)<10)
+                    if (st_gp_pt_screen.distance(mousePt) < 10)
                         return newStopsByGeoPos.get(st_gp);
                 }
                 return null;
@@ -896,18 +895,17 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     //                g.translate(-rect.x, -rect.y);
 
                     JXMapViewer mainMap = mapJXMapKit.getMainMap();
-                    Iterator it = matchStop.iterator();
-                    while(it.hasNext()){
+                    for (Stop stop : matchStop) {
                         g.setColor(matchColor);
-                        Stop st = (Stop)it.next();
+                        Stop st = stop;
                         GeoPosition st_gp = new GeoPosition(Double.parseDouble(st.getLat()), Double.parseDouble(st.getLon()));
                         //convert to pixel
                         Point2D st_gp_pt2D = mainMap.getTileFactory().geoToPixel(st_gp, mainMap.getZoom());
                         //convert to screen AND left 5, up 5 to have a nice square
-                        Point st_gp_pt_screen = new Point((int)st_gp_pt2D.getX()-rect.x-9, (int)st_gp_pt2D.getY()-rect.y-9);
+                        Point st_gp_pt_screen = new Point((int) st_gp_pt2D.getX() - rect.x - 9, (int) st_gp_pt2D.getY() - rect.y - 9);
 
                         //draw mask
-                        Rectangle yellow_mask = new Rectangle(st_gp_pt_screen, new Dimension(25,25));
+                        Rectangle yellow_mask = new Rectangle(st_gp_pt_screen, new Dimension(25, 25));
                         g.fill(yellow_mask);
                         g.setColor(Color.BLACK);
                         g.draw(yellow_mask);
@@ -1413,7 +1411,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         tableStopButton.setText("setTextByCode");
         tableStopButton.setName("tableStopButton"); // NOI18N
         tableStopButton.addActionListener(tableStopButtonActionListener);
-        tableStopButton.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, Event.CTRL_MASK), "doSomething");
+        tableStopButton.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, ActionEvent.CTRL_MASK), "doSomething");
         tableStopButton.getActionMap().put("doSomething", tableStopButtonActionListener);
 
         jStopsScrollPane1 = new javax.swing.JScrollPane();
@@ -1587,7 +1585,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         });
 
         //TODO add addosmcocombobox refocus shortcuts?
-        gtfsStopsComboBox.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Event.CTRL_MASK), "gtfs_prev");
+        gtfsStopsComboBox.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.CTRL_MASK), "gtfs_prev");
         gtfsStopsComboBox.getActionMap().put("gtfs_prev", new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
                 int currentindex = gtfsStopsComboBox.getSelectedIndex();
@@ -1596,7 +1594,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
             }
         });
-        gtfsStopsComboBox.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Event.CTRL_MASK), "gtfs_next");
+        gtfsStopsComboBox.getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK), "gtfs_next");
         gtfsStopsComboBox.getActionMap().put("gtfs_next", new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
                 int currentindex = gtfsStopsComboBox.getSelectedIndex();
