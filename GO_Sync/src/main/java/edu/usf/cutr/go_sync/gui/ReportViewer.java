@@ -315,15 +315,15 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         for (int i=0; i<reportKeys.size(); i++) {
             gtfsAllList.add(reportKeys.get(i));
             gtfsAll[i] = reportKeys.get(i);
-            OsmPrimitive.RC category = gtfsAll[i].getReportCategory();
-            if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)) {
-                uci++;
-            } else if (category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
-                unci++;
-            } else if (category.equals(OsmPrimitive.RC.MODIFY)) {
-                mi++;
-            } else if (category.equals(OsmPrimitive.RC.NOTHING_NEW)) {
-                nui++;
+            switch(gtfsAll[i].getReportCategory()){
+                case UPLOAD_CONFLICT:
+                uci++; break;
+                case UPLOAD_NO_CONFLICT:
+                unci++; break;
+                case MODIFY:
+                mi++; break;
+                case NOTHING_NEW:
+                nui++; break;
             }
         }
 
@@ -340,21 +340,22 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         gtfsNoUpload = new Stop[nui];
         uci=0; unci=0; mi=0; nui=0;
         for (Stop reportKey : reportKeys) {
-            OsmPrimitive.RC category = reportKey.getReportCategory();
-            if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)) {
+            switch(reportKey.getReportCategory())
+            {
+            case UPLOAD_CONFLICT:
                 gtfsUploadConflict[uci] = reportKey;
                 uci++;
-                stopsToFinish.add(reportKey.toString());
-            } else if (category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
+                stopsToFinish.add(reportKey.toString()); break;
+            case UPLOAD_NO_CONFLICT:
                 gtfsUploadNoConflict[unci] = reportKey;
-                unci++;
-            } else if (category.equals(OsmPrimitive.RC.MODIFY)) {
+                unci++; break;
+            case MODIFY:
                 gtfsModify[mi] = reportKey;
                 mi++;
-                stopsToFinish.add(reportKey.toString());
-            } else if (category.equals(OsmPrimitive.RC.NOTHING_NEW)) {
+                stopsToFinish.add(reportKey.toString()); break;
+            case NOTHING_NEW:
                 gtfsNoUpload[nui] = reportKey;
-                nui++;
+                nui++; break;
             }
 
             totalNumberOfStopsToFinish = stopsToFinish.size();
@@ -1221,18 +1222,23 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
     public void updateDataWhenStopSelected(Stop selected){
         OsmPrimitive.RC category = selected.getReportCategory();
-        if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)) {
+        switch(category){
+            case UPLOAD_CONFLICT:
             newWithMatchStopsRadioButton.setSelected(true);
             updateStopCategory(gtfsUploadConflict, 0);
-        } else if (category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
+            break;
+            case UPLOAD_NO_CONFLICT:
             newNoMatchStopsRadioButton.setSelected(true);
             updateStopCategory(gtfsUploadNoConflict, 0);
-        } else if (category.equals(OsmPrimitive.RC.MODIFY)) {
+            break;
+            case MODIFY:
             updateStopsRadioButton.setSelected(true);
             updateStopCategory(gtfsModify, 0);
-        } else if (category.equals(OsmPrimitive.RC.NOTHING_NEW)) {
+            break;
+            case NOTHING_NEW:
             existingStopRadioButton.setSelected(true);
             updateStopCategory(gtfsNoUpload, 0);
+            break;
         }
         updateBusStop(selected);
         gtfsStopsComboBox.setSelectedItem(selected);
