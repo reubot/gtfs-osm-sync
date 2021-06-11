@@ -63,6 +63,9 @@ import java.awt.Insets;
 import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
@@ -311,7 +314,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         gtfsAll = new Stop[reportKeys.size()];
         ArrayList<Stop> gtfsAllList = new ArrayList<Stop>(reportKeys.size());
         int uci=0, unci=0, mi=0, nui=0;
-
+/*
         for (int i=0; i<reportKeys.size(); i++) {
             gtfsAllList.add(reportKeys.get(i));
             gtfsAll[i] = reportKeys.get(i);
@@ -328,9 +331,17 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         }
 
         System.out.println("Categories " + " UPLOAD_CONFLICT:" + uci + " UPLOAD_NO_CONFLICT:" + unci + " MODIFY:" + mi + " NOTHING_NEW:" + nui);
+        System.out.println("Categories " + " uci:" + uci + " unci:" + unci + " mi:" + mi + " nui:" + nui);
         long tDelta = System.currentTimeMillis() - tStart;
 //        this.setMessage("Completed in "+ tDelta /1000.0 + "seconds");
         System.out.println("ReportViewer lists generated in "+ tDelta /1000.0 + "seconds");
+        tDelta = System.currentTimeMillis() - tStart;
+        System.out.println("Categories " +
+                " UPLOAD_CONFLICT:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_CONFLICT).collect(Collectors.toList()).size() +
+                " UPLOAD_NO_CONFLICT:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).size() +
+                " MODIFY:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.MODIFY).collect(Collectors.toList()).size() + "" +
+                " NOTHING_NEW:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.NOTHING_NEW).collect(Collectors.toList()).size());
+        System.out.println("ReportViewer gtfs lists generated in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
 
 
         // add data to correct list (categorizing)
@@ -364,6 +375,20 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
             searchKeyToStop.put(stopSearchData, reportKey);
         }
+        */
+        final Stop[] emptystoplist = new Stop[0];
+        gtfsUploadConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
+        gtfsUploadNoConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
+        gtfsModify = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.MODIFY).collect(Collectors.toList()).toArray(emptystoplist);
+        gtfsNoUpload = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.NOTHING_NEW).collect(Collectors.toList()).toArray(emptystoplist);
+        gtfsAll = reportKeys.toArray(emptystoplist);
+        for (Stop reportKey : reportKeys) {
+            String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
+            searchKeyToStop.put(stopSearchData, reportKey);
+        }
+
+        stopsToFinish = reportKeys.stream().filter(p->p.getReportCategory()!= OsmPrimitive.RC.NOTHING_NEW).map(p->(p.toString())).collect(Collectors.toCollection(HashSet::new));
+        totalNumberOfStopsToFinish = stopsToFinish.size();
         System.out.println("ReportViewer gtfs lists generated in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
 
         // set the list to All initially
