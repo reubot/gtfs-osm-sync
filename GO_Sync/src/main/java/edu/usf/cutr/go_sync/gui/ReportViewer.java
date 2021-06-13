@@ -318,71 +318,6 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         }});
         benchmarking("reportKeys sort");
 
-        //get the total elements in each list first
-        gtfsAll = new Stop[reportKeys.size()];
-        ArrayList<Stop> gtfsAllList = new ArrayList<Stop>(reportKeys.size());
-        int uci=0, unci=0, mi=0, nui=0;
-        {
-
-        for (int i=0; i<reportKeys.size(); i++) {
-            gtfsAllList.add(reportKeys.get(i));
-            gtfsAll[i] = reportKeys.get(i);
-            switch(gtfsAll[i].getReportCategory()){
-                case UPLOAD_CONFLICT:
-                uci++; break;
-                case UPLOAD_NO_CONFLICT:
-                unci++; break;
-                case MODIFY:
-                mi++; break;
-                case NOTHING_NEW:
-                nui++; break;
-            }
-        }
-
-        System.out.println("Categories " + " UPLOAD_CONFLICT:" + uci + " UPLOAD_NO_CONFLICT:" + unci + " MODIFY:" + mi + " NOTHING_NEW:" + nui);
-        System.out.println("Categories " + " uci:" + uci + " unci:" + unci + " mi:" + mi + " nui:" + nui);
-        long tDelta = System.currentTimeMillis() - tStart;
-//        this.setMessage("Completed in "+ tDelta /1000.0 + "seconds");
-        System.out.println("ReportViewer lists generated in "+ tDelta /1000.0 + "seconds");
-        tDelta = System.currentTimeMillis() - tStart;
-        benchmarking("ReportViewer gtfs stop lists");
-
-
-        // add data to correct list (categorizing)
-        gtfsUploadConflict = new Stop[uci];
-        gtfsUploadNoConflict = new Stop[unci];
-        gtfsModify = new Stop[mi];
-        gtfsNoUpload = new Stop[nui];
-        uci=0; unci=0; mi=0; nui=0;
-        for (Stop reportKey : reportKeys) {
-            switch(reportKey.getReportCategory())
-            {
-            case UPLOAD_CONFLICT:
-                gtfsUploadConflict[uci] = reportKey;
-                uci++;
-                stopsToFinish.add(reportKey.toString()); break;
-            case UPLOAD_NO_CONFLICT:
-                gtfsUploadNoConflict[unci] = reportKey;
-                unci++; break;
-            case MODIFY:
-                gtfsModify[mi] = reportKey;
-                mi++;
-                stopsToFinish.add(reportKey.toString()); break;
-            case NOTHING_NEW:
-                gtfsNoUpload[nui] = reportKey;
-                nui++; break;
-            }
-
-            totalNumberOfStopsToFinish = stopsToFinish.size();
-
-            // for search functionality
-            String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
-            searchKeyToStop.put(stopSearchData, reportKey);
-
-        }
-            benchmarking("ReportViewer gtfs loop lists");
-
-        }
         final Stop[] emptystoplist = new Stop[0];
         gtfsUploadConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
         gtfsUploadNoConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
@@ -517,54 +452,6 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             routeKeys.set(i, routeKeys.get(k));
             routeKeys.set(k, temp);
         }*/
-
-        {
-        //get the total elements in each list first
-        gtfsRouteAll = new Route[routeKeys.size()];
-
-        unci=0; mi=0; nui=0;
-        for (int i=0; i<routeKeys.size(); i++) {
-            gtfsRouteAll[i] = finalRoutes.get(routeKeys.get(i));
-            OsmPrimitive.status status = gtfsRouteAll[i].getStatus();
-            if (status.equals(OsmPrimitive.status.NEW)) {
-                unci++;
-            } else if (status.equals(OsmPrimitive.status.MODIFY)) {
-                mi++;
-            } else if (status.equals(OsmPrimitive.status.EMPTY)) {
-                nui++;
-            }
-        }
-            System.out.println("Categories " + " NEW:"  + unci + " MODIFY:" + mi + " EMPTY:" + nui);
-            System.out.println("Categories " + " unci:" + unci +     " mi:" + mi + "   nui:" + nui);
-
-        // add data to correct list (categorizing)
-        gtfsRouteUploadNoConflict = new Route[unci];
-        gtfsRouteModify = new Route[mi];
-        gtfsRouteNoUpload = new Route[nui];
-        unci=0; mi=0; nui=0;
-        for (String routeKey : routeKeys) {
-            Route tempr = finalRoutes.get(routeKey);
-            OsmPrimitive.status status = tempr.getStatus();
-            if (status.equals(OsmPrimitive.status.NEW)) {
-                gtfsRouteUploadNoConflict[unci] = tempr;
-                unci++;
-            } else if (status.equals(OsmPrimitive.status.MODIFY)) {
-                gtfsRouteModify[mi] = tempr;
-                mi++;
-            } else if (status.equals(OsmPrimitive.status.EMPTY)) {
-                gtfsRouteNoUpload[nui] = tempr;
-                nui++;
-            }
-        }
-
-        // set the list to All initially
-        gtfsRoutes = gtfsRouteAll;
-        benchmarking("Route Lists");
-
-
-        }
-
-
 
         Collection<Route> frv = finalRoutes.values();
         final Route[] emptyroutelist = new Route[0];
