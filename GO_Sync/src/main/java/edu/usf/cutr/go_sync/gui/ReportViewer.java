@@ -314,6 +314,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         gtfsAll = new Stop[reportKeys.size()];
         ArrayList<Stop> gtfsAllList = new ArrayList<Stop>(reportKeys.size());
         int uci=0, unci=0, mi=0, nui=0;
+        {
 /*
         for (int i=0; i<reportKeys.size(); i++) {
             gtfsAllList.add(reportKeys.get(i));
@@ -375,7 +376,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
             searchKeyToStop.put(stopSearchData, reportKey);
         }
-        */
+        */}
         final Stop[] emptystoplist = new Stop[0];
         gtfsUploadConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
         gtfsUploadNoConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
@@ -386,6 +387,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
             searchKeyToStop.put(stopSearchData, reportKey);
         }
+        System.out.println("Categories " + " UPLOAD_CONFLICT:" + gtfsUploadConflict.length + " UPLOAD_NO_CONFLICT:" + gtfsUploadNoConflict.length + " MODIFY:" + gtfsModify.length + " NOTHING_NEW:" + gtfsNoUpload.length);
+
 
         stopsToFinish = reportKeys.stream().filter(p->p.getReportCategory()!= OsmPrimitive.RC.NOTHING_NEW).map(p->(p.toString())).collect(Collectors.toCollection(HashSet::new));
         totalNumberOfStopsToFinish = stopsToFinish.size();
@@ -502,6 +505,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             routeKeys.set(k, temp);
         }*/
 
+        {
         //get the total elements in each list first
         gtfsRouteAll = new Route[routeKeys.size()];
 
@@ -517,6 +521,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 nui++;
             }
         }
+            System.out.println("Categories " + " NEW:"  + unci + " MODIFY:" + mi + " EMPTY:" + nui);
+            System.out.println("Categories " + " unci:" + unci +     " mi:" + mi + "   nui:" + nui);
+
         // add data to correct list (categorizing)
         gtfsRouteUploadNoConflict = new Route[unci];
         gtfsRouteModify = new Route[mi];
@@ -539,6 +546,23 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         // set the list to All initially
         gtfsRoutes = gtfsRouteAll;
+
+
+        }
+
+
+
+        Collection<Route> frv = finalRoutes.values();
+        final Route[] emptyroutelist = new Route[0];
+        gtfsRouteAll= frv.toArray(emptyroutelist);
+        gtfsRouteUploadNoConflict = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.NEW).collect(Collectors.toList()).toArray(emptyroutelist);
+//        gtfsUploadNoConflict = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).toArray(emptyroutelist);
+        gtfsRouteModify = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.MODIFY).collect(Collectors.toList()).toArray(emptyroutelist);
+        gtfsRouteNoUpload = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.EMPTY).collect(Collectors.toList()).toArray(emptyroutelist);
+
+        gtfsRoutes = gtfsRouteAll;
+        System.out.println("Categories " + " NEW:"  + gtfsRouteUploadNoConflict.length + " MODIFY:" + gtfsRouteModify.length + " EMPTY:" + gtfsRouteNoUpload.length);
+
 
         System.out.println("add data to correct lists generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
 
