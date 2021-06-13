@@ -286,9 +286,7 @@ public class CompareData extends OsmTask{
      * since our algorithm add node into noUpload set everytime a gtfs node matches an OSM node
      * */
     public void reviseNoUpload(){
-        Iterator<Stop> it = modify.iterator();
-        while (it.hasNext()) {
-            Stop s = (Stop)it.next();
+        for (Stop s : modify) {
             if (noUpload.contains(s)) {
                 noUpload.remove(s);
             }
@@ -300,15 +298,13 @@ public class CompareData extends OsmTask{
     public Hashtable<String,String> compareOsmTags(HashMap<String,String> osmtag, OsmPrimitive p) {
         Hashtable<String,String> diff = new Hashtable<String,String>();
         Hashtable<String,String> t = new Hashtable<String,String>();
-        Iterator<String> it = p.keySet().iterator();
-        while (it.hasNext()){
-            String k = (String)it.next();
+        for (String k : p.keySet()) {
             String v = p.getTag(k);
             if (osmtag.containsKey(k)) {
-                String osmValue = (String)osmtag.get(k);
-                if(!osmValue.toUpperCase().equals(v.toUpperCase())){
-                    if (osmValue.indexOf(v)==-1) {
-                        diff.put(k, v+";"+osmValue);
+                String osmValue = (String) osmtag.get(k);
+                if (!osmValue.toUpperCase().equals(v.toUpperCase())) {
+                    if (!osmValue.contains(v)) {
+                        diff.put(k, v + ";" + osmValue);
                     } else {
                         t.put(k, osmValue);
                     }
@@ -511,19 +507,13 @@ public class CompareData extends OsmTask{
         Hashtable<String, Route> routesByShortName = new Hashtable<String, Route>();
 
 
-        Iterator<Route> it = routes.values().iterator();
-        while (it.hasNext())
-//        	        for (Route ri:routes.values())
-        {
-            Route ri = it.next();
-            try{
-
-
+        //        	        for (Route ri:routes.values())
+        for (Route ri : routes.values()) {
+            try {
                 ri.getRouteRef();
 //        		if (ri.getTag(ri.getTag("gtfs_route_short_name"))!= null)
-                routesByShortName.put(ri.getRouteRef(),ri);}
-            catch (Exception e)
-            {
+                routesByShortName.put(ri.getRouteRef(), ri);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 //        	        	routesByShortName.put(ri.getTag("route_short_name"),ri);
@@ -924,11 +914,11 @@ public class CompareData extends OsmTask{
             reportIDs.add(rk.getStopID());
         }
         // find GTFS stops not in report and mark as new
-        for (int i=0; i<GTFSstops.size(); i++) {
-            if(this.flagIsDone) return;
+        for (Stop gtfSstop : GTFSstops) {
+            if (this.flagIsDone) return;
 //            if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportKeys.contains(GTFSstops.get(i))) ) {
-            if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportIDs.contains(GTFSstops.get(i).getStopID())) ) {
-                Stop n = new Stop(GTFSstops.get(i));
+            if ((!noUpload.contains(gtfSstop)) && (!reportIDs.contains(gtfSstop.getStopID()))) {
+                Stop n = new Stop(gtfSstop);
                 n.setType(OSMNodesType.get(tag_defs.primative_type.NODE));
                 n.setReportText("New upload with no conflicts");
                 n.setReportCategory(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
@@ -943,27 +933,28 @@ public class CompareData extends OsmTask{
 
     public void setStopWithOsmDataDefault(){
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
-        for(int i=0; i<reportKeys.size(); i++){
-            if(this.flagIsDone) return;
-            Stop s = new Stop(reportKeys.get(i));
+        for (Stop reportKey : reportKeys) {
+            if (this.flagIsDone) return;
+            Stop s = new Stop(reportKey);
             OsmPrimitive.RC category = s.getReportCategory();
-            if(category.equals(OsmPrimitive.RC.MODIFY)){
+            if (category.equals(OsmPrimitive.RC.MODIFY)) {
                 TreeSet<Stop> arr = report.get(s);
-                if(arr.size()==1) {
-                    String tempStopId=null;
+                if (arr.size() == 1) {
+                    String tempStopId = null;
                     report.remove(s);
                     // empty all the value of the tags
                     Hashtable<String, String> newTags = s.getTags();
                     ArrayList<String> newTagKeys = new ArrayList<String>(newTags.keySet());
                     for (String newTagKey : newTagKeys) {
-                        if (newTagKey.equals(tag_defs.GTFS_STOP_ID_KEY)) tempStopId = newTags.get(tag_defs.GTFS_STOP_ID_KEY);
+                        if (newTagKey.equals(tag_defs.GTFS_STOP_ID_KEY))
+                            tempStopId = newTags.get(tag_defs.GTFS_STOP_ID_KEY);
 
                         newTags.put(newTagKey, "");
                     }
                     s.addAndOverwriteTags(newTags);
                     // add Osm tags, the rest remains empty
                     s.addAndOverwriteTags(arr.first().getTags());
-                    if(tempStopId!=null) s.addAndOverwriteTag(tag_defs.GTFS_STOP_ID_KEY, tempStopId);
+                    if (tempStopId != null) s.addAndOverwriteTag(tag_defs.GTFS_STOP_ID_KEY, tempStopId);
                     report.put(s, arr);
                 }
             }
@@ -1036,9 +1027,9 @@ public class CompareData extends OsmTask{
             else {
                 System.out.println("There's no bus stop in the region "+minLon+", "+minLat+", "+maxLon+", "+maxLat);
                 // add all gtfs stops to report as new stops
-                for (int i=0; i<GTFSstops.size(); i++) {
-                    if(this.flagIsDone) return;
-                    Stop n = new Stop(GTFSstops.get(i));
+                for (Stop gtfSstop : GTFSstops) {
+                    if (this.flagIsDone) return;
+                    Stop n = new Stop(gtfSstop);
                     n.setReportText("New upload with no conflicts");
                     n.setReportCategory(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                     upload.add(n);
@@ -1074,10 +1065,8 @@ public class CompareData extends OsmTask{
             }
             if(st!=null && !this.flagIsDone) {
                 GTFSstops.addAll(st);
-                Iterator<Stop> it = GTFSstops.iterator();
 
-                while (it.hasNext())
-                    GTFSstopsIDs.add(it.next().getStopID());
+                for (Stop gtfSstop : GTFSstops) GTFSstopsIDs.add(gtfSstop.getStopID());
                 try {
                     startCompare();
                 } catch(InterruptedException e){
