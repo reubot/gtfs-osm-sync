@@ -294,19 +294,6 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // TODO: use comparator / java.util.Collections.sort()
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
         //ordering by hashcode
-        /*
-        for (int i=0; i<reportKeys.size()-1; i++) {
-            int k=i;
-            for (int j=i+1; j<reportKeys.size(); j++) {
-                if (reportKeys.get(k).getStopID().hashCode() > reportKeys.get(j).getStopID().hashCode()) {
-                    k = j;
-                }
-            }
-            Stop temp = new Stop(reportKeys.get(i));
-            reportKeys.set(i, reportKeys.get(k));
-            reportKeys.set(k, temp);
-        }
-        */
         reportKeys.sort(new Comparator<Stop>()
         {
             @Override
@@ -961,12 +948,12 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     private void updateRouteTable(Route selectedNewRoute){
 
         // get all the possible tag names from gtfs data and osm data
-        Set<String> tagKeys = new TreeSet<String>();
+        Set<String> tagKeys;
         Hashtable<String, String> aTags = new Hashtable<String, String>();
         Hashtable<String, String> eTags= new Hashtable<String, String>();
         Route aRoute = null, eRoute=null;
         if(selectedNewRoute!=null) {
-            tagKeys.addAll(selectedNewRoute.keySet());
+            tagKeys = new TreeSet<String>(selectedNewRoute.keySet());
             aRoute = agencyRoutes.get(selectedNewRoute.getRouteId());
             eRoute = existingRoutes.get(selectedNewRoute.getRouteId());
 
@@ -2438,28 +2425,6 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     }// </editor-fold>//GEN-END:initComponents
 
     private Stop[] removeOneStopFromArray(Stop[] arrayStops, Stop s){
-
-    	/*
-
-		Stop[] gtfsTemp = new Stop[arrayStops.length-1];
-
-        int i = 0;
-        while(!arrayStops[i].equals(s)){
-            gtfsTemp[i] = arrayStops[i];
-            i++;
-        }
-        while(i<gtfsTemp.length) {
-            gtfsTemp[i] = arrayStops[i+1];
-            i++;
-        }
-        // set the temporary array to its original reference
-      //  arrayStops = new Stop[gtfsTemp.length];
-        arrayStops = Arrays.copyOf(gtfsTemp, gtfsTemp.length);
-        for(i=0; i<gtfsTemp.length; i++) arrayStops[i] = gtfsTemp[i];
-        return arrayStops;
-        */
-
-
         LinkedList<Stop> stopList = new LinkedList<Stop>(Arrays.asList(arrayStops));
         System.out.print(stopList.size());
     	stopList.remove(s);
