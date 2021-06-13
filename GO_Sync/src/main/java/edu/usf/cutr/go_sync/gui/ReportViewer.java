@@ -189,7 +189,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jMemberScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JLabel lastEditedLabel;
+    private javax.swing.JLabel lastEditedLabel,osmDetailsLabel;
     private org.jdesktop.swingx.JXMapKit mapJXMapKit;
     private javax.swing.JTable memberTable;
     private javax.swing.ButtonGroup membersButtonGroup;
@@ -628,14 +628,17 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // set last edited information
         String lastEditedUser = "N/A";
         String lastEditedDate = "N/A";
+        String osmType = "";
         if(selectedOsmStop!=null) {
             if(selectedOsmStop.getLastEditedOsmUser()!=null && !selectedOsmStop.getLastEditedOsmUser().isEmpty())
                 lastEditedUser = selectedOsmStop.getLastEditedOsmUser();
             if(selectedOsmStop.getLastEditedOsmDate()!=null && !selectedOsmStop.getLastEditedOsmDate().isEmpty())
                 lastEditedDate = selectedOsmStop.getLastEditedOsmDate();
-        }
+            osmType = selectedOsmStop.getType().toString() + " " + selectedOsmStop.getOsmId();
 
-        if(!lastEditedUser.equals("N/A")) lastEditedLabel.setText("Last edited by "+lastEditedUser+" on "+lastEditedDate);
+        }
+        osmDetailsLabel.setText(osmType);
+        if(!lastEditedUser.equals("N/A")) lastEditedLabel.setText(" Last edited by "+lastEditedUser+" on "+lastEditedDate);
         else lastEditedLabel.setText("Last edited: Information cannot be retrieved from OSM");
     }
 
@@ -1736,6 +1739,20 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         gbc_lastEditedLabel.gridx = 6;
         gbc_lastEditedLabel.gridy = 4;
         busStopPanel.add(lastEditedLabel, gbc_lastEditedLabel);
+
+        osmDetailsLabel = new javax.swing.JLabel();
+        osmDetailsLabel.setFont(new java.awt.Font("Times New Roman", 0, 14));
+        osmDetailsLabel.setText("N/A");
+        osmDetailsLabel.setName("osmDetailsLabel"); // NOI18N
+        GridBagConstraints gbc_osmDetailsLabel = new GridBagConstraints();
+        gbc_osmDetailsLabel.anchor = GridBagConstraints.WEST;
+        gbc_osmDetailsLabel.fill = GridBagConstraints.HORIZONTAL;
+        gbc_osmDetailsLabel.insets = new Insets(0, 0, 5, 0);
+        gbc_osmDetailsLabel.gridwidth = 2;
+        gbc_searchTextField.gridx = 10;
+        gbc_searchTextField.gridy = 2;
+        busStopPanel.add(osmDetailsLabel, gbc_osmDetailsLabel);
+
         GridBagConstraints gbc_donotUploadButton = new GridBagConstraints();
         gbc_donotUploadButton.anchor = GridBagConstraints.NORTH;
         gbc_donotUploadButton.fill = GridBagConstraints.HORIZONTAL;
@@ -2527,7 +2544,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
 /*
         finalStops.entrySet().removeAll(gtfsListnew);
-        osmDefaultFinalStops.entrySet().removeAll(gtfsListnew);
+        osmDefaultFinalStops.entrySetperemoveAll(gtfsListnew);
         osmDefaultOnlyChangedFinalStops.entrySet().removeAll(gtfsListnew);
         finalCheckboxes.entrySet().removeAll(gtfsListnew);
 */    //    finalStops.remove(sid);
