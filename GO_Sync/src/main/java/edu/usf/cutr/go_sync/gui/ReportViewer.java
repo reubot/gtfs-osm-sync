@@ -438,28 +438,22 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         //ordering by hashcode
 
         //convert to arrayList for ordering
-        ArrayList<String> routeKeys = new ArrayList<String>(agencyRoutes.keySet());
-        java.util.Collections.sort(routeKeys);
- /*       //ordering by hashcode
-        for (int i=0; i<routeKeys.size()-1; i++) {
-            int k=i;
-            for (int j=i+1; j<routeKeys.size(); j++) {
-                if (routeKeys.get(k).hashCode() > routeKeys.get(j).hashCode()) {
-                    k = j;
-                }
-            }
-            String temp = routeKeys.get(i);
-            routeKeys.set(i, routeKeys.get(k));
-            routeKeys.set(k, temp);
-        }*/
+//        ArrayList<Route> routeKeys = new ArrayList<String>(agencyRoutes.entrySet();
+        ArrayList<Route> routeKeys = new ArrayList<>(finalRoutes.values());
+        routeKeys.sort(new Comparator<Route>()
+        {
+            @Override
+            public int compare(Route k, Route j) {
+                return k.getRouteId().compareTo(j.getRouteId());
+//                return Integer.compare(k.getRouteId().hashCode()m(j.getRouteId().hashCode());
+            }});
 
-        Collection<Route> frv = finalRoutes.values();
         final Route[] emptyroutelist = new Route[0];
-        gtfsRouteAll= frv.toArray(emptyroutelist);
-        gtfsRouteUploadNoConflict = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.NEW).collect(Collectors.toList()).toArray(emptyroutelist);
-//        gtfsUploadNoConflict = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).toArray(emptyroutelist);
-        gtfsRouteModify = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.MODIFY).collect(Collectors.toList()).toArray(emptyroutelist);
-        gtfsRouteNoUpload = frv.stream().filter(p->p.getStatus()== OsmPrimitive.status.EMPTY).collect(Collectors.toList()).toArray(emptyroutelist);
+        gtfsRouteAll= routeKeys.toArray(emptyroutelist);
+        gtfsRouteUploadNoConflict = routeKeys.stream().filter(p->p.getStatus()== OsmPrimitive.status.NEW).collect(Collectors.toList()).toArray(emptyroutelist);
+//        gtfsUploadNoConflict = routeKeys.stream().filter(p->p.getStatus()== OsmPrimitive.status.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).toArray(emptyroutelist);
+        gtfsRouteModify = routeKeys.stream().filter(p->p.getStatus()== OsmPrimitive.status.MODIFY).collect(Collectors.toList()).toArray(emptyroutelist);
+        gtfsRouteNoUpload = routeKeys.stream().filter(p->p.getStatus()== OsmPrimitive.status.EMPTY).collect(Collectors.toList()).toArray(emptyroutelist);
 
         gtfsRoutes = gtfsRouteAll;
         System.out.println("Categories " + " NEW:"  + gtfsRouteUploadNoConflict.length + " MODIFY:" + gtfsRouteModify.length + " EMPTY:" + gtfsRouteNoUpload.length);
