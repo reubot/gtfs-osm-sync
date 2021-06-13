@@ -217,11 +217,20 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     private JButton dontuploadAllBtn;
     private JButton dontupremainButton;
     private JButton nextButton;
-    /** Creates new form ReportViewer */
+
+    private final long tStart = System.currentTimeMillis();
+    private long tDelta = System.currentTimeMillis();
+
+    protected void benchmarking(String desc){
+        long tCurrent = System.currentTimeMillis();
+//        tDelta = tCurrent - tDelta;
+//        System.out.println(desc + " generated in "+ tDelta /1000.0 + "seconds");
+        System.out.println(desc + " generated in "+ (tCurrent-tStart) /1000.0 + "seconds");
+
+    }
 
 
-
-    /**
+    /** Creates new form ReportViewer
      * @param aData GTFSstops
      * @param r report
      * @param u upload
@@ -237,7 +246,6 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, HashSet<Stop>u, HashSet<Stop>m, HashSet<Stop>d, Hashtable routes, Hashtable nRoutes, Hashtable eRoutes, JTextArea to) {
         super("GO-Sync: Report");
         super.setResizable(true); //false);
-        long tStart = System.currentTimeMillis();
 
         try {
         	busIcon = new javax.swing.ImageIcon(this.getClass().getClassLoader().getResource("bus_icon.png"));
@@ -308,14 +316,14 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 return -1;
 //             (k.getStopID().hashCode() - (j).getStopID().hashCode());
         }});
-        System.out.println("reportKeys sort in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
+        benchmarking("reportKeys sort");
 
         //get the total elements in each list first
         gtfsAll = new Stop[reportKeys.size()];
         ArrayList<Stop> gtfsAllList = new ArrayList<Stop>(reportKeys.size());
         int uci=0, unci=0, mi=0, nui=0;
         {
-/*
+
         for (int i=0; i<reportKeys.size(); i++) {
             gtfsAllList.add(reportKeys.get(i));
             gtfsAll[i] = reportKeys.get(i);
@@ -337,12 +345,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //        this.setMessage("Completed in "+ tDelta /1000.0 + "seconds");
         System.out.println("ReportViewer lists generated in "+ tDelta /1000.0 + "seconds");
         tDelta = System.currentTimeMillis() - tStart;
-        System.out.println("Categories " +
-                " UPLOAD_CONFLICT:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_CONFLICT).collect(Collectors.toList()).size() +
-                " UPLOAD_NO_CONFLICT:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).size() +
-                " MODIFY:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.MODIFY).collect(Collectors.toList()).size() + "" +
-                " NOTHING_NEW:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.NOTHING_NEW).collect(Collectors.toList()).size());
-        System.out.println("ReportViewer gtfs lists generated in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
+        benchmarking("ReportViewer gtfs stop lists");
 
 
         // add data to correct list (categorizing)
@@ -375,14 +378,24 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             // for search functionality
             String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
             searchKeyToStop.put(stopSearchData, reportKey);
+
         }
-        */}
+            benchmarking("ReportViewer gtfs loop lists");
+
+        }
         final Stop[] emptystoplist = new Stop[0];
         gtfsUploadConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
         gtfsUploadNoConflict = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).toArray(emptystoplist);
         gtfsModify = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.MODIFY).collect(Collectors.toList()).toArray(emptystoplist);
         gtfsNoUpload = reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.NOTHING_NEW).collect(Collectors.toList()).toArray(emptystoplist);
         gtfsAll = reportKeys.toArray(emptystoplist);
+/*
+        System.out.println("Categories " +
+                " UPLOAD_CONFLICT:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_CONFLICT).collect(Collectors.toList()).size() +
+                " UPLOAD_NO_CONFLICT:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.UPLOAD_NO_CONFLICT).collect(Collectors.toList()).size() +
+                " MODIFY:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.MODIFY).collect(Collectors.toList()).size() + "" +
+                " NOTHING_NEW:" + reportKeys.stream().filter(p->p.getReportCategory()== OsmPrimitive.RC.NOTHING_NEW).collect(Collectors.toList()).size());
+*/
         for (Stop reportKey : reportKeys) {
             String stopSearchData = reportKey.getStopName() + ';' + reportKey.getStopID();
             searchKeyToStop.put(stopSearchData, reportKey);
@@ -392,7 +405,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         stopsToFinish = reportKeys.stream().filter(p->p.getReportCategory()!= OsmPrimitive.RC.NOTHING_NEW).map(p->(p.toString())).collect(Collectors.toCollection(HashSet::new));
         totalNumberOfStopsToFinish = stopsToFinish.size();
-        System.out.println("ReportViewer gtfs lists generated in "+ (System.currentTimeMillis() - tStart) /1000.0 + "seconds");
+        benchmarking("ReportViewer gtfs streams lists");
 
         // set the list to All initially
         gtfsStops = gtfsAll;
@@ -421,7 +434,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             finalStops.put(st.getStopID(), st);
             finalCheckboxes.put(st.getStopID(), arr);
         }
-        System.out.println("Final stops with Gtfs Value as Default generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
+        benchmarking("Final stops with Gtfs Value as Default");
 
         // set Final stops with Osm Value as Default
         for (Stop newStop : reportKeys) {
@@ -470,7 +483,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     osmDefaultOnlyChangedFinalStops.put(stopWithSelectedTags.getStopID(), stopWithSelectedTags);
             }
         }
-        System.out.println("Final stops with Osm Value as Default generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
+        benchmarking("Final stops with Osm Value as Default");
 
         // Routes
         routeTableModel = new TagReportTableModel(0);
@@ -546,6 +559,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         // set the list to All initially
         gtfsRoutes = gtfsRouteAll;
+        benchmarking("Route Lists");
 
 
         }
@@ -564,7 +578,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         System.out.println("Categories " + " NEW:"  + gtfsRouteUploadNoConflict.length + " MODIFY:" + gtfsRouteModify.length + " EMPTY:" + gtfsRouteNoUpload.length);
 
 
-        System.out.println("add data to correct lists generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
+        benchmarking("Route Lists");
 
 /*
         // set Final Routes
@@ -586,7 +600,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         }
 */
         initComponents();
-        System.out.println("initComponents generated in "+  (System.currentTimeMillis() - tStart)  /1000.0 + "seconds");
+        benchmarking("initComponents");
 
         // get main map
         mainMap = mapJXMapKit.getMainMap();
