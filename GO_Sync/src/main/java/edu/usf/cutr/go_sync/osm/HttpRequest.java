@@ -55,7 +55,7 @@ public class HttpRequest {
     private static final int SLEEP_TIME = 500;
     private static final String API_VERSION ="0.6";
     private static final String OSM_HOST = "https://openstreetmap.org/api/0.6/";
-    private static final String[] overpass_hosts = {"https://overpass.nchc.org.tw/api/interpreter","http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
+    private static final String[] overpass_hosts = {"https://overpass.openstreetmap.ru/api/interpreter","https://overpass.nchc.org.tw/api/interpreter","http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","https://overpass.kumi.systems/api/interpreter"};
 
 
 
