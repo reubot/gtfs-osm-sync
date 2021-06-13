@@ -22,6 +22,7 @@ import edu.usf.cutr.go_sync.object.RelationMember;
 import edu.usf.cutr.go_sync.object.Route;
 import edu.usf.cutr.go_sync.object.Session;
 import edu.usf.cutr.go_sync.object.Stop;
+import edu.usf.cutr.go_sync.tag_defs;
 import edu.usf.cutr.go_sync.tools.OsmFormatter;
 
 public class OsmPrinter {
@@ -88,6 +89,8 @@ public class OsmPrinter {
         String text="";
         Stop s = new Stop(st);
 
+        if (st.getType()== null)
+            st.setType(tag_defs.primative_type.NODE);
         switch (st.getType()) {
             case NODE:
                 text += "<node " + changesetText + " id='" + nodeID

@@ -39,7 +39,7 @@ public class AutoCompleteTextField extends JTextField {
     public boolean isStrict;
     private ArrayList<String> matches;
     private int matchIndex = 0;
-    
+
     class AutoDoc extends PlainDocument {
 
         @Override
@@ -50,7 +50,7 @@ public class AutoCompleteTextField extends JTextField {
 
         @Override
         public void insertString(int i, String s, AttributeSet attributeset) throws BadLocationException {
-            if (s == null || "".equals(s)) {
+            if (s == null || s.isEmpty()) {
                 return;
             }
             String s1 = getText(0, i);
@@ -76,7 +76,7 @@ public class AutoCompleteTextField extends JTextField {
             setSelectionStart(j + 1);
             setSelectionEnd(getLength());
         }
-        
+
         public void insertString(String s) throws BadLocationException {
             int i = Math.min(getCaret().getDot(), getCaret().getMark());
             super.remove(0, getLength());
@@ -106,7 +106,7 @@ public class AutoCompleteTextField extends JTextField {
             }
         }
     }
-    
+
     public AutoCompleteTextField(List _list) {
         isCaseSensitive = false;
         isStrict = false;
@@ -118,13 +118,13 @@ public class AutoCompleteTextField extends JTextField {
             return;
         }
     }
-    
+
     private void init() {
         setDocument(new AutoDoc());
         if(isStrict && list.size() > 0) {
             setText(list.get(0).toString());
         }
-        
+
         KeyListener listener = new KeyListener() {
 
             public void keyTyped(KeyEvent e) {
@@ -163,7 +163,7 @@ public class AutoCompleteTextField extends JTextField {
         };
         this.addKeyListener(listener);
     }
-    
+
     private void changeMatch() {
         AutoDoc doc = (AutoDoc) getDocument();
         if (doc != null) {
@@ -174,7 +174,7 @@ public class AutoCompleteTextField extends JTextField {
             }
         }
     }
-    
+
     private String findMatch(String s1) {
         String s2;
         for(Object i : list) {
@@ -184,7 +184,7 @@ public class AutoCompleteTextField extends JTextField {
                     return s2;
                 } else if(isCaseSensitive && s2.startsWith(s1)) {
                     return s2;
-                }   
+                }
             }
         }
         return null;
@@ -200,7 +200,7 @@ public class AutoCompleteTextField extends JTextField {
                     m.add(s2);
                 } else if(isCaseSensitive && s2.startsWith(s1)) {
                     m.add(s2);
-                }   
+                }
             }
         }
         return m;

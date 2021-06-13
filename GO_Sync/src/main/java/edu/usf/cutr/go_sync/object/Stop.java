@@ -29,11 +29,13 @@ import edu.usf.cutr.go_sync.tag_defs;
  */
 
 public class Stop extends OsmPrimitive implements Comparable{
+
 	private final double ERROR_TO_ZERO = 0.5;
 	private final String GTFS_STOP_ID_KEY	= tag_defs.GTFS_STOP_ID_KEY;
     private final String GTFS_OPERATOR_KEY	= tag_defs.GTFS_OPERATOR_KEY;
     private final String GTFS_NAME_KEY		= tag_defs.GTFS_NAME_KEY;
     private String lat, lon;
+    tag_defs.primative_type type = tag_defs.primative_type.NODE;
     private HashSet<Route> routes;
     private HashSet<RelationMember> osmMembers = new HashSet<>();
     private ArrayList<String> osmWayNodes = new ArrayList<String>();
@@ -58,6 +60,7 @@ public class Stop extends OsmPrimitive implements Comparable{
 //      osmTags.put(GTFS_OPERATOR_KEY, "");
         this.lat = lat;
         this.lon = lon;
+        this.setType(tag_defs.primative_type.NODE); //default to node
         routes = new HashSet<Route>();
     }
 
