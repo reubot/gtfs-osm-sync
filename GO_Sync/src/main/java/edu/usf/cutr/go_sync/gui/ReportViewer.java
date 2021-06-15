@@ -1335,9 +1335,10 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         busStopPanel.setPreferredSize(new java.awt.Dimension(750, 617));
         GridBagLayout gbl_busStopPanel = new GridBagLayout();
         gbl_busStopPanel.columnWidths = new int[]{44, 0, 133, 15, 75, 64, 6, 20, 40, 59, 110, 70, 0};
-        gbl_busStopPanel.rowHeights = new int[]{30, 28, 22, 17, 17, 25, 10, 20, 260, 0};
+        gbl_busStopPanel.rowHeights =       new int[]{30, 28, 22, 17, 17, 25, 10, 20, 260, 0};
         gbl_busStopPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_busStopPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_busStopPanel.rowWeights    = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+                                                    //0     1    2    3    4    6    6    7     8
         busStopPanel.setLayout(gbl_busStopPanel);
         tableStopButton = new javax.swing.JButton();
 
@@ -1915,8 +1916,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         GridBagLayout gbl_busRoutePanel = new GridBagLayout();
         gbl_busRoutePanel.columnWidths = new int[]{216, 46, 23, 22, 3, 120, 3};
         gbl_busRoutePanel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_busRoutePanel.rowHeights = new int[]{21, 23, 25, 25, 25, 85, 25, 34, 25, 25, 223,};
-        gbl_busRoutePanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_busRoutePanel.rowHeights = new int[]   {21,   23,  25,  25,  25,  85,  25,  34,  25,  25, 225,25};
+        gbl_busRoutePanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
         busRoutePanel.setLayout(gbl_busRoutePanel);
         existingRoutesWithUpdatesRadioButton = new javax.swing.JRadioButton();
 
@@ -2238,13 +2239,13 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         generalInformationRouteTextArea.setName("generalInformationRouteTextArea"); // NOI18N
         jScrollPane3.setViewportView(generalInformationRouteTextArea);
 
-        GridBagConstraints gbc_jScrollPane3 = new GridBagConstraints();
-        gbc_jScrollPane3.fill = GridBagConstraints.BOTH;
-        gbc_jScrollPane3.insets = new Insets(0, 0, 0, 5);
-        gbc_jScrollPane3.gridheight = 2;
-        gbc_jScrollPane3.gridx = 0;
-        gbc_jScrollPane3.gridy = 10;
-        busRoutePanel.add(jScrollPane3, gbc_jScrollPane3);
+        GridBagConstraints gbc_RouteTextArea = new GridBagConstraints();
+        gbc_RouteTextArea.fill = GridBagConstraints.BOTH;
+        gbc_RouteTextArea.insets = new Insets(0, 0, 0, 5);
+        gbc_RouteTextArea.gridheight = 2;
+        gbc_RouteTextArea.gridx = 0;
+        gbc_RouteTextArea.gridy = 10;
+        busRoutePanel.add(jScrollPane3, gbc_RouteTextArea);
 
 
         jMemberScrollPane5.setViewportView(memberTable);
@@ -2261,6 +2262,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         jLabel12.setText("Total:");
         jLabel12.setName("jLabel12"); // NOI18N
         GridBagConstraints gbc_jLabel12 = new GridBagConstraints();
+        gbc_jLabel12.fill = GridBagConstraints.HORIZONTAL;
+
         gbc_jLabel12.anchor = GridBagConstraints.WEST;
         gbc_jLabel12.insets = new Insets(0, 0, 0, 5);
         gbc_jLabel12.gridx = 1;
@@ -2273,6 +2276,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         totalGtfsMembersLabel.setName("totalGtfsMembersLabel"); // NOI18N
         GridBagConstraints gbc_totalGtfsMembersLabel = new GridBagConstraints();
         gbc_totalGtfsMembersLabel.anchor = GridBagConstraints.WEST;
+        gbc_totalGtfsMembersLabel.fill = GridBagConstraints.HORIZONTAL;
+
 //                gbc_totalGtfsMembersLabel.fill = GridBagConstraints.VERTICAL;
         gbc_totalGtfsMembersLabel.insets = new Insets(0, 0, 0, 5);
         gbc_totalGtfsMembersLabel.gridx = 2;
@@ -2285,7 +2290,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         totalOsmMembersLabel.setName("totalOsmMembersLabel"); // NOI18N
         GridBagConstraints gbc_totalOsmMembersLabel = new GridBagConstraints();
         gbc_totalOsmMembersLabel.anchor = GridBagConstraints.CENTER;
-//                gbc_totalOsmMembersLabel.fill = GridBagConstraints.VERTICAL;
+        gbc_totalOsmMembersLabel.fill = GridBagConstraints.HORIZONTAL;
         gbc_totalOsmMembersLabel.insets = new Insets(0, 0, 0, 5);
         gbc_totalOsmMembersLabel.gridx = 3;
         gbc_totalOsmMembersLabel.gridy = 11;
@@ -2299,7 +2304,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         totalNewMembersLabel.setName("totalNewMembersLabel"); // NOI18N
         GridBagConstraints gbc_totalNewMembersLabel = new GridBagConstraints();
         gbc_totalNewMembersLabel.anchor = GridBagConstraints.EAST;
-//                gbc_totalOsmMembersLabel.fill = GridBagConstraints.VERTICAL;
+        gbc_totalNewMembersLabel.fill = GridBagConstraints.HORIZONTAL;
         gbc_totalNewMembersLabel.gridx = 4;
         gbc_totalNewMembersLabel.gridy = 11;
         busRoutePanel.add(totalNewMembersLabel, gbc_totalNewMembersLabel);
