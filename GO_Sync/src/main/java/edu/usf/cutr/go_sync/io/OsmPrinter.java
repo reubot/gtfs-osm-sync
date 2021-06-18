@@ -18,10 +18,8 @@ package edu.usf.cutr.go_sync.io;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import edu.usf.cutr.go_sync.object.RelationMember;
-import edu.usf.cutr.go_sync.object.Route;
-import edu.usf.cutr.go_sync.object.Session;
-import edu.usf.cutr.go_sync.object.Stop;
+
+import edu.usf.cutr.go_sync.object.*;
 import edu.usf.cutr.go_sync.tag_defs;
 import edu.usf.cutr.go_sync.tools.OsmFormatter;
 
@@ -82,7 +80,9 @@ public class OsmPrinter {
                 "</node>";
     }
 
-    public String writeBusStop(String changeSetID, String nodeID, Stop st) {
+    public String writeBusStop(String changeSetID, String nodeID, Stop st) {return writeBusStop(changeSetID, nodeID, st, false);}
+
+    public String writeBusStop(String changeSetID, String nodeID, Stop st, boolean modify) {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
             changesetText = "changeset='" + changeSetID+ '\'';
@@ -105,7 +105,10 @@ public class OsmPrinter {
 
         // if modify, we need version number
         if(st.getOsmVersion()!=null) {
-            text += "' version='"+st.getOsmVersion();
+            String oVersion = st.getOsmVersion();
+            if (modify)
+                oVersion= Integer.toString(Integer.parseInt(oVersion)+1);
+            text += "' version='"+oVersion;
             text += "'>\n";
         }
         // mainly for create new node
@@ -164,8 +167,11 @@ public class OsmPrinter {
         Route route = new Route(r);
         // if modify, we need version number
         if(r.getOsmVersion()!=null) {
-            text += "<relation " + changesetText + " id='" + routeID
-                    + "' version='"+route.getOsmVersion() + "'>\n";
+            String oVersion = r.getOsmVersion();
+                if(r.getStatus()== OsmPrimitive.status.MODIFY)
+                   oVersion= Integer.toString(Integer.parseInt(oVersion)+1);
+                text += "<relation " + changesetText + " id='" + routeID
+                    + "' version='"+oVersion + "'>\n";
         }
         // mainly for create new relation
         else {

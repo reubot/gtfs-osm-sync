@@ -320,8 +320,8 @@ public class HttpRequest {
 
             ArrayList<Stop> toBeModified = new ArrayList<Stop>(par.getToBeModifiedStop());
             for (Stop ts : toBeModified) {
-                Integer versionNumber = (Integer.parseInt(ts.getOsmVersion()) - 1);
-                Stop ns = getNodeByVersion(ts.getOsmId(), versionNumber.toString(), false);
+                int versionNumber = (Integer.parseInt(ts.getOsmVersion()) - 1);
+                Stop ns = getNodeByVersion(ts.getOsmId(), Integer.toString(versionNumber), false);
                 ns.setOsmVersion(ts.getOsmVersion());
                 revertModify.add(ns);
             }
@@ -432,7 +432,7 @@ public class HttpRequest {
         stops = new ArrayList<Stop>(modifyStop);
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();
-            text.append(oprinter.writeBusStop(changeSetID, nodeid, stop));
+            text.append(oprinter.writeBusStop(changeSetID, nodeid, stop,true));
 //            System.out.println(stops.get(i).getOsmId()+","+stops.get(i).getStopID()+","+stops.get(i).getOsmVersion());
         }
         //all routes should be modified. Thus, k=0 after while loop
