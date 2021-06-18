@@ -318,8 +318,7 @@ public class HttpRequest {
 
             revertDelete.addAll(par.getToBeDeletedStop());
 
-            ArrayList<Stop> toBeModified = new ArrayList<Stop>();
-            toBeModified.addAll(par.getToBeModifiedStop());
+            ArrayList<Stop> toBeModified = new ArrayList<Stop>(par.getToBeModifiedStop());
             for (Stop ts : toBeModified) {
                 Integer versionNumber = (Integer.parseInt(ts.getOsmVersion()) - 1);
                 Stop ns = getNodeByVersion(ts.getOsmId(), versionNumber.toString(), false);
@@ -327,8 +326,7 @@ public class HttpRequest {
                 revertModify.add(ns);
             }
 
-            ArrayList<Stop> toBeUploaded = new ArrayList<Stop>();
-            toBeUploaded.addAll(par.getToBeUploadedStop());
+            ArrayList<Stop> toBeUploaded = new ArrayList<Stop>(par.getToBeUploadedStop());
             for (Stop ts : toBeUploaded) {
                 Stop ns = getNodeByVersion(ts.getOsmId(), ts.getOsmVersion(), true);
                 ns.setOsmVersion("-1");
@@ -408,53 +406,54 @@ public class HttpRequest {
     }
 
     public String getRequestContents(String changeSetID, HashSet<Stop> addStop, HashSet<Stop> modifyStop, HashSet<Stop> deleteStop, Hashtable r) {
+        long tStart = System.currentTimeMillis();
         oprinter = new OsmPrinter();
         Hashtable<String,Route> routes = new Hashtable();
         if (r!=null) routes.putAll(r);
         ArrayList<String> routeKeys = new ArrayList<String>();
         if (r!=null) routeKeys.addAll(routes.keySet());
-        String text = "";
-        List<Stop> stops = new ArrayList<Stop>();
-        stops.addAll(addStop);
-        text += oprinter.osmChangeCreate();
-        int id=0;
-        for(int i=0; i<stops.size(); i++){
+        StringBuilder text = new StringBuilder();
+        List<Stop> stops = new ArrayList<Stop>(addStop);
+        text.append(oprinter.osmChangeCreate());
+        int id=0,i=0;
+        for(Stop st:stops){
             id = (-1)*(i+1);
-            text += oprinter.writeBusStop(changeSetID, Integer.toString(id), stops.get(i));
+            text.append(oprinter.writeBusStop(changeSetID, Integer.toString(id), st));
+            i++;
         }
         for (Route tRoute:routes.values()){
             if(tRoute.getStatus()== OsmPrimitive.status.NEW){
                 id--;
-                text += oprinter.writeBusRoute(changeSetID, Integer.toString(id), tRoute);
+                text.append(oprinter.writeBusRoute(changeSetID, Integer.toString(id), tRoute));
 //                routes.remove(tRoute.getRouteId());
             }
         }
-        text += oprinter.osmChangeModify();
-        stops = new ArrayList<Stop>();
-        stops.addAll(modifyStop);
+        text.append(oprinter.osmChangeModify());
+        stops = new ArrayList<Stop>(modifyStop);
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();
-            text += oprinter.writeBusStop(changeSetID, nodeid, stop);
+            text.append(oprinter.writeBusStop(changeSetID, nodeid, stop));
 //            System.out.println(stops.get(i).getOsmId()+","+stops.get(i).getStopID()+","+stops.get(i).getOsmVersion());
         }
         //all routes should be modified. Thus, k=0 after while loop
         for (Route tRoute:routes.values()){
             if(tRoute.getStatus()== OsmPrimitive.status.MODIFY){
                 String routeid = tRoute.getOsmId();
-                text += oprinter.writeBusRoute(changeSetID, routeid, tRoute);
+                text.append(oprinter.writeBusRoute(changeSetID, routeid, tRoute));
 //                routes.remove(tRoute.getRouteId());
             }
         }
-        stops = new ArrayList<Stop>();
-        stops.addAll(deleteStop);
-        text += oprinter.osmChangeDelete();
+        stops = new ArrayList<Stop>(deleteStop);
+        text.append(oprinter.osmChangeDelete());
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();
             String nodeVersion = stop.getOsmVersion();
-            text += oprinter.writeDeleteNode(nodeid, changeSetID, nodeVersion);
+            text.append(oprinter.writeDeleteNode(nodeid, changeSetID, nodeVersion));
         }
-        text += oprinter.osmChangeDeleteClose();
-        return text;
+        text.append(oprinter.osmChangeDeleteClose());
+        long tDelta = System.currentTimeMillis()-tStart;
+        System.out.println("getRequestContents generated "+tDelta/1000.0);
+        return text.toString();
     }
 
     public void createChangeSet() throws InterruptedException{
@@ -643,13 +642,7 @@ public class HttpRequest {
                     break;
                 }
 
-            } catch (ConnectException e) {
-                e.printStackTrace();
-                System.out.println(e.toString());
-                taskOutput.append(e.toString()+ '\n');
-                retry ++;
-                continue;
-            } catch (SocketTimeoutException e) {
+            } catch (ConnectException | SocketTimeoutException e) {
                 e.printStackTrace();
                 System.out.println(e.toString());
                 taskOutput.append(e.toString()+ '\n');
