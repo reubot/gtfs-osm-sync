@@ -24,7 +24,7 @@ import java.util.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import edu.usf.cutr.go_sync.object.Stop;
+import edu.usf.cutr.go_sync.object.*;
 import edu.usf.cutr.go_sync.tools.parser.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
@@ -41,9 +41,7 @@ import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import javax.swing.JTextArea;
-import edu.usf.cutr.go_sync.object.RelationMember;
-import edu.usf.cutr.go_sync.object.Route;
-import edu.usf.cutr.go_sync.object.Session;
+
 import org.xml.sax.SAXException;
 //import sun.misc.BASE64Encoder;
 import edu.usf.cutr.go_sync.tag_defs;
@@ -411,7 +409,7 @@ public class HttpRequest {
 
     public String getRequestContents(String changeSetID, HashSet<Stop> addStop, HashSet<Stop> modifyStop, HashSet<Stop> deleteStop, Hashtable r) {
         oprinter = new OsmPrinter();
-        Hashtable routes = new Hashtable();
+        Hashtable<String,Route> routes = new Hashtable();
         if (r!=null) routes.putAll(r);
         ArrayList<String> routeKeys = new ArrayList<String>();
         if (r!=null) routeKeys.addAll(routes.keySet());
@@ -424,16 +422,11 @@ public class HttpRequest {
             id = (-1)*(i+1);
             text += oprinter.writeBusStop(changeSetID, Integer.toString(id), stops.get(i));
         }
-        int k=0;
-        while (k<routeKeys.size()){
-            Route tRoute = (Route)routes.get(routeKeys.get(k));
-            if(tRoute.getStatus().equals("n")){
+        for (Route tRoute:routes.values()){
+            if(tRoute.getStatus()== OsmPrimitive.status.NEW){
                 id--;
                 text += oprinter.writeBusRoute(changeSetID, Integer.toString(id), tRoute);
-                routeKeys.remove(k);
-            }
-            else {
-                k++;
+//                routes.remove(tRoute.getRouteId());
             }
         }
         text += oprinter.osmChangeModify();
@@ -445,16 +438,11 @@ public class HttpRequest {
 //            System.out.println(stops.get(i).getOsmId()+","+stops.get(i).getStopID()+","+stops.get(i).getOsmVersion());
         }
         //all routes should be modified. Thus, k=0 after while loop
-        k=0;
-        while (k<routeKeys.size()){
-            Route tRoute = (Route)routes.get(routeKeys.get(k));
-            if(tRoute.getStatus().equals("m")){
+        for (Route tRoute:routes.values()){
+            if(tRoute.getStatus()== OsmPrimitive.status.MODIFY){
                 String routeid = tRoute.getOsmId();
                 text += oprinter.writeBusRoute(changeSetID, routeid, tRoute);
-                routeKeys.remove(k);
-            }
-            else {
-                k++;
+//                routes.remove(tRoute.getRouteId());
             }
         }
         stops = new ArrayList<Stop>();

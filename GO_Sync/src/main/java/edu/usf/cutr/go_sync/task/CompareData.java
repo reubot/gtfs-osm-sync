@@ -481,8 +481,9 @@ public class CompareData extends OsmTask{
                         //add member
                         //Route rt = (Route)routes.get(routeArray[j]);
                         r.addOsmMembers(rios.getOsmMembers());
-                        String osmNodeId = st.getOsmId();
-                        RelationMember rm = new RelationMember(osmNodeId,"node","stop");
+                        String osmNodeId = st.getOsmId(); //FIXME use primative_type
+                        RelationMember rm = new RelationMember(osmNodeId,
+                                st.getType().toString().toLowerCase(),"stop");
                         rm.setStatus("GTFS dataset");
                         rm.setGtfsId(st.getStopID());
                         r.addOsmMember(rm);
