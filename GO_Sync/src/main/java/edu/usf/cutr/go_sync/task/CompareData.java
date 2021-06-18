@@ -195,7 +195,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
         maxLat += DELTA;
         maxLon += DELTA;
 
-        System.out.println("Lon, Lat format = "+minLon+","+minLat + "      " + maxLon + "," + maxLat);
+        System.out.println("Lon, Lat format = "+minLon+ ',' +minLat + "      " + maxLon + ',' + maxLat);
 
         List<Stop> boundList = new ArrayList<Stop>(2);
         boundList.add(new Stop("-1","Min Lat Min Lon", "UNKNOWN", Double.toString(minLat),Double.toString(minLon)));
@@ -238,7 +238,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 // some stops id are accidentally overwritten. We need to keep the original stop_id
                 gtfsStop.addAndOverwriteTag(tag_defs.GTFS_STOP_ID_KEY, gtfs.toString());
             }
-            if(gtfsStop.toString().equals("none") || gtfsStop.getStopID().equals("") || gtfsStop.getTag(tag_defs.GTFS_STOP_ID_KEY).equals("none")){
+            if(gtfsStop.toString().equals("none") || gtfsStop.getStopID().isEmpty() || gtfsStop.getTag(tag_defs.GTFS_STOP_ID_KEY).equals("none")){
                 System.out.println();
             }
 
@@ -296,7 +296,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 String osmValue = (String) osmtag.get(k);
                 if (!osmValue.toUpperCase().equals(v.toUpperCase())) {
                     if (!osmValue.contains(v)) {
-                        diff.put(k, v + ";" + osmValue);
+                        diff.put(k, v + ';' + osmValue);
                     } else {
                         t.put(k, osmValue);
                     }
@@ -509,7 +509,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             if((osmindex.get()%timeToUpdate)==0) {
 //                currentTotalProgress += progressToUpdate;
                 updateProgress(progressToUpdate);
-                this.setMessage("Comparing "+osmindex.get()+"/"+totalOsmNode+" ...");
+                this.setMessage("Comparing "+osmindex.get()+ '/' +totalOsmNode+" ...");
             }
 //            Hashtable<String, String> osmtag = new Hashtable<String, String>(OSMTags.get(osmindex));
             String osmOperator = (String)osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
