@@ -77,11 +77,7 @@ public class CompareData extends OsmTask{
     private ConcurrentHashMap.KeySetView<Stop, Boolean> upload = ConcurrentHashMap.newKeySet();
     private ConcurrentHashMap.KeySetView<Stop, Boolean> modify = ConcurrentHashMap.newKeySet();
     private ConcurrentHashMap.KeySetView<Stop, Boolean> delete = ConcurrentHashMap.newKeySet();
-//    private HashSet<Stop> noUpload = new HashSet<Stop>();
-//    private HashSet<Stop> upload = new HashSet<Stop>();
-//    private HashSet<Stop> modify = new HashSet<Stop>();
-//    private HashSet<Stop> delete = new HashSet<Stop>();
-    private Hashtable<String, Route> routes = new Hashtable<String, Route>();
+private Hashtable<String, Route> routes = new Hashtable<String, Route>();
     private Hashtable<String, Route> agencyRoutes = new Hashtable<String, Route>();
     private Hashtable<String, Route> existingRoutes = new Hashtable<String, Route>();
     private double minLat=0, minLon=0, maxLat=0, maxLon=0;
@@ -95,10 +91,6 @@ public class CompareData extends OsmTask{
     private final double ERROR_TO_ZERO = 0.5;       // acceptable error while calculating distance ~= consider as 0
     private /*final*/ double DELTA = 0.004;   // ~400m in Lat and 400m in Lon       0.00001 ~= 1.108m in Lat and 0.983 in Lon
     private /*final*/ double RANGE = 400;         // FIXME bus stop is within 400 meters
-
-//    private final double DELTA = 0.001;   // ~400m in Lat and 400m in Lon       0.00001 ~= 1.108m in Lat and 0.983 in Lon
-//    private final double RANGE = 100;         // FIXME bus stop is within 400 meters
-
 
 
     private String fileNameInStops;
@@ -324,120 +316,7 @@ public class CompareData extends OsmTask{
      * e.g., stops in noUpload and (modify sets - modified stops in osm)
      * We can use report hashtable for convenience
      * ALWAYS Invoke this method AFTER compareBusStopData()
-     * *//*
-    public void compareRouteData() throws InterruptedException{
-        //20% of task includes:
-        //10% for reading GTFS routes from modify and nothing_new sets
-        //10% for compare with existing OSM routes
-
-        updateProgress(10);
-        this.setMessage("Reading GTFS routes from modify and noupload sets...");
-        // get all the routes and its associated bus stops
-        ArrayList<Stop> reportKeys = new ArrayList<Stop>();
-        reportKeys.addAll(report.keySet());
-        HashSet<String> gtfsRoutes = new HashSet<String>();
-        gtfsRoutes.addAll(GTFSReadIn.getAllRoutesID());
-        for (int i=0; i<reportKeys.size(); i++) {
-            if(this.flagIsDone) return;
-            Stop st = reportKeys.get(i);
-            String category = st.getReportCategory();
-            if (category.equals(ReportCategory.MODIFY) || category.equals(ReportCategory.NOTHING_NEW)) {
-                ArrayList<Route> routeInOneStop = new ArrayList<Route>();
-                if(st.getRoutes()!=null) {
-                    routeInOneStop.addAll(st.getRoutes());
-                    for(int j=0; j<routeInOneStop.size(); j++){
-                        if(this.flagIsDone) return;
-                        Route rios = routeInOneStop.get(j);
-                        Route r;
-                        if(!routes.containsKey(rios.getRouteId())){
-                            r = new Route(rios);
-                            //add tag
-                            r.addTag("name", OperatorInfo.getAbbreviateName()+
-                                    " route "+ r.getRouteRef());
-                            r.addTag(tag_defs.GTFS_OPERATOR_KEY,OperatorInfo.getFullName());
-//                            r.addTag("network",OperatorInfo.getFullName());
-                            r.addTag("ref", r.getRouteRef());
-                            r.addTag("route", "bus");
-                            r.addTag("type", "route");
-                        }
-                        else {
-                            r = new Route((Route)routes.get(rios.getRouteId()));
-                            routes.remove(rios.getRouteId());
-                        }
-                        //add member
-                        //Route rt = (Route)routes.get(routeArray[j]);
-                        r.addOsmMembers(rios.getOsmMembers());
-                        String osmNodeId = st.getOsmId();
-                        RelationMember rm = new RelationMember(osmNodeId,"node","stop");
-                        rm.setStatus("GTFS dataset");
-                        rm.setGtfsId(st.getStopID());
-                        r.addOsmMember(rm);
-                        r.setStatus("n");
-                        routes.put(rios.getRouteId(), r);
-                    }
-                }
-            }
-        }
-
-        agencyRoutes.putAll(routes);
-
-        updateProgress(10);
-        this.setMessage("Comparing GTFS routes with OSM routes...");
-        //compare with existing OSM relation
-        ArrayList<String> routeKeys = new ArrayList<String>();
-        routeKeys.addAll(routes.keySet());
-        for(int osm=0; osm<OSMRelations.size(); osm++){
-            if(this.flagIsDone) return;
-            AttributesImpl osmRelation = OSMRelations.get(osm);
-            Hashtable<String,String> osmtag = new Hashtable<String,String>();
-            osmtag.putAll(OSMRelationTags.get(osm));
-            String routeName = osmtag.get("ref");
-            String routeId 	 = osmtag.get("gtfs_route_id");
-            String operator  = osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
-//            String network   = osmtag.get(tag_defs.GTFS_NETWORK_KEY);
-            if(routeKeys.contains(routeId) && operator!=null && OperatorInfo.isTheSameOperator(operator)) {
-                HashSet<RelationMember> em = OSMRelationMembers.get(osm);
-                Route r = new Route((Route)routes.get(routeId));
-                Route er = new Route(routeId, routeName, operator);
-                ArrayList<RelationMember> tempem = new ArrayList<RelationMember>();
-                tempem.addAll(em);
-                for(int i=0; i<em.size(); i++) {
-                    if(this.flagIsDone) return;
-                    RelationMember m = tempem.get(i);
-                    m.setGtfsId((String)osmIdToGtfsId.get(m.getRef()));
-                    er.addOsmMember(m);
-
-                    RelationMember matchMember = r.getOsmMember(m.getRef());
-                    if(matchMember!=null) {
-                        matchMember.setStatus("both GTFS dataset and OSM server");
-                    } else {
-                        r.addOsmMember(new RelationMember(m));
-                    }
-                }
-                er.addTags(osmtag);
-                er.setOsmVersion(osmRelation.getValue("version"));
-
-                Hashtable<String, String> diff = compareOsmTags(osmtag, r);
-                if(!em.containsAll(r.getOsmMembers()) || diff.size()!=0){
-                    r.setStatus("m");
-                    r.setOsmVersion(osmRelation.getValue("version"));
-                    r.setOsmId(osmRelation.getValue("id"));
-                    r.addOsmMembers(em);
-                    r.addTags(osmtag);
-                }
-                else {
-                    r.setStatus("e");
-                }
-
-                routes.remove((String)r.getRouteId());
-                routes.put(r.getRouteId(), r);
-
-                existingRoutes.put(routeId, er);
-            }
-        }
-        System.out.println("There are "+routeKeys.size()+" in total!");
-    }
-*/
+     * */
     public void compareRouteData() throws InterruptedException{
         //20% of task includes:
         //10% for reading GTFS routes from modify and nothing_new sets
@@ -703,21 +582,7 @@ public class CompareData extends OsmTask{
                             // for comparing tag
                             Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
                             if (distance>ERROR_TO_ZERO) {
-//                                Stop ns = new Stop(gtfsStop);
-//                                ns.addTags(osmtag);
-//                                ns.setOsmId(node.getValue("id"));
-//                                ns.setOsmVersion(version);
 
-//                                osmActiveUsers.add(node.getValue("user"));
-
-//                                Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
-//                                es.addTags(osmtag);
-//                                es.setOsmId(node.getValue("id"));
-//                                es.setLastEditedOsmUser(node.getValue("user"));
-//                                es.setLastEditedOsmDate(node.getValue("timestamp"));
-
-//                                // for comparing tag
-//                                Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
                                 if (diff.isEmpty()) {
                                     es.setReportText("Stop already exists in OSM but with different location." +
                                             "\n ACTION: Modify OSM stop with new location!");
@@ -737,21 +602,7 @@ public class CompareData extends OsmTask{
                                 break;
                             }
                             else {
-//                                Stop ns = new Stop(gtfsStop);
-//                                ns.setOsmId(node.getValue("id"));
-//                                ns.addTags(osmtag);
-//                                ns.setOsmVersion(version);
 
-//                                osmActiveUsers.add(node.getValue("user"));
-
-//                                Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
-//                                es.addTags(osmtag);
-//                                es.setOsmId(node.getValue("id"));
-//                                es.setLastEditedOsmUser(node.getValue("user"));
-//                                es.setLastEditedOsmDate(node.getValue("timestamp"));
-
-//                                // for comparing tag
-//                                Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
                                 if (diff.isEmpty()) {
                                     /**
                                      * OsmPrimitive.RC.NOTHING_NEW
@@ -802,15 +653,6 @@ public class CompareData extends OsmTask{
 //                                Stop ns = new Stop(gtfsStop);
                                 ns.addTag("FIXME", "This bus stop could be redundant");
                                 upload.add(ns);
-
-//                                osmActiveUsers.add(node.getValue("user"));
-
-//                                Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
-//                                es.addTags(osmtag);
-//                                es.setOsmId(node.getValue("id"));
-//                                es.setLastEditedOsmUser(node.getValue("user"));
-//                                es.setLastEditedOsmDate(node.getValue("timestamp"));
-//                                es.setOsmVersion(version);
 
                                 if ((osmStopID == null) || (osmStopID.equals("missing"))) {
                                     es.setReportText("Possible redundant stop. Please check again!");
