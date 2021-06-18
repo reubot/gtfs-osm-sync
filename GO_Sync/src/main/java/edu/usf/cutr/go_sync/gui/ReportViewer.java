@@ -993,10 +993,11 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             //add tag to table TODO finish
             if (finalRoutesAccepted.containsKey(selectedNewRoute.getRouteId())) {
                 routeTableModel.setRowValueAt(new Object[]{k, gtfsValue, finalCB.get(i * 2), osmValue, finalCB.get(i * 2 + 1), finalRt.getTag(k)}, i);
-
                 // stopTableModel.setRowValueAt(new Object[]{k, gtfsValue, finalCB.get((i + 2) * 2), osmValue, finalCB.get((i + 2) * 2 + 1), finalSt.getTag(k)}, i + 2);
             } else {
                 routeTableModel.setRowValueAt(new Object[]{k, gtfsValue, true, osmValue, false, newValue}, i);
+                saveChangeRouteButton.setEnabled(true);
+                saveChangeRouteButton.setText("Accept");
                 //   stopTableModel.setRowValueAt(new Object[]{k, gtfsValue, gtfsCB, osmValue, osmCB, newValue}, i + 2);
             }
         }
