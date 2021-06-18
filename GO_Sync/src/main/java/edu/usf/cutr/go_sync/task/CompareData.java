@@ -321,7 +321,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
         //20% of task includes:
         //10% for reading GTFS routes from modify and nothing_new sets
         //10% for compare with existing OSM routes
-
+        long tDelta = System.currentTimeMillis();
         updateProgress(10);
         this.setMessage("Reading GTFS routes from modify and noupload sets...");
         System.out.println("Reading GTFS routes from modify and noupload sets...");
@@ -334,9 +334,8 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 //            Stop st = reportKeys.get(i);
             OsmPrimitive.RC category = st.getReportCategory();
             if (category.equals(OsmPrimitive.RC.MODIFY) || category.equals(OsmPrimitive.RC.NOTHING_NEW)) {
-                ArrayList<Route> routeInOneStop = new ArrayList<Route>();
                 if(st.getRoutes()!=null) {
-                    routeInOneStop.addAll(st.getRoutes());
+                    ArrayList<Route> routeInOneStop = new ArrayList<Route>(st.getRoutes());
 //                    for(int j=0; j<routeInOneStop.size(); j++){
                     for(Route rios :routeInOneStop){
                         if(this.flagIsDone) return;
@@ -476,6 +475,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 
             }
         }
+        System.out.println("compareRouteData Completed in "+ (System.currentTimeMillis() - tDelta)/1000.0 + "seconds");
         System.out.println("There are "+routeKeys.size()+" routeKeys in total!");
     }
 
@@ -485,7 +485,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
      */
     public void compareBusStopData() throws InterruptedException {
         //Compare the OSM stops with GTFS data
-
+        long tDelta = System.currentTimeMillis();
         //this method takes 50% of this compare task
         int totalOsmNode = OSMNodes.size();
         int timeToUpdate, progressToUpdate;
@@ -770,7 +770,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 addToReport(n, null, false);
             }
         }
-
+        System.out.println("compareBusStopData Completed in "+ (System.currentTimeMillis() - tDelta)/1000.0 + "seconds");
         System.out.println(osmActiveUsers.toString());
     }
 
