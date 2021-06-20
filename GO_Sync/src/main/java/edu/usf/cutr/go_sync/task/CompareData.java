@@ -88,7 +88,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
     private HashMap<String,tag_defs.primative_type> OSMNodesType = new HashMap<>();
     private HashMap<String,ArrayList<String>> OSMWayNodes = new HashMap<>();
 
-    private final double ERROR_TO_ZERO = 0.5;       // acceptable error while calculating distance ~= consider as 0
+    private static final double ERROR_TO_ZERO = 0.5;       // acceptable error while calculating distance ~= consider as 0
     private /*final*/ double DELTA = 0.004;   // ~400m in Lat and 400m in Lon       0.00001 ~= 1.108m in Lat and 0.983 in Lon
     private /*final*/ double RANGE = 400;         // FIXME bus stop is within 400 meters
 
@@ -231,7 +231,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             tree.add(osmStop);
 
             // set stop value to osm value as default (only affect modify category)
-            if(gtfsStop.getReportCategory().equals(OsmPrimitive.RC.MODIFY)){
+            if(gtfsStop.getReportCategory()==(OsmPrimitive.RC.MODIFY)){
                 gtfsStop.setLat(osmStop.getLat());
                 gtfsStop.setLon(osmStop.getLon());
                 gtfsStop.addAndOverwriteTags(osmStop.getTags());
@@ -333,7 +333,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             if(this.flagIsDone) return;
 //            Stop st = reportKeys.get(i);
             OsmPrimitive.RC category = st.getReportCategory();
-            if (category.equals(OsmPrimitive.RC.MODIFY) || category.equals(OsmPrimitive.RC.NOTHING_NEW)) {
+            if (category==(OsmPrimitive.RC.MODIFY) || category==(OsmPrimitive.RC.NOTHING_NEW)) {
                 if(st.getRoutes()!=null) {
                     ArrayList<Route> routeInOneStop = new ArrayList<Route>(st.getRoutes());
 //                    for(int j=0; j<routeInOneStop.size(); j++){
@@ -780,7 +780,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             if (this.flagIsDone) return;
             Stop s = new Stop(reportKey);
             OsmPrimitive.RC category = s.getReportCategory();
-            if (category.equals(OsmPrimitive.RC.MODIFY)) {
+            if (category==(OsmPrimitive.RC.MODIFY)) {
                 TreeSet<Stop> arr = report.get(s);
                 if (arr.size() == 1) {
                     String tempStopId = null;
