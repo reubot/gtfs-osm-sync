@@ -64,7 +64,7 @@ public class CompareData extends OsmTask{
     private List<Stop> GTFSstops = new ArrayList<Stop>();
     private List<String> GTFSstopsIDs = new ArrayList<String>();
     private HashMap<String, AttributesImpl> OSMNodes = new HashMap<>();
-    private HashMap<String,HashMap> OSMTags = new HashMap<>();
+    private HashMap<String,HashMap<String, String>> OSMTags = new HashMap<>();
     private ArrayList<AttributesImpl> OSMRelations = new ArrayList<AttributesImpl>();
 //    private ArrayList<Hashtable<String, String>> OSMRelationTags = new ArrayList<Hashtable<String, String>>();
     private ArrayList<HashMap> OSMRelationTags = new ArrayList<HashMap>();
@@ -411,12 +411,12 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
         for(int osm=0; osm<OSMRelations.size(); osm++){
             if(this.flagIsDone) return;
             AttributesImpl osmRelation = OSMRelations.get(osm);
-            HashMap osmtag = new HashMap(OSMRelationTags.get(osm));
-            String routeLongName = (String)osmtag.get("name");
-            String routeId = (String)osmtag.get("gtfs_route_id");
-            String routeShortName = (String)osmtag.get("ref");
-            String operator = (String)osmtag.get("operator");  //tag_defs.GTFS_OPERATOR_KEY); //FIXME use tag_defs
-            String network = (String)osmtag.get(tag_defs.OSM_NETWORK_KEY);    //FIXME use tag_defs
+            HashMap<String,String> osmtag = new HashMap(OSMRelationTags.get(osm));
+            String routeLongName = osmtag.get("name");
+            String routeId = osmtag.get("gtfs_route_id");
+            String routeShortName = osmtag.get("ref");
+            String operator = osmtag.get("operator");  //tag_defs.GTFS_OPERATOR_KEY); //FIXME use tag_defs
+            String network = osmtag.get(tag_defs.OSM_NETWORK_KEY);    //FIXME use tag_defs
 //            System.out.println(osm + " routeId " + routeId + routeKeys.contains(routeId) +  "routeShortName " + routeShortName + routeNameKeys.contains(routeShortName) + operator + network);
             if((routeKeys.contains(routeId) ||routeNameKeys.contains(routeShortName))
                     && (
@@ -499,17 +499,17 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             progressToUpdate = 50/totalOsmNode;
         }
         int currentTotalProgress=0;
-        Map<String, Stop> map = GTFSstops.stream()
+        Map<String, Stop> gtfsidToStopMap = GTFSstops.stream()
                 .collect(Collectors.toMap(Stop::getStopID, e->e));
 
 
-       List<HashMap> gtfstoosm = OSMTags.entrySet().stream()
+       List<HashMap<String, String>> gtfsosm = OSMTags.entrySet().stream()
                 .filter(e -> e.getValue().containsKey("gtfs_id"))
                        .map(Map.Entry::getValue)
                        .collect(Collectors.toList());
 //                .collect(Collectors.toMap(e->e.getValue().get("gtfs_id"),e->e.getKey()));
 
-        Map<String,String> gtfstoosmmap = OSMTags.entrySet().stream()
+        Map<String,String> gtfsIDToOsmIDmap = OSMTags.entrySet().stream()
                 .filter(e->e.getValue().containsKey("gtfs_id"))
                 .collect(Collectors.toMap(
                         e->e.getValue().get("gtfs_id").toString(), Map.Entry::getKey
@@ -520,18 +520,28 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                     return e1;}
                 ));
 /*
+        for (Map.Entry idmap :gtfsIDToOsmIDmap.entrySet())
+        {
+            newStop(gtfsidToStopMap.get(idmap.getKey() )
+
+        }
+
+ */
+/*
         Map<String,HashMap> gtfstoosmtagsmap = OSMTags.entrySet().stream()
                 .filter(e->e.getValue().containsKey("gtfs_id"))
                 .collect(Collectors.toMap(
                         e->e.getValue().get("gtfs_id").toString(), e->e.getValue()
-                        , (BinaryOperator<String>) (e1, e2) -> {
-                            System.out.println("duplicate key found! " +
-                                    "https://openstreetmap.org/" + OSMNodesType.get(e1).toString().toLowerCase()+'/'+e1 +' '+
-                                    "https://openstreetmap.org/" + OSMNodesType.get(e2).toString().toLowerCase()+'/'+ e2);
-                            return e1;}
+//                        , (BinaryOperator<String>) (e1, e2) -> {
+//                            System.out.println("duplicate key found! " +
+//                                    "https://openstreetmap.org/" + OSMNodesType.get(e1).toString().toLowerCase()+'/'+e1 +' '+
+//                                    "https://openstreetmap.org/" + OSMNodesType.get(e2).toString().toLowerCase()+'/'+ e2);
+//                            return e1;}
                 ));
 
+
 */
+
 
         //todo process these and remove from lists below
 //        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
@@ -540,7 +550,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 forEach(osmtagEntry -> {
             if(this.flagIsDone)
                 return;
-            HashMap osmtag = osmtagEntry.getValue();
+            HashMap<String, String> osmtag = osmtagEntry.getValue();
             String osmid = osmtagEntry.getKey();
             osmindex.getAndIncrement();
             if((osmindex.get()%timeToUpdate)==0) {
@@ -549,8 +559,8 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 this.setMessage("Comparing "+osmindex.get()+ '/' +totalOsmNode+" ...");
             }
 //            Hashtable<String, String> osmtag = new Hashtable<String, String>(OSMTags.get(osmindex));
-            String osmOperator = (String)osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
-            String osmStopID = (String)osmtag.get(tag_defs.GTFS_STOP_ID_KEY);
+            String osmOperator = osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
+            String osmStopID = osmtag.get(tag_defs.GTFS_STOP_ID_KEY);
             //add leading 0's
             if(osmStopID!=null) {
                 if (!osmStopID.equals("missing")) {
@@ -576,7 +586,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 // set operator field to missing
                 osmOperator = "missing";
             }
-            String osmStopName = (String)osmtag.get("name");
+            String osmStopName = osmtag.get("name");
 // FIXME This breaks if there are nodes with identical tags
             AttributesImpl node = OSMNodes.get(osmid);
             String osmID = node.getValue("id");
@@ -1017,6 +1027,104 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
         rv.setResizable(true);
         rv.setVisible(true);
     }
+
+
+
+    private void newStop(Stop gtfsStop,
+                         HashMap<String,String> osmtag, String osmid)
+
+            //             AttributesImpl node,HashMap osmtag )
+
+    {
+        AttributesImpl node = OSMNodes.get(osmid);
+        String osmID = node.getValue("id");
+        String osmStopName = osmtag.get("name");
+        String version = Integer.toString(Integer.parseInt(node.getValue("version")));
+        String osmOperator = osmtag.get(tag_defs.GTFS_OPERATOR_KEY);
+        String osmStopID = osmtag.get(tag_defs.GTFS_STOP_ID_KEY);
+
+//        HashMap osmtag = osmtagEntry.getValue();
+//        String osmid = osmtagEntry.getKey();
+        double distance = OsmDistance.distVincenty(node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON),
+                gtfsStop.getLat(), gtfsStop.getLon());
+
+
+        if ((osmStopID != null) && (!osmStopID.equals("missing")) && (osmStopID.equals(gtfsStop.getStopID()))) {
+            noUpload.add(gtfsStop);
+            osmIdToGtfsId.put(node.getValue("id"), gtfsStop.getStopID());  //EXISTING STOP WITH UPDATE
+            Stop ns = new Stop(gtfsStop);
+            ns.addTags(osmtag);
+            ns.setOsmId(node.getValue("id"));
+            ns.setType(OSMNodesType.get(osmID));
+            ns.setOsmVersion(version);
+
+            osmActiveUsers.add(node.getValue("user"));
+
+            // existing OSM Stop
+            Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
+            es.addTags(osmtag);
+            es.setOsmId(node.getValue("id"));
+            es.setType(OSMNodesType.get(osmID));
+            if (es.getType() == tag_defs.primative_type.WAY)
+                es.addOsmNodes(OSMWayNodes.get(osmID));
+            if (es.getType() == tag_defs.primative_type.RELATION)
+                es.addOsmMembers(OSMStationMembers.get(osmID));
+            es.setLastEditedOsmUser(node.getValue("user"));
+            es.setLastEditedOsmDate(node.getValue("timestamp"));
+            // for comparing tag
+            Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
+            if (distance > ERROR_TO_ZERO) {
+
+                if (diff.isEmpty()) {
+                    es.setReportText("Stop already exists in OSM but with different location." +
+                            "\n ACTION: Modify OSM stop with new location!");
+                } else {
+                    ns.addAndOverwriteTags(diff);
+                    es.setReportText("Stop already exists in OSM but with different location.\n" +
+                            "\t   Some stop TAGs are also different." +
+                            "\n ACTION: Modify OSM stop with new location and stop tags!");
+                }
+
+                if (modify.contains(ns)) {
+                    modify.remove(ns);
+                }
+                modify.add(ns);
+                ns.setReportCategory(OsmPrimitive.RC.MODIFY);
+                addToReport(ns, es, true);
+//                break;
+            } else {
+
+                if (diff.isEmpty()) {
+                    /**
+                     * OsmPrimitive.RC.NOTHING_NEW
+                     * "Existing Stops"
+                     */
+                    es.setReportText("Stop already exists in OSM. Nothing new from last upload.\n" +
+                            "\t   " + es.printOSMStop() +
+                            "\n ACTION: No upload!");
+                    ns.setReportCategory(OsmPrimitive.RC.NOTHING_NEW);
+                    addToReport(ns, es, true);
+                    noUpload.add(ns);
+                    osmIdToGtfsId.put(node.getValue("id"), gtfsStop.getStopID());
+                } else {
+                    ns.addAndOverwriteTags(diff);
+                    es.setReportText("Stop already exists in OSM but some TAGs are different.\n" +
+                            "\t   " + es.printOSMStop() + "\n ACTION: Modify OSM stop with new tags!");
+                    ns.setOsmVersion(version);
+                    if (modify.contains(ns)) {
+                        modify.remove(ns);
+                    }
+                    modify.add(ns);
+                    osmActiveUsers.add(node.getValue("user"));
+                    ns.setReportCategory(OsmPrimitive.RC.MODIFY);
+                    addToReport(ns, es, true);
+                }
+//                break;
+            }
+        }
+        // stop_id == null OR OSMnode does NOT have same stop id
+    }
+
 }
 
 //TODO parallelise comparebusdata using https://stackoverflow.com/questions/11366330/waiting-for-multiple-swingworkers/11372932#11372932
