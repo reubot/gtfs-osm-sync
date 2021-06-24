@@ -26,6 +26,8 @@ import java.awt.Toolkit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
@@ -481,7 +483,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 
     /**
      * FIXME: why is wrong gtfs_id included?
-     *
+     * TODO process osm stops with gtfs_id first
      */
     public void compareBusStopData() throws InterruptedException {
         //Compare the OSM stops with GTFS data
@@ -497,6 +499,41 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             progressToUpdate = 50/totalOsmNode;
         }
         int currentTotalProgress=0;
+        Map<String, Stop> map = GTFSstops.stream()
+                .collect(Collectors.toMap(Stop::getStopID, e->e));
+
+
+       List<HashMap> gtfstoosm = OSMTags.entrySet().stream()
+                .filter(e -> e.getValue().containsKey("gtfs_id"))
+                       .map(Map.Entry::getValue)
+                       .collect(Collectors.toList());
+//                .collect(Collectors.toMap(e->e.getValue().get("gtfs_id"),e->e.getKey()));
+
+        Map<String,String> gtfstoosmmap = OSMTags.entrySet().stream()
+                .filter(e->e.getValue().containsKey("gtfs_id"))
+                .collect(Collectors.toMap(
+                        e->e.getValue().get("gtfs_id").toString(), Map.Entry::getKey
+                        , (BinaryOperator<String>) (e1, e2) -> {
+                    System.out.println("duplicate key found! " +
+                            "https://openstreetmap.org/" + OSMNodesType.get(e1).toString().toLowerCase()+'/'+e1 +' '+
+                            "https://openstreetmap.org/" + OSMNodesType.get(e2).toString().toLowerCase()+'/'+ e2);
+                    return e1;}
+                ));
+/*
+        Map<String,HashMap> gtfstoosmtagsmap = OSMTags.entrySet().stream()
+                .filter(e->e.getValue().containsKey("gtfs_id"))
+                .collect(Collectors.toMap(
+                        e->e.getValue().get("gtfs_id").toString(), e->e.getValue()
+                        , (BinaryOperator<String>) (e1, e2) -> {
+                            System.out.println("duplicate key found! " +
+                                    "https://openstreetmap.org/" + OSMNodesType.get(e1).toString().toLowerCase()+'/'+e1 +' '+
+                                    "https://openstreetmap.org/" + OSMNodesType.get(e2).toString().toLowerCase()+'/'+ e2);
+                            return e1;}
+                ));
+
+*/
+
+        //todo process these and remove from lists below
 //        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
         AtomicInteger osmindex= new AtomicInteger();
         OSMTags.entrySet().parallelStream().
