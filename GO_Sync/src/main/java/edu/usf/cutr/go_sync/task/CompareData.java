@@ -519,14 +519,26 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                             "https://openstreetmap.org/" + OSMNodesType.get(e2).toString().toLowerCase()+'/'+ e2);
                     return e1;}
                 ));
-/*
-        for (Map.Entry idmap :gtfsIDToOsmIDmap.entrySet())
-        {
-            newStop(gtfsidToStopMap.get(idmap.getKey() )
 
+        HashMap<String, Stop> gtfsidToStopMapLocal = new HashMap<>(gtfsidToStopMap);
+        HashMap<String, HashMap<String, String>> OSMTagsLocal = new HashMap<>(OSMTags);
+
+        for (Map.Entry<String,String> idmap :gtfsIDToOsmIDmap.entrySet())
+        {
+            Stop gtfsStop =gtfsidToStopMap.get(idmap.getKey());
+
+            // osm gtfs doesn't exist in agency data
+            if (gtfsStop!=null) {
+/*                newStop(gtfsStop,
+                        OSMTags.get(idmap.getValue()),
+                        idmap.getValue());
+*/                gtfsidToStopMapLocal.remove(idmap.getKey());
+                    OSMTagsLocal.remove(idmap.getValue());
+
+            }
         }
 
- */
+
 /*
         Map<String,HashMap> gtfstoosmtagsmap = OSMTags.entrySet().stream()
                 .filter(e->e.getValue().containsKey("gtfs_id"))
