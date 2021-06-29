@@ -298,9 +298,20 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         {
             @Override
             public int compare(Stop k, Stop j) {
+                int result = 0;
+                try{
+                    int ki = Integer.parseInt(k.getStopID());
+                    int ji = Integer.parseInt(j.getStopID());
+                    if (ki > ji)
+                        return 1;
+                    return -1;
+
+                } catch (NumberFormatException e) {}
+
                 if ((k).getStopID().hashCode() > (j).getStopID().hashCode())
                     return 1;
                 return -1;
+
 //             (k.getStopID().hashCode() - (j).getStopID().hashCode());
         }});
         benchmarking("reportKeys sort");
