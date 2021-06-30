@@ -35,7 +35,6 @@ public class Stop extends OsmPrimitive implements Comparable{
     private final String GTFS_OPERATOR_KEY	= tag_defs.GTFS_OPERATOR_KEY;
     private final String GTFS_NAME_KEY		= tag_defs.GTFS_NAME_KEY;
     private String lat, lon;
-    tag_defs.primative_type type = tag_defs.primative_type.NODE;
     private HashSet<Route> routes;
     private HashSet<RelationMember> osmMembers = new HashSet<>();
     private ArrayList<String> osmWayNodes = new ArrayList<String>();

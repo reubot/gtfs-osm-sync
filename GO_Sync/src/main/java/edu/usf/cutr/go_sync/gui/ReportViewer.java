@@ -19,6 +19,7 @@ import edu.usf.cutr.go_sync.io.WriteFile;
 import edu.usf.cutr.go_sync.object.*;
 import edu.usf.cutr.go_sync.osm.HttpRequest;
 import edu.usf.cutr.go_sync.task.UploadData;
+import edu.usf.cutr.go_sync.tools.CompareStopGtfsID;
 import edu.usf.cutr.go_sync.tools.OsmDistance;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -81,7 +82,6 @@ import javax.swing.JCheckBox;
  * @author Khoa Tran
  */
 public class ReportViewer extends javax.swing.JFrame implements TableModelListener, PropertyChangeListener {
-
 
     protected static Color matchColor, selectedOSMColor, selectedGTFSColor;
     protected String[] tagReportColumnHeaderToolTips = {
@@ -294,26 +294,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // TODO: use comparator / java.util.Collections.sort()
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
         //ordering by hashcode
-        reportKeys.sort(new Comparator<Stop>()
-        {
-            @Override
-            public int compare(Stop k, Stop j) {
-                int result = 0;
-                try{
-                    int ki = Integer.parseInt(k.getStopID());
-                    int ji = Integer.parseInt(j.getStopID());
-                    if (ki > ji)
-                        return 1;
-                    return -1;
-
-                } catch (NumberFormatException e) {}
-
-                if ((k).getStopID().hashCode() > (j).getStopID().hashCode())
-                    return 1;
-                return -1;
-
-//             (k.getStopID().hashCode() - (j).getStopID().hashCode());
-        }});
+        reportKeys.sort(new CompareStopGtfsID());
         benchmarking("reportKeys sort");
 
         final Stop[] emptystoplist = new Stop[0];
@@ -1230,6 +1211,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 modify.add(s);
 
             } else if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT)) {
+                // TODO: CHANGE TYPE to node and get gtfs coords
                 // upload the new stop
                 upload.add(s);
                 // add FIXME to its potential matches

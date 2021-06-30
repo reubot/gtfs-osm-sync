@@ -25,6 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import edu.usf.cutr.go_sync.object.*;
+import edu.usf.cutr.go_sync.tools.CompareStopGtfsID;
 import edu.usf.cutr.go_sync.tools.parser.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
@@ -414,6 +415,7 @@ public class HttpRequest {
         if (r!=null) routeKeys.addAll(routes.keySet());
         StringBuilder text = new StringBuilder();
         List<Stop> stops = new ArrayList<Stop>(addStop);
+        stops.sort(new CompareStopGtfsID());
         text.append(oprinter.osmChangeCreate());
         int id=0,i=0;
         for(Stop st:stops){
@@ -430,6 +432,7 @@ public class HttpRequest {
         }
         text.append(oprinter.osmChangeModify());
         stops = new ArrayList<Stop>(modifyStop);
+        stops.sort(new CompareStopGtfsID());
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();
             text.append(oprinter.writeBusStop(changeSetID, nodeid, stop,true));
@@ -444,6 +447,7 @@ public class HttpRequest {
             }
         }
         stops = new ArrayList<Stop>(deleteStop);
+        stops.sort(new CompareStopGtfsID());
         text.append(oprinter.osmChangeDelete());
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();
