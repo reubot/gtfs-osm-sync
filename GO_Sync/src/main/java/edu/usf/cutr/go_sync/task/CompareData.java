@@ -522,22 +522,22 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 
         HashMap<String, Stop> gtfsidToStopMapLocal = new HashMap<>(gtfsidToStopMap);
         HashMap<String, HashMap<String, String>> OSMTagsLocal = new HashMap<>(OSMTags);
-
+/*
         for (Map.Entry<String,String> idmap :gtfsIDToOsmIDmap.entrySet())
         {
             Stop gtfsStop =gtfsidToStopMap.get(idmap.getKey());
 
             // osm gtfs doesn't exist in agency data
             if (gtfsStop!=null) {
-/*                newStop(gtfsStop,
+                newStop(gtfsStop,
                         OSMTags.get(idmap.getValue()),
                         idmap.getValue());
-*/                gtfsidToStopMapLocal.remove(idmap.getKey());
+               gtfsidToStopMapLocal.remove(idmap.getKey());
                     OSMTagsLocal.remove(idmap.getValue());
 
             }
         }
-
+*/
 
 /*
         Map<String,HashMap> gtfstoosmtagsmap = OSMTags.entrySet().stream()
@@ -694,6 +694,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                         else {
                             Stop ns = new Stop(gtfsStop);
                             osmActiveUsers.add(node.getValue("user"));
+                            /** NOTE: this causes new unaccepted stops to be invallidly ourput not as nodes */
                             ns.setType(OSMNodesType.get(osmID));
 
                             Stop es = new Stop(osmStopID, osmOperator, osmStopName, node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON));
