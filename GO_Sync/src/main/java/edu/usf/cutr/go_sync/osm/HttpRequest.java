@@ -56,7 +56,32 @@ public class HttpRequest {
     private static final String OSM_HOST = "https://openstreetmap.org/api/0.6/";
     private static final String[] overpass_hosts = {"https://overpass.openstreetmap.ru/api/interpreter","https://overpass.nchc.org.tw/api/interpreter","http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","https://overpass.kumi.systems/api/interpreter"};
 
+    public class CompareStopOsmID implements  Comparator<OsmPrimitive>{
 
+        @Override
+        public int compare(OsmPrimitive k, OsmPrimitive j) {
+            /*
+            int result = 0;
+            try{
+                int ki = Integer.parseInt(k.getOsmId());
+                int ji = Integer.parseInt(j.getOsmId());
+                if (ki > ji)
+                    return 1;
+                return -1;
+
+            } catch (NumberFormatException e) {
+
+            }
+*/
+
+            if ((k).getOsmId().hashCode() > (j).getOsmId().hashCode())
+                return 1;
+            return -1;
+
+        }
+
+
+    }
 
     private HashMap<String,AttributesImpl> existingNodes = new HashMap<>();
     private HashMap<String,AttributesImpl> existingStations = new HashMap<>();
@@ -432,7 +457,8 @@ public class HttpRequest {
         }
         text.append(oprinter.osmChangeModify());
         stops = new ArrayList<Stop>(modifyStop);
-        stops.sort(new CompareStopGtfsID());
+//        stops.sort(new CompareStopGtfsID());
+        stops.sort(new CompareStopOsmID());
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();
             text.append(oprinter.writeBusStop(changeSetID, nodeid, stop,true));

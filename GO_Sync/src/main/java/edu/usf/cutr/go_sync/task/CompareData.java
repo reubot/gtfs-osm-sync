@@ -836,12 +836,14 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 
     public void setStopWithOsmDataDefault(){
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
-        for (Stop reportKey : reportKeys) {
+        HashMap<Stop, TreeSet<Stop>> reportHM = new HashMap<>(report);
+        for (HashMap.Entry<Stop, TreeSet<Stop>> reportEntry : reportHM.entrySet()) {
+            Stop reportKey = reportEntry.getKey();
             if (this.flagIsDone) return;
             Stop s = new Stop(reportKey);
             OsmPrimitive.RC category = s.getReportCategory();
             if (category==(OsmPrimitive.RC.MODIFY)) {
-                TreeSet<Stop> arr = report.get(s);
+                TreeSet<Stop> arr = reportEntry.getValue(); //.get(s);
                 if (arr.size() == 1) {
                     String tempStopId = null;
                     report.remove(s);

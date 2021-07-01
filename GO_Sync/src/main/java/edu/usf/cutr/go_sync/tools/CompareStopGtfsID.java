@@ -15,8 +15,22 @@ public class CompareStopGtfsID implements  Comparator<Stop>{
                 return 1;
             return -1;
 
-        } catch (NumberFormatException e) {}
+        } catch (NumberFormatException e) {
 
+        }
+        /*
+        try{
+            //try using osmid
+            if  (!(k.getOsmId().isEmpty() ||j.getOsmId().isEmpty())) {
+                int ki = Integer.parseInt(k.getOsmId());
+                int ji = Integer.parseInt(j.getOsmId());
+                if (ki > ji)
+                    return 1;
+                return -1;
+            }
+
+        }catch (Exception e) {}
+*/
         if ((k).getStopID().hashCode() > (j).getStopID().hashCode())
             return 1;
         return -1;
