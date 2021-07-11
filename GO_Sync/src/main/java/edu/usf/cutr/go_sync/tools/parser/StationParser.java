@@ -137,6 +137,7 @@ public class StationParser extends DefaultHandler {
             if (tempTag!=null)
                 if(tempTag.containsKey("public_transport") ||
                         tempTag.containsKey("station") ||
+                        tempTag.containsKey("railway") ||
                         tempTag.containsValue("bus_station") ||
                         tempTag.containsValue("ferry_terminal") )
                 {

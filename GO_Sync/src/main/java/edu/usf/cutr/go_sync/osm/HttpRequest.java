@@ -230,14 +230,18 @@ public class HttpRequest {
 //        String urlSuffix = "/api/0.6/relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
 //        String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
-
+/** overpass query - if changed you also need to update StationParser.endElement */
         String content = "[bbox:"+bottom+ ',' +left+ ',' +top+ ',' +right+"]; ( " +
                 "relation[public_transport=station];" +
                 "relation[public_transport=platform];" +
+                "relation[railway=station];" +
+                "relation[railway=platform];" +
                 "relation[public_transport];" +
                 "way[station];" +
                 "way[public_transport=station];"+
                 "way[public_transport=platform];"+
+                "way[railway=station];"+
+                "way[railway=platform];"+
                 "way[amenity=bus_station];"+
                 "way[amenity=ferry_terminal];"+
             "); (._;>;); out meta;";
