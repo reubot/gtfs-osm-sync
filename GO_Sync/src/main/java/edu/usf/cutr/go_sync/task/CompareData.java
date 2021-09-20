@@ -532,12 +532,15 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 newStop(gtfsStop,
                         OSMTags.get(idmap.getValue()),
                         idmap.getValue());
-               gtfsidToStopMapLocal.remove(idmap.getKey());
-                    OSMTagsLocal.remove(idmap.getValue());
+                gtfsidToStopMapLocal.remove(idmap.getKey());
+                OSMTagsLocal.remove(idmap.getValue());
 
             }
         }
-*/
+
+ */
+        System.out.println("GTFSstops "+ GTFSstops.size() + " report:" + report.size() + " upload:" + upload.size() + " modify:" + modify.size() + " delete:" + delete.size()  );
+        System.out.println("gtfsidToStopMapLocal "+ gtfsidToStopMapLocal.size() + " OSMTagsLocal:" + OSMTagsLocal.size() + " upload:" + upload.size() + " modify:" + modify.size() + " delete:" + delete.size()  );
 
 /*
         Map<String,HashMap> gtfstoosmtagsmap = OSMTags.entrySet().stream()
@@ -553,11 +556,10 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 
 
 */
-
-
         //todo process these and remove from lists below
 //        for (int osmindex=0; osmindex<totalOsmNode; osmindex++){
         AtomicInteger osmindex= new AtomicInteger();
+//        OSMTagsLocal.entrySet().parallelStream().
         OSMTags.entrySet().parallelStream().
                 forEach(osmtagEntry -> {
             if(this.flagIsDone)
@@ -604,8 +606,10 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             String osmID = node.getValue("id");
             String version = Integer.toString(Integer.parseInt(node.getValue("version")));
             if (isOp) {
+//                for (Map.Entry<String,Stop> gtfsStopEntry : gtfsidToStopMapLocal.entrySet()){Stop gtfsStop=gtfsStopEntry.getValue();
                 for (Stop gtfsStop : GTFSstops){
                     if(this.flagIsDone) return;
+                    if (gtfsidToStopMap.containsKey(osmStopID)) gtfsStop = gtfsidToStopMap.get(osmStopID);
 //                    Stop gtfsStop = GTFSstops.get(gtfsindex);
                     double distance = OsmDistance.distVincenty(node.getValue(tag_defs.LAT), node.getValue(tag_defs.LON),
                             gtfsStop.getLat(), gtfsStop.getLon());
@@ -822,7 +826,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 //            if ((!noUpload.contains((GTFSstops.get(i)))) && (!reportKeys.contains(GTFSstops.get(i))) ) {
             if ((!noUpload.contains(gtfSstop)) && (!reportIDs.contains(gtfSstop.getStopID()))) {
                 Stop n = new Stop(gtfSstop);
-                n.setType(OSMNodesType.get(tag_defs.primative_type.NODE));
+                n.setType(tag_defs.primative_type.NODE);
                 n.setReportText("New upload with no conflicts");
                 n.setReportCategory(OsmPrimitive.RC.UPLOAD_NO_CONFLICT);
                 upload.add(n);
