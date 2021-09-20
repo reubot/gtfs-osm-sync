@@ -82,7 +82,15 @@ import javax.swing.JCheckBox;
  * @author Khoa Tran
  */
 public class ReportViewer extends javax.swing.JFrame implements TableModelListener, PropertyChangeListener {
+    protected class BooleanPair
+    {
+        public boolean gtfs, osm;
+        BooleanPair(boolean bgtfs,boolean bosm){
+            gtfs = bgtfs;
+            osm = bosm;
+        }
 
+    }
     protected static Color matchColor, selectedOSMColor, selectedGTFSColor;
     protected String[] tagReportColumnHeaderToolTips = {
             "Tag name",
@@ -103,6 +111,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                            osmDefaultFinalStops = new Hashtable<String, Stop>(),
                 osmDefaultOnlyChangedFinalStops = new Hashtable<String, Stop>(),
     usedOSMstops = new Hashtable<>();
+    private HashMap<String, ArrayList<BooleanPair>> finalCheckboxesBP;
+
     private Hashtable<String, ArrayList<Boolean>> finalCheckboxes, finalRouteCheckboxes;
     private Hashtable<String, Stop> searchKeyToStop = new Hashtable<String, Stop>();
     private HashSet<String> stopsToFinish = new HashSet<String>();  // uploadConflict + modified
@@ -285,6 +295,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         delete = new HashSet<Stop>();
         delete.addAll(d);
 
+        finalCheckboxesBP = new HashMap<String, ArrayList<BooleanPair>>();
 
         finalCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
         finalRouteCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
@@ -333,7 +344,10 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             // the size should be 2x of the number of tags+2(for lat,lon) since we need checkboxes for both osm and gtfs values
             // format: gtfs,osm,gtfs,osm,gtfs,osm,etc.
             int numberOfBool = (st.getTags().size() + 2) * 2;
+            int numberOfBoolBP = (st.getTags().size() + 2);
             ArrayList<Boolean> arr = new ArrayList<Boolean>(numberOfBool);
+            ArrayList<BooleanPair> arrBP = new ArrayList<>(numberOfBoolBP);
+
             // FIXME: very difficult to read, and does not handle gtfs nulls
             for (int j = 0; j < numberOfBool; j++) {
                 if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) || category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
@@ -344,7 +358,14 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     else arr.add(false);
                 }
             }
+            for (int j = 0; j <numberOfBoolBP; j++) {
+                if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) || category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT))
+                    arrBP.add(new BooleanPair(true,false));
+                else
+                    arrBP.add(new BooleanPair(false,true));
 
+            }
+            finalCheckboxesBP.put(st.getStopID(), arrBP);
             finalStops.put(st.getStopID(), st);
             finalCheckboxes.put(st.getStopID(), arr);
         }
@@ -517,6 +538,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // first, add lat and lon
         Stop finalSt = finalStops.get(selectedNewStop.getStopID());
         ArrayList<Boolean> finalCB = finalCheckboxes.get(selectedNewStop.getStopID());
+        ArrayList<BooleanPair> finalCBBP = finalCheckboxesBP.get(selectedNewStop.getStopID());
 
         if(selectedOsmStop!=null) {
             stopTableModel.setRowValueAt(new Object[] {"lat", agencyStop.getLat(), finalCB.get(0), selectedOsmStop.getLat(), finalCB.get(1), finalSt.getLat()}, 0);
@@ -525,7 +547,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             stopTableModel.setRowValueAt(new Object[] {"lat", agencyStop.getLat(), finalCB.get(0), "",finalCB.get(1), finalSt.getLat()}, 0);
             stopTableModel.setRowValueAt(new Object[] {"lon", agencyStop.getLon(), finalCB.get(2), "", finalCB.get(3), finalSt.getLon()}, 1);
         }
-        for(int i=0; i<tkeys.size(); i++){
+            for(int i=0; i<tkeys.size(); i++){
             String k = tkeys.get(i);
             boolean osmCB = false, gtfsCB = false;
             //make sure there's null pointer
@@ -550,10 +572,15 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                                 	gtfsCB = true;
                         	newValue = gtfsValue;
                         }
+                    //FIXME this needs double checking
             //add tag to table, index+2 because of lat and lon
             if (finalStopsAccepted.containsKey(selectedNewStop.getStopID()) && selectedOsmStop!=null
                     &&  finalStopsAccepted.get(selectedNewStop.getStopID()).getOsmId().equals(selectedOsmStop.getOsmId())) {
-                stopTableModel.setRowValueAt(new Object[]{k, gtfsValue, finalCB.get((i + 2) * 2), osmValue, finalCB.get((i + 2) * 2 + 1), finalSt.getTag(k)}, i + 2);
+                BooleanPair row = finalCBBP.get(i+2);
+//                System.out.println(k +  gtfsValue+ row.gtfs+ osmValue+ row.osm+ finalSt.getTag(k));
+//                stopTableModel.setRowValueAt(new Object[]{k, gtfsValue, finalCB.get(i + 2), osmValue, finalCB.get(i + 3), finalSt.getTag(k)},i + 2);
+//                stopTableModel.setRowValueAt(new Object[]{k, gtfsValue, finalCB.get((i + 2) * 2), osmValue, finalCB.get((i + 2) * 2 + 1), finalSt.getTag(k)}, i + 2);
+                stopTableModel.setRowValueAt(new Object[]{k, gtfsValue, row.gtfs, osmValue, row.osm, finalSt.getTag(k)}, i+2);
 //            if(selectedOsmStop!=null) osmValue = (String)selectedOsmStop.getTag(k);
 //
 //            /* default to GTFS checked
@@ -2778,18 +2805,25 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         Stop selectedOSMStop  = (Stop)osmStopsComboBox.getSelectedItem();
 
         String tableStopButtonText = tableStopButton.getText();
-        if (tableStopButtonText.contains("Save Change")) {
+//        if (tableStopButtonText.contains("Save Change")) {
+        if(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Save Change")) {
+
 
             // Save Checkboxes values
             // no need to add 2 since lat and lon are already there (counted)
             ArrayList<Boolean> saveValues = new ArrayList<Boolean>(stopTableModel.getRowCount() * 2);
+            ArrayList<BooleanPair> saveValuesBP = new ArrayList<>(stopTableModel.getRowCount());
+            //for (int i = 0; i < stopTableModel.getRowCount(); i++) {
             for (int i = 0; i < stopTableModel.getRowCount(); i++) {
+
                 saveValues.add((Boolean) stopTableModel.getValueAt(i, StopTableInfo.GTFS_CHECK_COL)); //gtfs
                 saveValues.add((Boolean) stopTableModel.getValueAt(i, StopTableInfo.OSM_CHECK_COL)); //osm
+                saveValuesBP.add(new BooleanPair((Boolean) stopTableModel.getValueAt(i, StopTableInfo.GTFS_CHECK_COL),(Boolean) stopTableModel.getValueAt(i, StopTableInfo.OSM_CHECK_COL)));
             }
             finalCheckboxes.put(selectedGtfs, saveValues);
-        }
-        if(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Save Change")) {
+            finalCheckboxesBP.put(selectedGtfs, saveValuesBP);
+//        }
+//        if(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Save Change")) {
 
             // Save to final Stops
             Stop st = saveAcceptedDataToFinalStops(selectedGtfs);
@@ -2797,8 +2831,10 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //                st.setOsmId(selectedOSMStop.getOsmId());
                 st.setOsmData(selectedOSMStop);
             if (st.getOsmVersion() == null) {
-                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion())+1;
-                st.setOsmVersion(Integer.toString(newOSMVersion));
+                // FIXME CHECK THIS
+//                int newOSMVersion = Integer.parseInt(selectedOSMStop.getOsmVersion())+1;
+//                st.setOsmVersion(Integer.toString(newOSMVersion));
+                st.setOsmVersion(selectedOSMStop.getOsmVersion());
             }
             st.setReportCategory(OsmPrimitive.RC.MODIFY);
             usedOSMstops.put(selectedOSMStop.getOsmId(),st); //TODO do this properly
@@ -2963,6 +2999,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             generateStopsToUpload(finalStops);
             uploadRoutes = finalRoutes;
         }
+        System.out.println("report:" + report.size() + " upload:" + upload.size() + " modify:" + modify.size() + " delete:" + delete.size()  );
 
         String osmChangeText ="";
         if (routesCheckbox.isSelected() && stopsCheckbox.isSelected())
