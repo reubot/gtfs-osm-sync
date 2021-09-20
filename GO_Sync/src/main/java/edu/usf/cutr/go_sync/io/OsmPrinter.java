@@ -106,8 +106,8 @@ public class OsmPrinter {
         // if modify, we need version number
         if(st.getOsmVersion()!=null) {
             String oVersion = st.getOsmVersion();
-            if (modify)
-                oVersion= Integer.toString(Integer.parseInt(oVersion)+1);
+//            if (modify)
+//                oVersion= Integer.toString(Integer.parseInt(oVersion)+1);
             text += "' version='"+oVersion;
             text += "'>\n";
         }
