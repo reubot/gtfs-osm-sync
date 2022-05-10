@@ -1046,6 +1046,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     }
 
     private void updateMemberList(Route selectedNewRoute, String criteria){
+        System.out.println("updateMemberList");
         Route aRoute = null, eRoute=null;
         if(selectedNewRoute!=null) {
             aRoute = agencyRoutes.get(selectedNewRoute.getRouteId());
@@ -1073,14 +1074,14 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         for (RelationMember t : gtfsMembers) {
             String v = t.getGtfsId();
             if (v != null && !v.equals("none") && !v.isEmpty()) hashGtfs.put(t, v);
-//            else hashGtfs.put(t, t.getType() + " (" + t.getRef()+")");
+            else hashGtfs.put(t, t.getType() + " (" + t.getRef()+")");
         }
 
         Hashtable<RelationMember, String> hashOsm = new Hashtable<RelationMember, String>();
         for (RelationMember t : osmMembers) {
             String v = t.getGtfsId();
             if (v != null && !v.equals("none") && !v.isEmpty()) hashOsm.put(t, v);
-//            else hashOsm.put(t, t.getType() + " (" + t.getRef()+")");
+            else hashOsm.put(t, t.getType() + " (" + t.getRef()+")");
         }
 
         int memberNewIndex = 0;
@@ -1089,12 +1090,13 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             String status = t.getStatus();
             if (status.equals(criteria) || criteria.equals("all")) {
                 String v = t.getGtfsId();
-//                if (v==null || v.equals("none") || v.equals("")) v = t.getType() + " (" + t.getRef() +")";
+                if (v==null || v.equals("none") || v.equals("")) v = t.getType() + " (" + t.getRef() +")";
 
                 if (hashGtfs.get(t) != null) memberGtfsIndex++;
                 if (hashOsm.get(t) != null) memberOsmIndex++;
 
-                if (v != null && !v.equals("none") && !v.isEmpty()) {
+                //if (v != null && !v.equals("none") && !v.isEmpty())
+                {
                     memberTableModel.setRowValueAt(new Object[]{hashGtfs.get(t), hashOsm.get(t), v}, memberNewIndex);
                     memberNewIndex++;
                 }
