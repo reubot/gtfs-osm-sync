@@ -28,6 +28,7 @@ import edu.usf.cutr.go_sync.tools.OsmFormatter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.input.BOMInputStream;
 
 public class GTFSReadIn {
     private static Hashtable<String, Route> allRoutes;
@@ -79,7 +80,7 @@ public class GTFSReadIn {
         String [] elements;
         int stopIdKey=-1, stopNameKey=-1, stopLatKey=-1, stopLonKey=-1;
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fName),"UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new BOMInputStream(new FileInputStream(fName)),"UTF-8"));
             HashMap<String,Integer> keysIndex = new HashMap<String,Integer> ();
             thisLine = br.readLine();
             StringReader sr = new StringReader(thisLine);
@@ -227,7 +228,7 @@ public class GTFSReadIn {
         int routeIdKey=-1, routeShortNameKey=-1,routeLongNameKey=-1;
 
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(routes_fName),"UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new BOMInputStream(new FileInputStream(routes_fName)),"UTF-8"));
             HashMap<String,Integer> keysIndex = new HashMap<String,Integer> ();
             thisLine = br.readLine();
             StringReader sr = new StringReader(thisLine);
@@ -240,7 +241,10 @@ public class GTFSReadIn {
             keysn = CSVkeysList.toArray(keysn);
             for(int i=0; i<keysn.length; i++) {
                 //read keys
-                switch (keysn[i]) {
+                String x = keysn[i].trim();
+                System.out.println(keysn[i].trim());
+                System.out.println(keysn[i].trim().equals(tag_defs.GTFS_ROUTE_ID_KEY));
+                switch (keysn[i].trim()) {
                     case tag_defs.GTFS_ROUTE_ID_KEY:
                         routeIdKey = i;
                         break;
@@ -266,6 +270,7 @@ public class GTFSReadIn {
                         break;
                 }
             }
+            System.out.println(CSVkeysList.indexOf(tag_defs.GTFS_ROUTE_ID_KEY));
             if (routeLongNameKey != -1)
                 keysIndex.put("name",routeLongNameKey);
 //                    System.out.println(stopIdKey+","+stopNameKey+","+stopLatKey+","+stopLonKey);
@@ -344,7 +349,7 @@ public class GTFSReadIn {
 
         // trips.txt read-in
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(trips_fName),"UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new BOMInputStream(new FileInputStream(trips_fName)),"UTF-8"));
             CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
             for (CSVRecord csvRecord : parser) {
 
@@ -364,7 +369,7 @@ public class GTFSReadIn {
         Hashtable<String, HashSet<Route>> stopIDs = new Hashtable<String, HashSet<Route>>();
         // stop_times.txt read-in
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(stop_times_fName), "UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new BOMInputStream(new FileInputStream(stop_times_fName)), "UTF-8"));
 
             CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
 
