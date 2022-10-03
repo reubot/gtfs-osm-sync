@@ -297,7 +297,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         finalCheckboxesBP = new HashMap<String, ArrayList<BooleanPair>>();
 
-        finalCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
+//        finalCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
         finalRouteCheckboxes = new Hashtable<String, ArrayList<Boolean>>();
 
 //System.out.println(r.size() + "\t" + u.size() + "\t" + m.size() + "\t" + d.size() + "\t");
@@ -349,7 +349,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             ArrayList<BooleanPair> arrBP = new ArrayList<>(numberOfBoolBP);
 
             // FIXME: very difficult to read, and does not handle gtfs nulls
-            for (int j = 0; j < numberOfBool; j++) {
+/*            for (int j = 0; j < numberOfBool; j++) {
                 if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) || category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT)) {
                     if (j % 2 == 0) arr.add(true);
                     else arr.add(false);
@@ -358,6 +358,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                     else arr.add(false);
                 }
             }
+ */
             for (int j = 0; j <numberOfBoolBP; j++) {
                 if (category.equals(OsmPrimitive.RC.UPLOAD_CONFLICT) || category.equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT))
                     arrBP.add(new BooleanPair(true,false));
@@ -367,7 +368,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             }
             finalCheckboxesBP.put(st.getStopID(), arrBP);
             finalStops.put(st.getStopID(), st);
-            finalCheckboxes.put(st.getStopID(), arr);
+//            finalCheckboxes.put(st.getStopID(), arr);
         }
         benchmarking("Final stops with Gtfs Value as Default");
 
@@ -537,15 +538,16 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // add data to table
         // first, add lat and lon
         Stop finalSt = finalStops.get(selectedNewStop.getStopID());
-        ArrayList<Boolean> finalCB = finalCheckboxes.get(selectedNewStop.getStopID());
+//        ArrayList<Boolean> finalCB = finalCheckboxes.get(selectedNewStop.getStopID());
         ArrayList<BooleanPair> finalCBBP = finalCheckboxesBP.get(selectedNewStop.getStopID());
-
+        BooleanPair latrow = finalCBBP.get(0);
+        BooleanPair lonrow = finalCBBP.get(0);
         if(selectedOsmStop!=null) {
-            stopTableModel.setRowValueAt(new Object[] {"lat", agencyStop.getLat(), finalCB.get(0), selectedOsmStop.getLat(), finalCB.get(1), finalSt.getLat()}, 0);
-            stopTableModel.setRowValueAt(new Object[] {"lon", agencyStop.getLon(), finalCB.get(2), selectedOsmStop.getLon(), finalCB.get(3), finalSt.getLon()}, 1);
+            stopTableModel.setRowValueAt(new Object[] {"lat", agencyStop.getLat(), latrow.gtfs, selectedOsmStop.getLat(), latrow.osm, finalSt.getLat()}, 0);
+            stopTableModel.setRowValueAt(new Object[] {"lon", agencyStop.getLon(), lonrow.gtfs, selectedOsmStop.getLon(), lonrow.osm, finalSt.getLon()}, 1);
         } else {
-            stopTableModel.setRowValueAt(new Object[] {"lat", agencyStop.getLat(), finalCB.get(0), "",finalCB.get(1), finalSt.getLat()}, 0);
-            stopTableModel.setRowValueAt(new Object[] {"lon", agencyStop.getLon(), finalCB.get(2), "", finalCB.get(3), finalSt.getLon()}, 1);
+            stopTableModel.setRowValueAt(new Object[] {"lat", agencyStop.getLat(), latrow.gtfs, "", latrow.osm, finalSt.getLat()}, 0);
+            stopTableModel.setRowValueAt(new Object[] {"lon", agencyStop.getLon(), lonrow.gtfs, "", lonrow.osm, finalSt.getLon()}, 1);
         }
             for(int i=0; i<tkeys.size(); i++){
             String k = tkeys.get(i);
@@ -2528,7 +2530,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
           finalStops.entrySet().removeAll(gtfsUploadConflictList);
           osmDefaultFinalStops.entrySet().removeAll(gtfsUploadConflictList);
           osmDefaultOnlyChangedFinalStops.entrySet().removeAll(gtfsUploadConflictList);
-          finalCheckboxes.entrySet().removeAll(gtfsUploadConflictList);
+//          finalCheckboxes.entrySet().removeAll(gtfsUploadConflictList);
+          finalCheckboxesBP.entrySet().removeAll(gtfsUploadConflictList);
+
           upload.removeAll(gtfsUploadConflictList);
           modify.removeAll(gtfsUploadConflictList);
           delete.removeAll(gtfsUploadConflictList);
@@ -2549,7 +2553,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             finalStops.entrySet().removeAll(gtfsUploadNoConflictList);
             osmDefaultFinalStops.entrySet().removeAll(gtfsUploadNoConflictList);
             osmDefaultOnlyChangedFinalStops.entrySet().removeAll(gtfsUploadNoConflictList);
-            finalCheckboxes.entrySet().removeAll(gtfsUploadNoConflictList);
+//            finalCheckboxes.entrySet().removeAll(gtfsUploadNoConflictList);
+            finalCheckboxesBP.entrySet().removeAll(gtfsUploadNoConflictList);
             upload.removeAll(gtfsUploadNoConflictList);
             modify.removeAll(gtfsUploadNoConflictList);
             delete.removeAll(gtfsUploadNoConflictList);
@@ -2565,7 +2570,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             finalStops.entrySet().removeAll(gtfsModifyConflictList);
             osmDefaultFinalStops.entrySet().removeAll(gtfsModifyConflictList);
             osmDefaultOnlyChangedFinalStops.entrySet().removeAll(gtfsModifyConflictList);
-            finalCheckboxes.entrySet().removeAll(gtfsModifyConflictList);
+//            finalCheckboxes.entrySet().removeAll(gtfsModifyConflictList);
+            finalCheckboxesBP.entrySet().removeAll(gtfsModifyConflictList);
 
             upload.removeAll(gtfsModifyConflictList);
             modify.removeAll(gtfsModifyConflictList);
@@ -2677,7 +2683,9 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         finalStops.remove(sid);
         osmDefaultFinalStops.remove(sid);
         osmDefaultOnlyChangedFinalStops.remove(sid);
-        finalCheckboxes.remove(sid);
+//        finalCheckboxes.remove(sid);
+        finalCheckboxesBP.remove(sid);
+
     //    System.err.println(allMembersRadioButton.isSelected() + " "+ newWithMatchStopsRadioButton.isSelected());
         if (allStopsRadioButton.isSelected())
         	updateStopCategory(gtfsAll, 0);
@@ -2828,7 +2836,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 saveValues.add((Boolean) stopTableModel.getValueAt(i, StopTableInfo.OSM_CHECK_COL)); //osm
                 saveValuesBP.add(new BooleanPair((Boolean) stopTableModel.getValueAt(i, StopTableInfo.GTFS_CHECK_COL),(Boolean) stopTableModel.getValueAt(i, StopTableInfo.OSM_CHECK_COL)));
             }
-            finalCheckboxes.put(selectedGtfs, saveValues);
+//            finalCheckboxes.put(selectedGtfs, saveValues);
             finalCheckboxesBP.put(selectedGtfs, saveValuesBP);
 //        }
 //        if(tableStopButtonText.contains("Accept") || tableStopButtonText.contains("Save Change")) {
