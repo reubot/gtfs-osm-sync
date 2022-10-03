@@ -986,7 +986,8 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             else {
                 this.setMessage("No GTFS stops to be processed");
             }
-        }  catch (Exception e)     {         System.err.println(e + " " + e.getStackTrace());    }
+        }  catch (Exception e)     {         System.err.println(e + " " + e.getStackTrace());
+        e.printStackTrace();}
         finally {
             //make sure it's a complete task
             if(this.flagIsDone) firePropertyChange("progress", this.getCurrentProgress(), 100);
