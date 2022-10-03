@@ -634,15 +634,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // Must be placed after all data has been inserted inside the table. Otherwise, saveChangeButton is enabled
         dataTable.getModel().addTableModelListener(this);
 
-        if(selectedNewStop.getReportCategory().equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT) && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
-            updateButtonTableStop("Accept", true, "Add", true);
-        else
-            updateButtonTableStop("Accept", true, "Save Change", false);
-        if (selectedOsmStop!= null && usedOSMstops.containsKey(selectedOsmStop.getOsmId() )
-                && !usedOSMstops.get(selectedOsmStop.getOsmId()).getStopID().equals(agencyStop))
-//                && !finalStopsAccepted.get(selectedNewStop.getStopID()).getOsmId().equals(selectedOsmStop.getOsmId())) // TODO allow changing osm matches
-            updateButtonTableStop("Already Matched", false, "Already Matched", false);
-
+        updateButtonTableStop(selectedNewStop,selectedOsmStop);
 
         // set last edited information
         String lastEditedUser = "N/A";
@@ -1129,6 +1121,20 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     @param otherCategoryText text to set if in other categories or has been accepted
 
      */
+    private void updateButtonTableStop(Stop gtfsStop, Stop selectedOsmStop){
+        Stop selectedNewStop = gtfsStop;//(Stop)gtfsStopsComboBox.getSelectedItem();
+        Stop agencyStop = agencyStops.get(selectedNewStop.toString());
+
+        if(selectedNewStop.getReportCategory().equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT) && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
+            updateButtonTableStop("Accept", true, "Add", true);
+        else
+            updateButtonTableStop("Accept", true, "Save Change", false);
+        if (selectedOsmStop!= null && usedOSMstops.containsKey(selectedOsmStop.getOsmId() )
+                && !usedOSMstops.get(selectedOsmStop.getOsmId()).getStopID().equals(agencyStop))
+//                && !finalStopsAccepted.get(selectedNewStop.getStopID()).getOsmId().equals(selectedOsmStop.getOsmId())) // TODO allow changing osm matches
+            updateButtonTableStop("Already Matched", false, "Already Matched", false);
+
+    }
     private void updateButtonTableStop(String uploadConflictCategoryText, boolean uploadConflictStatus, String otherCategoryText, boolean otherStatus){
         Stop selectedGtfsStop = (Stop)gtfsStopsComboBox.getSelectedItem();
 
@@ -2848,6 +2854,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
             if(tableStopButtonText.equals("Accept & Save Change"))
                 JOptionPane.showMessageDialog(this,"Stop is accepted and changes have been made!");
+            //TODO only save change is already match
             else if (tableStopButtonText.equals("Save Change"))
                 JOptionPane.showMessageDialog(this,"Changes have been made!");
             else
@@ -2903,18 +2910,16 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 //TODO the code/logic here needs simplifying
         //FIXME the button is disabled after a change is made to the preceding stop
         Stop selectedNewStop =(Stop)gtfsStopsComboBox.getSelectedItem();
+        Stop selectedNewOSMStop  = (Stop)osmStopsComboBox.getSelectedItem();
+
 /*        if(tableStopButtonText.equals("Accept & Save Change")) {
 //            System.out.println("test");
 //            JOptionPane.showMessageDialog(this,"Stop is accepted and changes have been made!");
             updateButtonTableStop("Save Change", false, "Save Change", false);
             if(selectedNewStop.getReportCategory().equals(ReportCategory.UPLOAD_NO_CONFLICT) && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
                 updateButtonTableStop("Accept", true, "Add", true);
-        } else */if(selectedNewStop.getReportCategory().equals(OsmPrimitive.RC.UPLOAD_NO_CONFLICT) && !finalStopsAccepted.containsKey(selectedNewStop.getStopID()))
-            updateButtonTableStop("Accept", true, "Add", true);
-        else
-        {
-            updateButtonTableStop("Accept", true, "Save Change", false);
-        }
+        } else */
+        updateButtonTableStop(selectedNewStop,selectedNewOSMStop);
 }//GEN-LAST:event_tableStopButtonActionPerformed
 
     //action when savechange button on  route tags
