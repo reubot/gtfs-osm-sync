@@ -216,6 +216,15 @@ public class Stop extends OsmPrimitive implements Comparable{
 
     @Override
     public String toString(){
+        if (this.getStopID().equals("missing")){
+            String retname = "missing";
+            if (this.osmTags.containsKey("name") && !this.osmTags.get("name").equals("none"))
+                retname = this.osmTags.get("name").toString();
+            if (this.osmTags.containsKey("ref"))
+                retname = retname + " " + osmTags.get("ref");
+            return retname;
+
+        }
         return this.getStopID();
     }
 
