@@ -144,44 +144,15 @@ public class HttpRequest {
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
 //    	String urlSuffix = "?node[highway=bus_stop][bbox="+left+","+bottom+","+right+","+top+"]";
 //        String[] hosts = {"http://api.openstreetmap.fr/xapi","http://www.informationfreeway.org"};
+        String content = "[bbox:"+bottom+ ',' +left+ ',' +top+ ',' +right+"]; ( " +
+                "node[public_transport=station];" +
+                "node[public_transport=platform];" +
+                "node[highway=bus_stop];" +
+                "node[amenity=bus_station];"+
+                "node[amenity=ferry_terminal];"+
+                "); (._;>;); out meta;";
 
-    	String content = "<union>"+
-      			"<query type='node'>" +
-    			"<has-kv k='highway' v='bus_stop'/>"+
-    			"<bbox-query w='left' e='right' s='bottom' n='north'/>"+
-    			"</query>"+
 
-    			"<query type='node'>" +
-    			"<has-kv k='public_transport' v='platform'/>"+
-    			"<bbox-query w='left' e='right' s='bottom' n='north'/>"+
-    			"</query>"+
-
-    			"<query type='node'>" +
-    			"<has-kv k='public_transport' v='station'/>"+
-    			"<bbox-query w='left' e='right' s='bottom' n='north'/>"+
-    			"</query>"+
-
-    			"<query type='node'>" +
-    			"<has-kv k='amenity' v='bus_station'/>"+
-    			"<bbox-query w='left' e='right' s='bottom' n='north'/>"+
-    			"</query>"+
-/*
-    			"<query type=\"node\">" +
-    "<has-kv k=\"highway\" v=\"bus_stop\"/>"+
-    "<bbox-query w=\""+left+"\" e=\""+right+"\" s=\""+bottom+"\" n=\""+top+"\"/>"+
-    " </query>"+
-  "<query type=\"node\">" +
-  	" <has-kv k=\"public_transport\" v=\"platform\"/>"+
-    "<bbox-query w=\""+left+"\" e=\""+right+"\" s=\""+bottom+"\" n=\""+top+"\"/>"+
-   "</query>"+
-   "<query type=\"node\">" +
- 	" <has-kv k=\"public_transport\" v=\"station\"/>"+
-   "<bbox-query w=\""+left+"\" e=\""+right+"\" s=\""+bottom+"\" n=\""+top+"\"/>"+
-  "</query>"+  */
-"</union>"+
-"<print mode=\"meta\"/>";
-
-    	content = content.replace("left", left).replace("right",right).replace("bottom", bottom).replace("north",top);
 //      String[] hosts = {"http://overpass-api.de/api/interpreter","http://api.openstreetmap.fr/oapi/interpreter","http://overpass.osm.rambler.ru/cgi/interpreter",};
 
       System.out.println(content);
@@ -230,7 +201,7 @@ public class HttpRequest {
 //        String urlSuffix = "/api/0.6/relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
 //        String[] hosts = {"http://open.mapquestapi.com/xapi","http://www.informationfreeway.org"};
 //        String urlSuffix = "?relation[route=bus][bbox="+left+","+bottom+","+right+","+top+"]";
-/** overpass query - if changed you also need to update StationParser.endElement */
+/** NOTE overpass query - if changed you also need to update StationParser.endElement */
         String content = "[bbox:"+bottom+ ',' +left+ ',' +top+ ',' +right+"]; ( " +
                 "relation[public_transport=station];" +
                 "relation[public_transport=platform];" +
