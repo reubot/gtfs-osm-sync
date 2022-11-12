@@ -21,19 +21,17 @@ import edu.usf.cutr.go_sync.osm.HttpRequest;
 import edu.usf.cutr.go_sync.task.UploadData;
 import edu.usf.cutr.go_sync.tools.CompareStopGtfsID;
 import edu.usf.cutr.go_sync.tools.OsmDistance;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
@@ -58,12 +56,8 @@ import org.jdesktop.swingx.mapviewer.WaypointRenderer;
 import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.Painter;
 import edu.usf.cutr.go_sync.tag_defs;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.Event;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -642,15 +636,35 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         String lastEditedUser = "N/A";
         String lastEditedDate = "N/A";
         String osmType = "";
+        String osmURL = "";
         if(selectedOsmStop!=null) {
             if(selectedOsmStop.getLastEditedOsmUser()!=null && !selectedOsmStop.getLastEditedOsmUser().isEmpty())
                 lastEditedUser = selectedOsmStop.getLastEditedOsmUser();
             if(selectedOsmStop.getLastEditedOsmDate()!=null && !selectedOsmStop.getLastEditedOsmDate().isEmpty())
                 lastEditedDate = selectedOsmStop.getLastEditedOsmDate();
             osmType = selectedOsmStop.getType().toString() + " " + selectedOsmStop.getOsmId();
+            osmURL  = "https://www.openstreetmap.org/"+selectedOsmStop.getType().toString() .toLowerCase()+"/"+ selectedOsmStop.getOsmId();
+         //   osmURL = "<html><a href='/"+'>" + osmType + "</a></html>"
 
         }
-        osmDetailsLabel.setText(osmType);
+        osmDetailsLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        osmDetailsLabel.setText("<html><a href='"+osmURL+"'>" + osmType + "</a></html>");
+        final String osmURLfinal = osmURL;
+        MouseListener[] mla = osmDetailsLabel.getMouseListeners();
+        for (MouseListener ml :mla)
+            osmDetailsLabel.removeMouseListener(ml);
+        osmDetailsLabel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    Desktop.getDesktop().browse(new URI(osmURLfinal));
+                } catch (IOException | URISyntaxException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+        });
         if(!lastEditedUser.equals("N/A")) lastEditedLabel.setText(" Last edited by "+lastEditedUser+" on "+lastEditedDate);
         else lastEditedLabel.setText("Last edited: Information cannot be retrieved from OSM");
     }
