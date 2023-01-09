@@ -58,6 +58,7 @@ import org.jdesktop.swingx.painter.Painter;
 import edu.usf.cutr.go_sync.tag_defs;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -245,7 +246,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
      * @param eRoutes existingRoutes
      * @param to taskOutput
      */
-    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, HashSet<Stop>u, HashSet<Stop>m, HashSet<Stop>d, Hashtable<String, Route> routes, Hashtable<String, Route> nRoutes, Hashtable<String, Route> eRoutes, JTextArea to) {
+    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, Set<Stop>u, Set<Stop>m, Set<Stop>d, Hashtable<String, Route> routes, Hashtable<String, Route> nRoutes, Hashtable<String, Route> eRoutes, JTextArea to) {
 
 //    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, HashSet<Stop>u, HashSet<Stop>m, HashSet<Stop>d, Hashtable routes, Hashtable nRoutes, Hashtable eRoutes, JTextArea to) {
         super("GO-Sync: Report");
@@ -280,13 +281,13 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         stopTableModel = new TagReportTableModel(0);
 
-        upload = new HashSet<Stop>();
+        upload = new HashSet<Stop>(u.size());
         upload.addAll(u);
 
-        modify = new HashSet<Stop>();
+        modify = new HashSet<Stop>(m.size());
         modify.addAll(m);
 
-        delete = new HashSet<Stop>();
+        delete = new HashSet<Stop>(d.size());
         delete.addAll(d);
 
         finalCheckboxesBP = new HashMap<String, ArrayList<BooleanPair>>();
@@ -299,7 +300,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // TODO: use comparator / java.util.Collections.sort()
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
         //ordering by hashcode
-        reportKeys.sort(new CompareStopGtfsID());
+        reportKeys.sort(Stop.COMPARE_PADDED);//new CompareStopGtfsID());
         benchmarking("reportKeys sort");
 
         final Stop[] emptystoplist = new Stop[0];
@@ -394,8 +395,8 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
                 //String stopID, String operatorName, String stopName, String lat, String lon
                 Stop stopWithSelectedTags = new Stop(newStop.getStopID(), newStop.getOperatorName(), osmStop.getStopName(), osmStop.getLat(), osmStop.getLon());
                 Stop agencyStop = agencyStops.get(newStop.getStopID());
-                Hashtable<String, String> agencyTags = agencyStop.getTags();
-                Hashtable<String, String> osmTags = osmStop.getTags();
+                ConcurrentHashMap<String,String> agencyTags = agencyStop.getTags();
+                ConcurrentHashMap<String,String> osmTags = osmStop.getTags();
                 ArrayList<String> osmTagKeys = new ArrayList<String>(osmStop.keySet());
                 osmTagKeys.remove(tag_defs.GTFS_OPERATOR_KEY);
 //                osmTagKeys.remove("highway");
@@ -510,7 +511,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         addSelectedStopsOverlay(selectedNewStop, selectedOsmStop);
         // get all the possible tag names from gtfs data and osm data
         Set<String> tagKeys = new TreeSet<String>();
-        Hashtable aTags = null;
+        ConcurrentHashMap aTags = null;
         if(selectedNewStop!=null) {
             tagKeys.addAll(selectedNewStop.keySet());
 //            aTags = (Hashtable)agencyTable.get(selectedNewStop);
@@ -3019,6 +3020,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
     }//GEN-LAST:event_exportOsmValueStopsWithConflictsMenuItemActionPerformed
 
     private void dummyUploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dummyUploadButtonActionPerformed
+        benchmarking("dummyUploadButtonActionPerformed 1");
         Hashtable uploadRoutes;
         if (acceptedOnlyCheckbox.isSelected()) {
             generateStopsToUpload(finalStopsAccepted);
@@ -3041,7 +3043,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
             JOptionPane.showMessageDialog(this, "Nothing to export");
             return;
         }
-        new WriteFile("DUMMY_OSM_CHANGE.osc", osmChangeText);
+        new WriteFile("DUMMY_OSM_CHANGE.osc", osmChangeText);         benchmarking("dummyUploadButtonActionPerformed 2");
         JOptionPane.showMessageDialog(this, "DUMMY_OSM_CHANGE.osc has been written to "+ (new File(".")).getAbsolutePath());
     }//GEN-LAST:event_dummyUploadButtonActionPerformed
 

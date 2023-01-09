@@ -17,10 +17,8 @@ Copyright 2010 University of South Florida
 
 package edu.usf.cutr.go_sync.object;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
+
 import edu.usf.cutr.go_sync.tools.OsmDistance;
 import edu.usf.cutr.go_sync.tag_defs;
 /**
@@ -30,19 +28,33 @@ import edu.usf.cutr.go_sync.tag_defs;
 
 public class Stop extends OsmPrimitive implements Comparable{
 
+    public static final Comparator<Stop> COMPARE_PADDED = new ComparePaddedStopGtfsID();
+    public static class ComparePaddedStopGtfsID implements Comparator<Stop> {
+
+        @Override
+        public int compare(Stop k, Stop j) {
+            return k.getPaddedStopID().compareToIgnoreCase(j.getPaddedStopID());
+
+        }
+    }
 	private final double ERROR_TO_ZERO = 0.5;
 	private final String GTFS_STOP_ID_KEY	= tag_defs.GTFS_STOP_ID_KEY;
     private final String GTFS_OPERATOR_KEY	= tag_defs.GTFS_OPERATOR_KEY;
     private final String GTFS_NAME_KEY		= tag_defs.GTFS_NAME_KEY;
-    private String lat, lon;
+
+
+    private Agency ai;
+
+    private String lat, lon, agencyName, paddedStopID;
     private HashSet<Route> routes;
     private HashSet<RelationMember> osmMembers = new HashSet<>();
     private ArrayList<String> osmWayNodes = new ArrayList<String>();
     public Stop(String stopID, String operatorName, String stopName, String lat, String lon) {
-        osmTags = new Hashtable();
-        if (operatorName == null || operatorName.equals("")) operatorName="none";
-        if (stopID == null || stopID.equals("")) stopID="none";
-        if (stopName == null || stopName.equals("")) stopName="none";
+        osmTags = new java.util.concurrent.ConcurrentHashMap();
+        if (operatorName == null || operatorName.isEmpty()) operatorName="none";
+        if (stopID == null || stopID.isEmpty()) stopID="none";
+        paddedStopID = String.format("%1$" + 10 + "s", stopID);
+        if (stopName == null || stopName.isEmpty()) stopName="none";
 //        osmTags.put("highway", "bus_stop");
         osmTags.put(GTFS_STOP_ID_KEY, stopID);
         osmTags.put(GTFS_OPERATOR_KEY, operatorName);
@@ -64,7 +76,7 @@ public class Stop extends OsmPrimitive implements Comparable{
     }
 
     public Stop(Stop s) {
-        this.osmTags = new Hashtable();
+        this.osmTags = new java.util.concurrent.ConcurrentHashMap();
         this.osmTags.putAll(s.osmTags);
 //        this.osmTags.put("highway", "bus_stop");
 
@@ -95,7 +107,28 @@ public class Stop extends OsmPrimitive implements Comparable{
         this.setOsmData(s);
         //if(s.getOsmNodes()!=null) this.addOsmNodes(s.getOsmNodes());
         routes = new HashSet<Route>();
-        routes.addAll(s.getRoutes());
+        routes.addAll(s.routes);
+        this.ai = s.ai;
+        this.paddedStopID = s.paddedStopID;
+    }
+
+    public void fixNetwork(){
+        if (osmTags.containsKey(tag_defs.TEMP_NETWORK_KEY))
+        if (osmTags.get(tag_defs.TEMP_NETWORK_KEY).isEmpty())
+                osmTags.remove(tag_defs.TEMP_NETWORK_KEY);
+        else
+        {
+            osmTags.put(tag_defs.OSM_NETWORK_KEY, osmTags.get(tag_defs.TEMP_NETWORK_KEY));
+            osmTags.remove(tag_defs.TEMP_NETWORK_KEY);
+        }
+    }
+    public Agency getAgency(){
+        return ai;
+    }
+
+    public void setAgency(Agency ail){
+        ai= ail;
+        agencyName = ail.getName();
     }
 
     /**
@@ -105,8 +138,8 @@ public class Stop extends OsmPrimitive implements Comparable{
     public void setOsmData(Stop s){
         this.setOsmId(s.getOsmId());
         this.setType(s.getType());
-        if(s.getOsmNodes()!=null) this.addOsmNodes(s.getOsmNodes());
-        if(s.getOsmMembers()!=null) this.osmMembers.addAll(s.getOsmMembers());
+        if(s.osmWayNodes !=null) this.addOsmNodes(s.osmWayNodes);
+        if(s.osmMembers !=null) this.osmMembers.addAll(s.osmMembers);
 
     }
 
@@ -129,6 +162,9 @@ public class Stop extends OsmPrimitive implements Comparable{
 
     public String getStopID(){
         return (String)osmTags.get(GTFS_STOP_ID_KEY);
+    }
+    public String getPaddedStopID(){
+        return paddedStopID;
     }
 
     public String getOperatorName(){
@@ -160,8 +196,8 @@ public class Stop extends OsmPrimitive implements Comparable{
 
     public int compareTo(Object o){
         Stop s = (Stop) o;
-        double distance = OsmDistance.distVincenty(this.getLat(), this.getLon(),
-                            s.getLat(), s.getLon());
+        double distance = OsmDistance.distVincenty(this.lat, this.lon,
+                s.lat, s.lon);
         if (!(this.getStopID().equals("none")) && !(this.getStopID().equals("missing"))
                 && (!(s.getStopID().equals("none"))) && (!(s.getStopID().equals("missing")))
                 && (!this.getOperatorName().equals("none")) && (!s.getOperatorName().equals("none"))
@@ -199,11 +235,11 @@ public class Stop extends OsmPrimitive implements Comparable{
         Stop st = new Stop(this);
         if (st.getOsmId()!=null) {
             temp = temp+"node_id:"+st.getOsmId()+";name:"+st.getStopName()+";lat:"+
-                    st.getLat()+";lon:"+st.getLon();
+                    st.lat +";lon:"+ st.lon;
         }
         else {
             temp = temp+"name:"+st.getStopName()+";lat:"+
-                    st.getLat()+";lon:"+st.getLon();
+                    st.lat +";lon:"+ st.lon;
         }
         HashSet<String> keys = st.keySet();
         Iterator it = keys.iterator();

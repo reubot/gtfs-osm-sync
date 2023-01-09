@@ -74,10 +74,22 @@ public class HttpRequest {
             }
 */
 
+/*
             if ((k).getOsmId().hashCode() > (j).getOsmId().hashCode())
                 return 1;
             return -1;
+*/
+            return k.getOsmId().compareToIgnoreCase(j.getOsmId());
+        }
 
+
+    }
+
+    public class CompareStopGTFSstrID implements  Comparator<Stop>{
+
+        @Override
+        public int compare(Stop k, Stop j) {
+            return k.getStopID().compareToIgnoreCase(j.getStopID());
         }
 
 
@@ -415,7 +427,7 @@ public class HttpRequest {
         if (r!=null) routeKeys.addAll(routes.keySet());
         StringBuilder text = new StringBuilder();
         List<Stop> stops = new ArrayList<Stop>(addStop);
-        stops.sort(new CompareStopGtfsID());
+        stops.sort(new CompareStopGTFSstrID());
         text.append(oprinter.osmChangeCreate());
         int id=0,i=0;
         for(Stop st:stops){
@@ -432,7 +444,7 @@ public class HttpRequest {
         }
         text.append(oprinter.osmChangeModify());
         stops = new ArrayList<Stop>(modifyStop);
-//        stops.sort(new CompareStopGtfsID());
+////        stops.sort(new CompareStopGtfsID());
         stops.sort(new CompareStopOsmID());
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();
@@ -448,7 +460,7 @@ public class HttpRequest {
             }
         }
         stops = new ArrayList<Stop>(deleteStop);
-        stops.sort(new CompareStopGtfsID());
+        stops.sort(new CompareStopGTFSstrID());
         text.append(oprinter.osmChangeDelete());
         for (Stop stop : stops) {
             String nodeid = stop.getOsmId();

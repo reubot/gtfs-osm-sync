@@ -289,8 +289,8 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 
     /** compare osmtag with new gtfs tag
      */
-    public Hashtable<String,String> compareOsmTags(HashMap<String,String> osmtag, OsmPrimitive p) {
-        Hashtable<String,String> diff = new Hashtable<String,String>();
+    public ConcurrentHashMap compareOsmTags(HashMap<String,String> osmtag, OsmPrimitive p) {
+        ConcurrentHashMap diff = new ConcurrentHashMap();
         Hashtable<String,String> t = new Hashtable<String,String>();
         for (String k : p.keySet()) {
             String v = p.getTag(k);
@@ -348,7 +348,8 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                             //add tag
                             r.addTag("name", OperatorInfo.getAbbreviateName()+
                                     " Route "+ r.getRouteRef()); //TODO use long route name instead of creating own
-                            r.addTag(tag_defs.GTFS_OPERATOR_KEY,OperatorInfo.getFullName());
+//                            r.addTag(tag_defs.GTFS_OPERATOR_KEY,OperatorInfo.getFullName());
+                            r.addTag("network",r.getAgency().getName());
 //                            r.addTag("network",OperatorInfo.getFullName());
                             r.addTag("ref", r.getRouteRef());
 //                            r.addTag("route", "bus"); //TODO handle type from gtfs value
@@ -377,7 +378,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
         agencyRoutes.putAll(routes);
 
         updateProgress(10);
-        System.out.println ("routes " + routes.size());
+        System.out.println ("routes with existing OSM stops:" + routes.size());
         this.setMessage("Comparing GTFS routes with OSM routes...");
         System.out.println("Comparing GTFS routes with OSM routes...");
 
@@ -458,7 +459,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 er.addTags(osmtag);
                 er.setOsmVersion(osmRelation.getValue("version"));
 
-                Hashtable diff = compareOsmTags(osmtag, r);
+                ConcurrentHashMap diff = compareOsmTags(osmtag, r);
                 if(!em.containsAll(r.getOsmMembers()) || diff.size()!=0){
                     r.setStatus(OsmPrimitive.status.MODIFY);
                     r.setOsmVersion(osmRelation.getValue("version"));
@@ -643,7 +644,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             // for comparing tag
-                            Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
+                            ConcurrentHashMap diff = compareOsmTags(osmtag, gtfsStop);
                             if (distance>ERROR_TO_ZERO) {
 
                                 if (diff.isEmpty()) {
@@ -852,7 +853,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                     String tempStopId = null;
                     report.remove(s);
                     // empty all the value of the tags
-                    Hashtable<String, String> newTags = s.getTags();
+                    ConcurrentHashMap<String,String> newTags = s.getTags();
                     ArrayList<String> newTagKeys = new ArrayList<String>(newTags.keySet());
                     for (String newTagKey : newTagKeys) {
                         if (newTagKey.equals(tag_defs.GTFS_STOP_ID_KEY))
@@ -964,7 +965,9 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             this.setMessage("Reading GTFS files ... ");
             GTFSReadIn data = new GTFSReadIn();
             String aName = data.readAgency(fileNameInAngency);
+            HashMap<String, Agency> agencies = data.readAgencies(fileNameInAngency);
             System.out.println("Agency Name: " + aName);
+            System.out.println("Agency Names: " + agencies);
             if (aName!= null)
                 OperatorInfo.setFullName(aName);
             List<Stop> st = data.readBusStop(fileNameInStops, OperatorInfo.getFullName(), fileNameInRoutes, fileNameInTrips, fileNameInStopTimes);
@@ -1028,10 +1031,17 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             ArrayList<Stop> arr = new ArrayList<Stop>(entry.getValue());
             reportArrays.put(key, arr);
         }
+
+        for (Stop st:GTFSstops){st.fixNetwork();}
+        for (Stop st:reportArrays.keySet()){st.fixNetwork();}
+        for (Stop st:upload){st.fixNetwork();}
+        for (Stop st:modify){st.fixNetwork();}
+        for (Stop st:delete){st.fixNetwork();}
+
         ReportViewer rv = new ReportViewer(GTFSstops, reportArrays,
-                new HashSet<Stop>(upload),
-                new HashSet<Stop>(modify),
-                new HashSet<Stop>(delete),
+                upload, //new HashSet<Stop>(upload),
+                modify, //new HashSet<Stop>(modify),
+                delete, //new HashSet<Stop>(delete),
                 routes, agencyRoutes, existingRoutes, taskOutput);
 //    	ReportViewer rv = new ReportViewer(GTFSstops, reportArrays, upload, modify, delete, routes, agencyRoutes, existingRoutes, taskOutput);
         String info = "Active OSM bus stop mappers:\n"+osmActiveUsers.toString()+"\n\n";
@@ -1092,7 +1102,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             es.setLastEditedOsmUser(node.getValue("user"));
             es.setLastEditedOsmDate(node.getValue("timestamp"));
             // for comparing tag
-            Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
+            ConcurrentHashMap diff = compareOsmTags(osmtag, gtfsStop);
             if (distance > ERROR_TO_ZERO) {
 
                 if (diff.isEmpty()) {
