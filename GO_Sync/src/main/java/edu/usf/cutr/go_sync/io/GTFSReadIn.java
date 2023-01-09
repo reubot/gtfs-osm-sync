@@ -49,6 +49,7 @@ public class GTFSReadIn {
     }
 
 //TODO handle multiple agencies
+    //https://developers.google.com/transit/gtfs/reference#agencytxt
     public String readAgency(String agency_fName){
         try {
             BufferedReader br = new BufferedReader(new FileReader(agency_fName));
@@ -69,6 +70,30 @@ public class GTFSReadIn {
             return null;
         }
         return null;
+    }
+    //TODO handle multiple agencies
+    //https://developers.google.com/transit/gtfs/reference#agencytxt
+    public HashMap<String,String> readAgencies(String agency_fName){
+        try {
+            HashMap<String,String> agencies= new HashMap<>();
+            BufferedReader br = new BufferedReader(new InputStreamReader(new BOMInputStream(new FileInputStream(agency_fName))));
+            CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
+
+            boolean multiple = parser.getHeaderNames().contains(tag_defs.GTFS_NETWORK_ID_KEY);
+
+            for (CSVRecord csvRecord : parser) {
+                if (multiple)
+                    agencies.put(csvRecord.get(tag_defs.GTFS_NETWORK_ID_KEY),csvRecord.get(tag_defs.GTFS_NETWORK_KEY));
+                else
+                    agencies.put("1",csvRecord.get(tag_defs.GTFS_NETWORK_KEY));
+            }
+            br.close();
+            return agencies;
+        }
+        catch (IOException e) {
+            System.err.println("Error: " + e);
+            return null;
+        }
     }
 
     public List<Stop> readBusStop(String fName, String agencyName, String routes_fName, String trips_fName, String stop_times_fName){
@@ -196,6 +221,7 @@ public class GTFSReadIn {
                         System.exit(0);
                     }
                     // TODO use routes to determine stop tags
+                // TODO railway drop station drop word https://wiki.openstreetmap.org/wiki/Tag:railway%3Dstation#Things_to_avoid
                    // System.err.println(s.getTags());
                     String r = getRoutesInTextByBusStop(stopIDs.get(tempStopId));
 
