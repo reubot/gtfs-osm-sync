@@ -47,7 +47,10 @@ public class tag_defs {
 
     public final static String GTFS_STOP_URL_KEY  = "stop_url";
     public final static String GTFS_ROUTE_URL_KEY  = "route_url";
-    public final static String  OSM_URL_KEY  = "url";
+    public final static String GTFS_ROUTE_DESC_KEY  = "route_url";
+
+    public final static String  OSM_URL_KEY  = "website";
+    public final static String  OSM_DESC_KEY  = "description";
 
     //https://developers.google.com/transit/gtfs/reference#tripstxt
     public final static String GTFS_ROUTE_ID_KEY    = "route_id";
