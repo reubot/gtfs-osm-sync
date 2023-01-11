@@ -245,7 +245,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
      * @param eRoutes existingRoutes
      * @param to taskOutput
      */
-    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, HashSet<Stop>u, HashSet<Stop>m, HashSet<Stop>d, Hashtable<String, Route> routes, Hashtable<String, Route> nRoutes, Hashtable<String, Route> eRoutes, JTextArea to) {
+    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, Set<Stop>u, Set<Stop>m, Set<Stop>d, Hashtable<String, Route> routes, Hashtable<String, Route> nRoutes, Hashtable<String, Route> eRoutes, JTextArea to) {
 
 //    public ReportViewer(List<Stop> aData, Hashtable<Stop, ArrayList<Stop>> r, HashSet<Stop>u, HashSet<Stop>m, HashSet<Stop>d, Hashtable routes, Hashtable nRoutes, Hashtable eRoutes, JTextArea to) {
         super("GO-Sync: Report");
@@ -280,13 +280,13 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
 
         stopTableModel = new TagReportTableModel(0);
 
-        upload = new HashSet<Stop>();
+        upload = new HashSet<Stop>(u.size());
         upload.addAll(u);
 
-        modify = new HashSet<Stop>();
+        modify = new HashSet<Stop>(m.size());
         modify.addAll(m);
 
-        delete = new HashSet<Stop>();
+        delete = new HashSet<Stop>(d.size());
         delete.addAll(d);
 
         finalCheckboxesBP = new HashMap<String, ArrayList<BooleanPair>>();

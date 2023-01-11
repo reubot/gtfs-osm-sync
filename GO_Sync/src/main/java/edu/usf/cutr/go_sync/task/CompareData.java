@@ -1031,9 +1031,9 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             reportArrays.put(key, arr);
         }
         ReportViewer rv = new ReportViewer(GTFSstops, reportArrays,
-                new HashSet<Stop>(upload),
-                new HashSet<Stop>(modify),
-                new HashSet<Stop>(delete),
+                upload, //new HashSet<Stop>(upload),
+                modify, //new HashSet<Stop>(modify),
+                delete, //new HashSet<Stop>(delete),
                 routes, agencyRoutes, existingRoutes, taskOutput);
 //    	ReportViewer rv = new ReportViewer(GTFSstops, reportArrays, upload, modify, delete, routes, agencyRoutes, existingRoutes, taskOutput);
         String info = "Active OSM bus stop mappers:\n"+osmActiveUsers.toString()+"\n\n";
