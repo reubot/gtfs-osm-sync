@@ -964,7 +964,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             this.setMessage("Reading GTFS files ... ");
             GTFSReadIn data = new GTFSReadIn();
             String aName = data.readAgency(fileNameInAngency);
-            HashMap<String,String> agencies = data.readAgencies(fileNameInAngency);
+            HashMap<String, OperatorInfo> agencies = data.readAgencies(fileNameInAngency);
             System.out.println("Agency Name: " + aName);
             System.out.println("Agency Names: " + agencies);
             if (aName!= null)

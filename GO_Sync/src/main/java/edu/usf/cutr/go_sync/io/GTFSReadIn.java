@@ -57,10 +57,10 @@ public class GTFSReadIn {
 
             for (CSVRecord csvRecord : parser) {
                 String agencyName;
-                if (csvRecord.get(tag_defs.GTFS_NETWORK_KEY) == null ||
-                    csvRecord.get(tag_defs.GTFS_NETWORK_KEY).isEmpty())
+                if (csvRecord.get(tag_defs.GTFS_NETWORK_NAME) == null ||
+                    csvRecord.get(tag_defs.GTFS_NETWORK_NAME).isEmpty())
                     agencyName = csvRecord.get(tag_defs.GTFS_NETWORK_ID_KEY);
-                else agencyName = csvRecord.get(tag_defs.GTFS_NETWORK_KEY);
+                else agencyName = csvRecord.get(tag_defs.GTFS_NETWORK_NAME);
                 br.close();
                 return agencyName;
             }
@@ -73,19 +73,21 @@ public class GTFSReadIn {
     }
     //TODO handle multiple agencies
     //https://developers.google.com/transit/gtfs/reference#agencytxt
-    public HashMap<String,String> readAgencies(String agency_fName){
+    public HashMap<String, OperatorInfo> readAgencies(String agency_fName){
         try {
-            HashMap<String,String> agencies= new HashMap<>();
+            HashMap<String,OperatorInfo> agencies= new HashMap<>();
             BufferedReader br = new BufferedReader(new InputStreamReader(new BOMInputStream(new FileInputStream(agency_fName))));
             CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withHeader());
 
             boolean multiple = parser.getHeaderNames().contains(tag_defs.GTFS_NETWORK_ID_KEY);
 
             for (CSVRecord csvRecord : parser) {
+                OperatorInfo oi = new  OperatorInfo(csvRecord.get(tag_defs.GTFS_NETWORK_NAME),"","","",0,agency_fName);
+
                 if (multiple)
-                    agencies.put(csvRecord.get(tag_defs.GTFS_NETWORK_ID_KEY),csvRecord.get(tag_defs.GTFS_NETWORK_KEY));
+                    agencies.put(csvRecord.get(tag_defs.GTFS_NETWORK_ID_KEY),oi);
                 else
-                    agencies.put("1",csvRecord.get(tag_defs.GTFS_NETWORK_KEY));
+                    agencies.put("1",oi);
             }
             br.close();
             return agencies;
