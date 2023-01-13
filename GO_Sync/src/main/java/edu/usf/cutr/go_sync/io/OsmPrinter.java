@@ -16,6 +16,7 @@ Copyright 2010 University of South Florida
 **/
 package edu.usf.cutr.go_sync.io;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -86,21 +87,20 @@ public class OsmPrinter {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
             changesetText = "changeset='" + changeSetID+ '\'';
-        String text="";
+        StringBuilder text= new StringBuilder();
         Stop s = new Stop(st);
 
         if (st.getType()== null)
             st.setType(tag_defs.primative_type.NODE);
         switch (st.getType()) {
             case NODE:
-                text += "<node " + changesetText + " id='" + nodeID
-                        + "' lat='" + st.getLat() + "' lon='" + st.getLon();
+                text.append("<node ").append(changesetText).append(" id='").append(nodeID).append("' lat='").append(st.getLat()).append("' lon='").append(st.getLon());
                 break;
             case WAY:
-                text += "<way " + changesetText + " id='" + nodeID;
+                text.append("<way ").append(changesetText).append(" id='").append(nodeID);
                 break;
             case RELATION:
-                text += "<relation " + changesetText + " id='" + nodeID;
+                text.append("<relation ").append(changesetText).append(" id='").append(nodeID);
         }
 
         // if modify, we need version number
@@ -108,41 +108,42 @@ public class OsmPrinter {
             String oVersion = st.getOsmVersion();
 //            if (modify)
 //                oVersion= Integer.toString(Integer.parseInt(oVersion)+1);
-            text += "' version='"+oVersion;
-            text += "'>\n";
+            text.append("' version='").append(oVersion);
+            text.append("'>\n");
         }
         // mainly for create new node
         else {
-            text += "'>\n";
+            text.append("'>\n");
             if(st.getTag(APPLICATION_CREATOR_KEY)!=null && !st.getTag(APPLICATION_CREATOR_KEY).equals("none")) {
-                text += "<tag k='"+APPLICATION_CREATOR_KEY+"' v='"+APPLICATION_CREATOR_NAME+"' />\n";
+                text.append("<tag k='" + APPLICATION_CREATOR_KEY + "' v='" + APPLICATION_CREATOR_NAME + "' />\n");
             }
         }
         //add tag
-        HashSet<String> keys = new HashSet<String>(s.keySet().size());
-        keys.addAll(s.keySet());
+        ArrayList<String> keys = new ArrayList<>(s.keySet());
+//        keys.addAll(s.keySet());
+        keys.sort(String.CASE_INSENSITIVE_ORDER);
         for (String k : keys) {
             if (!s.getTag(k).equals("none")) {
-                text += "<tag k='" + OsmFormatter.getValidXmlText(k) + "' v='" + OsmFormatter.getValidXmlText(s.getTag(k)) + "' />\n";
+                text.append("<tag k='").append(OsmFormatter.getValidXmlText(k)).append("' v='").append(OsmFormatter.getValidXmlText(s.getTag(k))).append("' />\n");
             }
         }
         switch (st.getType()) {
             case WAY:
                 for (String nd:st.getOsmNodes())
-                    text += "<nd ref='" + nd + "' />\n";
-                text += "</way>\n";
+                    text.append("<nd ref='").append(nd).append("' />\n");
+                text.append("</way>\n");
                 break;
             case RELATION:
-                text += writeMembers(st.getOsmMembers());
-                text += "</relation>\n";
+                text.append(writeMembers(st.getOsmMembers()));
+                text.append("</relation>\n");
                 break;
             case NODE:
             default:
-                text += "</node>\n";
+                text.append("</node>\n");
 
         }
 
-        return text;
+        return text.toString();
     }
     public String writeMembers(HashSet<RelationMember> members){
         StringBuilder text= new StringBuilder();
@@ -163,43 +164,40 @@ public class OsmPrinter {
         String changesetText = " ";
         if (!changeSetID.equals("DUMMY"))
             changesetText = "changeset='" + changeSetID+ '\'';
-        String text="";
+        StringBuilder text= new StringBuilder();
         Route route = new Route(r);
         // if modify, we need version number
         if(r.getOsmVersion()!=null) {
             String oVersion = r.getOsmVersion();
                 if(r.getStatus()== OsmPrimitive.status.MODIFY)
                    oVersion= Integer.toString(Integer.parseInt(oVersion)+1);
-                text += "<relation " + changesetText + " id='" + routeID
-                    + "' version='"+oVersion + "'>\n";
+                text.append("<relation ").append(changesetText).append(" id='").append(routeID).append("' version='").append(oVersion).append("'>\n");
         }
         // mainly for create new relation
         else {
-            text += "<relation  " + changesetText + "  id='" + routeID
-                    + "' version='"+ routeID +"'>\n";
-            text += "<tag k='"+APPLICATION_CREATOR_KEY+"' v='"+APPLICATION_CREATOR_NAME+"' />\n";
+            text.append("<relation  ").append(changesetText).append("  id='").append(routeID).append("' version='").append(routeID).append("'>\n");
+            text.append("<tag k='" + APPLICATION_CREATOR_KEY + "' v='" + APPLICATION_CREATOR_NAME + "' />\n");
         }
         //add member
         HashSet<RelationMember> members = route.getOsmMembers();
         Iterator it = members.iterator();
         while (it.hasNext()){
             RelationMember rm = (RelationMember) it.next();
-            if(rm.getRole()!=null) text += "<member type='"+rm.getType()+"' ref='"+rm.getRef()+
-                    "' role='"+OsmFormatter.getValidXmlText(rm.getRole())+"' />\n";
-            else text += "<member type='"+rm.getType()+"' ref='"+rm.getRef()+"' role='' />\n";
+            if(rm.getRole()!=null) text.append("<member type='").append(rm.getType()).append("' ref='").append(rm.getRef()).append("' role='").append(OsmFormatter.getValidXmlText(rm.getRole())).append("' />\n");
+            else text.append("<member type='").append(rm.getType()).append("' ref='").append(rm.getRef()).append("' role='' />\n");
         }
         //add tag
-        HashSet<String> keys = new HashSet<String>(route.keySet().size());
-        keys.addAll(route.keySet());
+        ArrayList<String> keys = new ArrayList<>(route.keySet());
+//              keys.addAll(route.keySet());  keys.addAll(s.keySet());
+        keys.sort(String.CASE_INSENSITIVE_ORDER);
         it = keys.iterator();
         while (it.hasNext()){
             String k = (String) it.next();
             if (!route.getTag(k).equals("none")) {
-                text += "<tag k='"+OsmFormatter.getValidXmlText(k)+
-                        "' v='"+OsmFormatter.getValidXmlText(route.getTag(k))+"' />\n";
+                text.append("<tag k='").append(OsmFormatter.getValidXmlText(k)).append("' v='").append(OsmFormatter.getValidXmlText(route.getTag(k))).append("' />\n");
             }
         }
-        text += "</relation>\n";
-        return text;
+        text.append("</relation>\n");
+        return text.toString();
     }
 }
