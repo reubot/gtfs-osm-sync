@@ -348,7 +348,8 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                             //add tag
                             r.addTag("name", OperatorInfo.getAbbreviateName()+
                                     " Route "+ r.getRouteRef()); //TODO use long route name instead of creating own
-                            r.addTag(tag_defs.GTFS_OPERATOR_KEY,OperatorInfo.getFullName());
+//                            r.addTag(tag_defs.GTFS_OPERATOR_KEY,OperatorInfo.getFullName());
+                            r.addTag("network",r.getAgency().getName());
 //                            r.addTag("network",OperatorInfo.getFullName());
                             r.addTag("ref", r.getRouteRef());
 //                            r.addTag("route", "bus"); //TODO handle type from gtfs value
@@ -377,7 +378,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
         agencyRoutes.putAll(routes);
 
         updateProgress(10);
-        System.out.println ("routes " + routes.size());
+        System.out.println ("routes with existing OSM stops:" + routes.size());
         this.setMessage("Comparing GTFS routes with OSM routes...");
         System.out.println("Comparing GTFS routes with OSM routes...");
 
@@ -964,7 +965,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             this.setMessage("Reading GTFS files ... ");
             GTFSReadIn data = new GTFSReadIn();
             String aName = data.readAgency(fileNameInAngency);
-            HashMap<String, OperatorInfo> agencies = data.readAgencies(fileNameInAngency);
+            HashMap<String, Agency> agencies = data.readAgencies(fileNameInAngency);
             System.out.println("Agency Name: " + aName);
             System.out.println("Agency Names: " + agencies);
             if (aName!= null)

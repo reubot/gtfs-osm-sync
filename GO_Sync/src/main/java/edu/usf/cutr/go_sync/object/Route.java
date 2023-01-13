@@ -27,9 +27,10 @@ import java.util.Iterator;
  */
 
 public class Route extends OsmPrimitive implements Comparable{
-    private String routeId, routeRef, operatorName;
+    private String routeId, routeRef, operatorName, agencyName;
     private HashSet<RelationMember> osmMembers;
     private final String route_id_key = "gtfs_route_id";
+    private Agency ai;
 
     public Route(String rId, String rRef, String op) {
         osmTags = new Hashtable();
@@ -58,6 +59,11 @@ public class Route extends OsmPrimitive implements Comparable{
         if(getStatus()!=null) this.setStatus(r.getStatus());
         this.setLastEditedOsmDate(r.getLastEditedOsmDate());
         this.setLastEditedOsmUser(r.getLastEditedOsmUser());
+        this.ai = r.ai;
+        this.agencyName = r.agencyName;
+
+
+        //todo make agency class
     }
 
     public void addOsmMember(RelationMember osmNodeId){
@@ -91,6 +97,15 @@ public class Route extends OsmPrimitive implements Comparable{
 
     public String getOperatorName(){
         return operatorName;
+    }
+
+    public Agency getAgency(){
+        return ai;
+    }
+
+    public void setAgency(Agency ail){
+        ai= ail;
+        agencyName = ail.getName();
     }
 
     public String getRouteId(){
