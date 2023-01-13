@@ -39,7 +39,7 @@ public class Stop extends OsmPrimitive implements Comparable{
     private HashSet<RelationMember> osmMembers = new HashSet<>();
     private ArrayList<String> osmWayNodes = new ArrayList<String>();
     public Stop(String stopID, String operatorName, String stopName, String lat, String lon) {
-        osmTags = new Hashtable();
+        osmTags = new java.util.concurrent.ConcurrentHashMap();
         if (operatorName == null || operatorName.equals("")) operatorName="none";
         if (stopID == null || stopID.equals("")) stopID="none";
         if (stopName == null || stopName.equals("")) stopName="none";
@@ -64,7 +64,7 @@ public class Stop extends OsmPrimitive implements Comparable{
     }
 
     public Stop(Stop s) {
-        this.osmTags = new Hashtable();
+        this.osmTags = new java.util.concurrent.ConcurrentHashMap();
         this.osmTags.putAll(s.osmTags);
 //        this.osmTags.put("highway", "bus_stop");
 

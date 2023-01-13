@@ -33,7 +33,7 @@ public class Route extends OsmPrimitive implements Comparable{
     private Agency ai;
 
     public Route(String rId, String rRef, String op) {
-        osmTags = new Hashtable();
+        osmTags = new java.util.concurrent.ConcurrentHashMap();
         osmMembers = new HashSet<RelationMember>();
         routeId = rId;
         if(rId!=null) this.osmTags.put(route_id_key, rId);
@@ -42,7 +42,7 @@ public class Route extends OsmPrimitive implements Comparable{
     }
 
     public Route(Route r) {
-        this.osmTags = new Hashtable();
+        this.osmTags = new java.util.concurrent.ConcurrentHashMap();
         if(r.osmTags!=null) this.osmTags.putAll(r.osmTags);
         this.osmMembers = new HashSet<RelationMember>();
         if(r.getOsmMembers()!=null) this.osmMembers.addAll(r.getOsmMembers());

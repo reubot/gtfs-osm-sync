@@ -289,8 +289,8 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
 
     /** compare osmtag with new gtfs tag
      */
-    public Hashtable<String,String> compareOsmTags(HashMap<String,String> osmtag, OsmPrimitive p) {
-        Hashtable<String,String> diff = new Hashtable<String,String>();
+    public ConcurrentHashMap compareOsmTags(HashMap<String,String> osmtag, OsmPrimitive p) {
+        ConcurrentHashMap diff = new ConcurrentHashMap();
         Hashtable<String,String> t = new Hashtable<String,String>();
         for (String k : p.keySet()) {
             String v = p.getTag(k);
@@ -459,7 +459,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                 er.addTags(osmtag);
                 er.setOsmVersion(osmRelation.getValue("version"));
 
-                Hashtable diff = compareOsmTags(osmtag, r);
+                ConcurrentHashMap diff = compareOsmTags(osmtag, r);
                 if(!em.containsAll(r.getOsmMembers()) || diff.size()!=0){
                     r.setStatus(OsmPrimitive.status.MODIFY);
                     r.setOsmVersion(osmRelation.getValue("version"));
@@ -644,7 +644,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                             es.setLastEditedOsmUser(node.getValue("user"));
                             es.setLastEditedOsmDate(node.getValue("timestamp"));
                             // for comparing tag
-                            Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
+                            ConcurrentHashMap diff = compareOsmTags(osmtag, gtfsStop);
                             if (distance>ERROR_TO_ZERO) {
 
                                 if (diff.isEmpty()) {
@@ -853,7 +853,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
                     String tempStopId = null;
                     report.remove(s);
                     // empty all the value of the tags
-                    Hashtable<String, String> newTags = s.getTags();
+                    ConcurrentHashMap<String,String> newTags = s.getTags();
                     ArrayList<String> newTagKeys = new ArrayList<String>(newTags.keySet());
                     for (String newTagKey : newTagKeys) {
                         if (newTagKey.equals(tag_defs.GTFS_STOP_ID_KEY))
@@ -1095,7 +1095,7 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             es.setLastEditedOsmUser(node.getValue("user"));
             es.setLastEditedOsmDate(node.getValue("timestamp"));
             // for comparing tag
-            Hashtable<String, String> diff = compareOsmTags(osmtag, gtfsStop);
+            ConcurrentHashMap diff = compareOsmTags(osmtag, gtfsStop);
             if (distance > ERROR_TO_ZERO) {
 
                 if (diff.isEmpty()) {
