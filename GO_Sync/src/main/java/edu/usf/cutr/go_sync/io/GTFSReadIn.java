@@ -240,14 +240,13 @@ public class GTFSReadIn {
                     }
                 String n = getNetworksInTextByBusStop(stopIDs.get(tempStopId));
 
-/*  FIXME this creates duplicates in reportkeys
-            generate tag for routes using stop
+//  FIXME this creates duplicates in reportkeys
                 if (!n.isEmpty()) {
-                    s.addAndOverwriteTag(tag_defs.OSM_NETWORK_KEY, n);
+                    s.addTag(tag_defs.TEMP_NETWORK_KEY, n);
 //todo get network from routes
                 }
 
- */
+
                     HashSet<Route> asdf = stopIDs.get(tempStopId);
                     if(asdf!=null)s.addRoutes(stopIDs.get(tempStopId));
 

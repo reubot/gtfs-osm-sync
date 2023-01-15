@@ -37,11 +37,11 @@ public class OperatorInfo {
         aliasName = aName;
         addName(fullName);
         addName(abbreviate);
-        if(aliasName!=null && !aliasName.equals("")){
+        if(aliasName!=null && !aliasName.isEmpty()){
             String[] temp;
             temp = aliasName.split(";");
-            for(int i=0; i<temp.length; i++){
-                addName(temp[i]);
+            for (String s : temp) {
+                addName(s);
             }
         }
         ntdID = id;
@@ -70,11 +70,11 @@ public class OperatorInfo {
         fullName = aName;
         addName(fullName);
         addName(abbreviate);
-        if(aliasName!=null && !aliasName.equals("")){
+        if(aliasName!=null && !aliasName.isEmpty()){
             String[] temp;
             temp = aliasName.split(";");
-            for(int i=0; i<temp.length; i++){
-                addName(temp[i]);
+            for (String s : temp) {
+                addName(s);
             }
         }
     }
@@ -92,15 +92,15 @@ public class OperatorInfo {
 
     public static void addName(String name){
         // generate possible name for operator fields e.g. HART / Hillsborough Area Regional Transit
-        if(name!=null && !name.equals("")) {
+        if(name!=null && !name.isEmpty()) {
             possibleOperatorName.add(name.toUpperCase());
         }
     }
 
     public static boolean isTheSameOperator(String osmOperator) {
-        for (int i=0; i<possibleOperatorName.size(); i++) {
-            if (osmOperator.toUpperCase().contains(possibleOperatorName.get(i)) ||
-                    possibleOperatorName.get(i).contains(osmOperator.toUpperCase())) {
+        for (String s : possibleOperatorName) {
+            if (osmOperator.toUpperCase().contains(s) ||
+                    s.contains(osmOperator.toUpperCase())) {
                 return true;
             }
         }

@@ -22,6 +22,8 @@ public class tag_defs {
 
     public final static String GTFS_NETWORK_ID_KEY  = "agency_id";
     public final static String  OSM_NETWORK_KEY  = "network";
+    public final static String  TEMP_NETWORK_KEY  = "temp_network";
+
     public final static String GTFS_ZONE_KEY  = "zone_id";
     public final static String  OSM_ZONE_KEY  = "transport:zone";
     public final static String GTFS_PLATFORM_KEY  = "platform_code";

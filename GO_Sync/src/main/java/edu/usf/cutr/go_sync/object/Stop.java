@@ -112,6 +112,13 @@ public class Stop extends OsmPrimitive implements Comparable{
         this.paddedStopID = s.paddedStopID;
     }
 
+    public void fixNetwork(){
+        if (osmTags.containsKey(tag_defs.TEMP_NETWORK_KEY))
+        {
+            osmTags.put(tag_defs.OSM_NETWORK_KEY, osmTags.get(tag_defs.TEMP_NETWORK_KEY));
+            osmTags.remove(tag_defs.TEMP_NETWORK_KEY);
+        }
+    }
     public Agency getAgency(){
         return ai;
     }
