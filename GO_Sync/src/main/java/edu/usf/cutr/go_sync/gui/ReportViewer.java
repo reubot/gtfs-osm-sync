@@ -300,7 +300,7 @@ public class ReportViewer extends javax.swing.JFrame implements TableModelListen
         // TODO: use comparator / java.util.Collections.sort()
         ArrayList<Stop> reportKeys = new ArrayList<Stop>(report.keySet());
         //ordering by hashcode
-        reportKeys.sort(new CompareStopGtfsID());
+        reportKeys.sort(Stop.COMPARE_PADDED);//new CompareStopGtfsID());
         benchmarking("reportKeys sort");
 
         final Stop[] emptystoplist = new Stop[0];

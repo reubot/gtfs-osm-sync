@@ -103,8 +103,8 @@ public class GTFSReadIn {
 
     public List<Stop> readBusStop(String fName, String agencyName, String routes_fName, String trips_fName, String stop_times_fName){
         long tStart = System.currentTimeMillis();
-        HashMap<String, HashSet<Route>> id = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
-        HashMap<String, HashSet<Route>> stopIDs = new HashMap<String, HashSet<Route>>(id);
+        HashMap<String, HashSet<Route>> routeIDs = matchRouteToStop(routes_fName, trips_fName, stop_times_fName);
+        HashMap<String, HashSet<Route>> stopIDs = new HashMap<String, HashSet<Route>>(routeIDs);
 
         String thisLine;
         String [] elements;
@@ -234,7 +234,20 @@ public class GTFSReadIn {
                     String r = getRoutesInTextByBusStop(stopIDs.get(tempStopId));
 
 //             generate tag for routes using stop
-                    if (!r.isEmpty()) s.addTag(ROUTE_KEY, r);
+                    if (!r.isEmpty()) {
+                        s.addTag(ROUTE_KEY, r);
+//todo get network from routes
+                    }
+                String n = getNetworksInTextByBusStop(stopIDs.get(tempStopId));
+
+/*  FIXME this creates duplicates in reportkeys
+            generate tag for routes using stop
+                if (!n.isEmpty()) {
+                    s.addAndOverwriteTag(tag_defs.OSM_NETWORK_KEY, n);
+//todo get network from routes
+                }
+
+ */
                     HashSet<Route> asdf = stopIDs.get(tempStopId);
                     if(asdf!=null)s.addRoutes(stopIDs.get(tempStopId));
 
@@ -485,6 +498,21 @@ public class GTFSReadIn {
             ArrayList<Route> routes = new ArrayList<Route>(r);
             for (Route rr:routes) {
                 routeRefSet.add(rr.getRouteRef());
+            }
+            text = String.join(";",routeRefSet);
+        }
+        return text;
+    }
+
+    public String getNetworksInTextByBusStop(HashSet<Route> r) {
+        String text="";
+
+        if (r!=null) {
+            TreeSet<String> routeRefSet = new TreeSet<String>(new hashCodeCompare());
+            //convert from hashset to arraylist
+            ArrayList<Route> routes = new ArrayList<Route>(r);
+            for (Route rr:routes) {
+                routeRefSet.add(rr.getAgency().getName());
             }
             text = String.join(";",routeRefSet);
         }
