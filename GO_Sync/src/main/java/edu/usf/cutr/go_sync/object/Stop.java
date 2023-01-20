@@ -114,6 +114,9 @@ public class Stop extends OsmPrimitive implements Comparable{
 
     public void fixNetwork(){
         if (osmTags.containsKey(tag_defs.TEMP_NETWORK_KEY))
+        if (osmTags.get(tag_defs.TEMP_NETWORK_KEY).isEmpty())
+                osmTags.remove(tag_defs.TEMP_NETWORK_KEY);
+        else
         {
             osmTags.put(tag_defs.OSM_NETWORK_KEY, osmTags.get(tag_defs.TEMP_NETWORK_KEY));
             osmTags.remove(tag_defs.TEMP_NETWORK_KEY);

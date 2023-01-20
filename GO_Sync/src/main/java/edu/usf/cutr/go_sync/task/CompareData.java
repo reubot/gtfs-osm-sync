@@ -1031,6 +1031,13 @@ private Hashtable<String, Route> routes = new Hashtable<String, Route>();
             ArrayList<Stop> arr = new ArrayList<Stop>(entry.getValue());
             reportArrays.put(key, arr);
         }
+
+        for (Stop st:GTFSstops){st.fixNetwork();}
+        for (Stop st:reportArrays.keySet()){st.fixNetwork();}
+        for (Stop st:upload){st.fixNetwork();}
+        for (Stop st:modify){st.fixNetwork();}
+        for (Stop st:delete){st.fixNetwork();}
+
         ReportViewer rv = new ReportViewer(GTFSstops, reportArrays,
                 upload, //new HashSet<Stop>(upload),
                 modify, //new HashSet<Stop>(modify),
