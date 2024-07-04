@@ -159,10 +159,19 @@ public class RouteVariant {
         String tripDepartureTime = stops.get(firstStopIndex).getDeparture_time();
         Integer lastStopIndex = Collections.max(stops.keySet());
         String tripArrivalTime = stops.get(lastStopIndex).getArrival_time();
+        try {
+            LocalTime tripDepartureTimeLT = LocalTime.parse(tripDepartureTime, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            LocalTime tripArrivalTimeLT = LocalTime.parse(tripArrivalTime, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            return Duration.between(tripDepartureTimeLT, tripArrivalTimeLT);
+        }catch(Exception e)
+        {
+            //TODO handle overnight values properly
+            System.out.println(e);
+            System.out.println(e.getStackTrace());
+            e.printStackTrace();
+            return Duration.ZERO;
+        }
 
-        LocalTime tripDepartureTimeLT = LocalTime.parse(tripDepartureTime, DateTimeFormatter.ofPattern("HH:mm:ss"));
-        LocalTime tripArrivalTimeLT = LocalTime.parse(tripArrivalTime, DateTimeFormatter.ofPattern("HH:mm:ss"));
-        return Duration.between(tripDepartureTimeLT, tripArrivalTimeLT);
     }
 
     public String getDuration() {

@@ -611,7 +611,7 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                 osmStopTypeByGtfsStopId.put(gtfs_id.toString(), OSMNodes.get(i).geOsmPrimitiveType());
             }
         }
-
+        System.out.println("        for (HashMap.Entry<String, RouteVariant> rv_entry : allRouteVariants.entrySet())");
         for (HashMap.Entry<String, RouteVariant> rv_entry : allRouteVariants.entrySet()) {
             RouteVariant rv = rv_entry.getValue();
             //Route r = new Route(rv.getOsmValue("gtfs:route_id"), rv.getOsmValue("ref"), OperatorInfo.getFullName());
@@ -716,7 +716,8 @@ private ArrayList<Hashtable> OSMRelationTags = new ArrayList<Hashtable>();
                 routesByShortName.put(ri.getRouteRef(),ri);}
             catch (Exception e)
             {
-                System.out.println(e);
+                System.out.println("exception\t" + e);
+                System.out.println(e.getStackTrace());
                 e.printStackTrace();
             }
 //        	        	routesByShortName.put(ri.getTag("route_short_name"),ri);
